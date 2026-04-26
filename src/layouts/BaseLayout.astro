@@ -3,7 +3,6 @@ import '../styles/global.css';
 import { getManifoldLocaleBundle, type ManifoldLocale } from '../i18n/manifoldLocale';
 import { getLocalePath } from '../i18n/localeRouting';
 import { siteMetadata } from '../config/siteMetadata';
-import manifoldModeScriptUrl from '../scripts/manifold-mode.ts?url';
 
 interface Props {
   imageAlt?: string;
@@ -82,7 +81,7 @@ const structuredDataPayload = structuredData
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;800&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;800&display=swap" /></noscript>
-    <link rel="modulepreload" href={manifoldModeScriptUrl} />
+
     <title>{title}</title>
     <script is:inline define:vars={{ localeLiteral }}>
       (() => {
@@ -127,6 +126,8 @@ const structuredDataPayload = structuredData
       })();
     </script>
     <slot />
-    <script type="module" src={manifoldModeScriptUrl} is:inline></script>
+    <script>
+      import '../scripts/manifold-mode.ts';
+    </script>
   </body>
 </html>

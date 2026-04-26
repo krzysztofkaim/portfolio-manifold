@@ -1963,7 +1963,8 @@ body.is-intro-active .hud-mode-picker {
   z-index: 26;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 260ms ease;
+  visibility: hidden;
+  transition: opacity 260ms ease, visibility 260ms ease;
   contain: layout style paint;
 }
 
@@ -2538,6 +2539,8 @@ body.is-intro-active .hud-mode-picker {
 
 body.hud-nav-open .hud-nav-overlay {
   opacity: 1;
+  visibility: visible;
+  display: block !important;
   pointer-events: auto;
 }
 
