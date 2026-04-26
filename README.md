@@ -1,6 +1,6 @@
-# Personal Portfolio
+# Manifold
 
-A professional creative developer portfolio built with Astro 6 and Three.js. This project implements a high-performance single-canvas, multiple-scene architecture utilizing viewport and scissor-testing for seamless transitions and optimal resource management.
+High-performance creative developer portfolio built with Astro 6 and Three.js. Features a custom "Manifold" architecture for multi-scene rendering, infinite logical scrolling, and WebGPU-ready pipeline.
 
 ## Technical foundation
 
