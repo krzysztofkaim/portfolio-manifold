@@ -11,6 +11,7 @@ node_modules/
 dist/
 build/
 out/
+reports/
 
 # Runtime / Tooling
 .astro/
@@ -47,4 +48,3 @@ coverage/
 # Extras
 *.zip
 *.tar.gz
-

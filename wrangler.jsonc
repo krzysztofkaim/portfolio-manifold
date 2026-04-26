@@ -1,6 +1,7 @@
 {
+  "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "manifold",
-  "compatibility_date": "2026-04-26",
+  "compatibility_date": "2026-04-27",
   "assets": {
     "directory": "./dist"
   }

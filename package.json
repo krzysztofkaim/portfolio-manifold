@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev --host",
+    "sync:headers": "node scripts/sync-cloudflare-headers.mjs",
+    "prepare:static": "node scripts/prepare-static-build.mjs",
+    "prebuild": "npm run sync:headers && npm run prepare:static",
     "build": "astro build",
+    "build:analyze": "npm run sync:headers && npm run prepare:static && ANALYZE=true astro build",
     "preview": "astro preview --host",
     "optimize": "bash scripts/optimize-assets.sh",
     "copy-basis": "bash scripts/copy-basis.sh",
