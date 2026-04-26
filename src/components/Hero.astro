@@ -1,0 +1,655 @@
+---
+import {
+  getManifoldLocaleBundle,
+  getNextManifoldLocale,
+  type ManifoldLocale
+} from '../i18n/manifoldLocale';
+
+interface Props {
+  locale?: ManifoldLocale;
+}
+
+const { locale = 'en' } = Astro.props;
+const bundle = getManifoldLocaleBundle(locale);
+const nextLocale = getNextManifoldLocale(locale);
+---
+
+<div class="bg-gradient"></div>
+<div class="bg-gradient-soft"></div>
+<canvas class="liquid-gradient" id="liquid-gradient" aria-hidden="true"
+></canvas>
+
+<div class="custom-cursor is-idle" id="custom-cursor" aria-hidden="true" hidden>
+  <div class="custom-cursor-core"></div>
+  <div class="custom-cursor-ring">
+    <span class="custom-cursor-tick custom-cursor-tick--top"></span>
+    <span class="custom-cursor-tick custom-cursor-tick--right"></span>
+    <span class="custom-cursor-tick custom-cursor-tick--bottom"></span>
+    <span class="custom-cursor-tick custom-cursor-tick--left"></span>
+  </div>
+</div>
+
+<audio id="background-audio" data-src="/audio/musical.mp3" preload="none" loop
+></audio>
+
+<div class="top-ui">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-mark" id="topbar-mark">KK</div>
+      <div class="topbar-copy" id="topbar-copy">
+        <strong id="topbar-name">krzysztof kaim</strong>
+        <span id="topbar-role">{bundle.ui.topbarRole}</span>
+      </div>
+    </div>
+
+    <div class="topbar-center-hint" id="topbar-center-hint"></div>
+    <div class="topbar-loader">
+      <span class="topbar-loader-kicker" id="topbar-loader-kicker"
+        >{bundle.ui.systemLoader}</span
+      >
+      <div class="topbar-loader-progress">
+        <div class="topbar-loader-bar"></div>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <a
+        href={locale === 'pl'
+          ? '/files/krzysztof_kaim_resume.pdf'
+          : '/files/krzysztof_kaim_resume.pdf'}
+        class="topbar-chip topbar-chip--download"
+        id="download-cv"
+        download={locale === 'pl'
+          ? 'Krzysztof_Kaim_Resume_PL.txt'
+          : 'Krzysztof_Kaim_Resume_EN.txt'}
+        aria-label={bundle.ui.cvDownloadAria}
+      >
+        <span class="topbar-chip-icon" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </span>
+        <span
+          class="topbar-chip-label"
+          id="download-cv-label"
+          data-text={bundle.ui.cvLabel}>{bundle.ui.cvLabel}</span
+        >
+      </a>
+
+      <button
+        type="button"
+        class="topbar-chip topbar-chip--contact"
+        id="contact-me"
+        aria-label={bundle.ui.contactAria}
+        data-d="kaim.dev"
+      >
+        <span class="topbar-chip-icon" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          </svg>
+        </span>
+        <span class="topbar-chip-label" id="contact-me-label">
+          <span class="contact-u scramble-target"></span><span class="contact-d scramble-target">@kaim.dev</span>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="topbar-chip topbar-chip--locale"
+        id="toggle-locale"
+        aria-label={nextLocale === 'pl'
+          ? bundle.ui.localeSwitchToPolish
+          : bundle.ui.localeSwitchToEnglish}
+        aria-pressed={locale === 'pl' ? 'true' : 'false'}
+      >
+        <span class="topbar-chip-label" id="toggle-locale-label"
+          >{bundle.ui.localeLabel}</span
+        >
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="hud-nav-overlay" id="hud-nav-overlay" aria-hidden="true">
+  <button
+    type="button"
+    class="hud-nav-backdrop"
+    id="hud-nav-backdrop"
+    tabindex="-1"
+    aria-label={bundle.ui.closeNavigationAria}></button>
+  <div
+    class="hud-nav-panel"
+    id="hud-nav-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="hud-nav-title"
+  >
+    <div class="hud-nav-additional">
+      <span class="hud-nav-additional-label" id="hud-additional-label"
+        >{bundle.ui.additionalOptions}</span
+      >
+      <div class="hud-nav-additional-actions">
+        <button
+          type="button"
+          class="topbar-chip topbar-chip--audio"
+          id="play-audio"
+          aria-label={bundle.audio.playAria}
+        >
+          <span class="topbar-chip-icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polygon points="8 6 18 12 8 18 8 6"></polygon>
+              <path d="M4 6v12"></path>
+            </svg>
+          </span>
+          <span class="topbar-chip-label" id="play-audio-label"
+            >{bundle.audio.playLabel}</span
+          >
+        </button>
+
+        <button
+          type="button"
+          class="topbar-chip topbar-chip--exit hud-nav-return"
+          id="exit-world"
+          aria-label={bundle.ui.returnToEntryAria}
+        >
+          <span class="topbar-chip-icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </span>
+          <span class="topbar-chip-label" id="exit-world-label"
+            >{bundle.ui.return}</span
+          >
+        </button>
+
+        <button
+          type="button"
+          class="topbar-chip topbar-chip--about"
+          id="hud-about-trigger"
+          aria-label={bundle.ui.aboutLabel}
+        >
+          <span class="topbar-chip-icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 20h.01"></path>
+              <path d="M7 20h.01"></path>
+              <path d="M17 20h.01"></path>
+              <path d="M12 16h.01"></path>
+              <path d="M7 16h.01"></path>
+              <path d="M17 16h.01"></path>
+              <path d="M12 12h.01"></path>
+              <path d="M7 12h.01"></path>
+              <path d="M17 12h.01"></path>
+              <path d="M12 8h.01"></path>
+              <path d="M7 8h.01"></path>
+              <path d="M17 8h.01"></path>
+              <path d="M12 4h.01"></path>
+              <path d="M7 4h.01"></path>
+              <path d="M17 4h.01"></path>
+            </svg>
+          </span>
+          <span class="topbar-chip-label" id="hud-about-label"
+            >{bundle.ui.aboutLabel}</span
+          >
+        </button>
+
+        <button
+          type="button"
+          class="topbar-chip topbar-chip--policy"
+          id="hud-policy-trigger"
+          aria-label={bundle.ui.policyLabel}
+        >
+          <span class="topbar-chip-icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3 5 6v6c0 5 3.4 8.6 7 9 3.6-.4 7-4 7-9V6l-7-3Z"
+              ></path>
+              <path d="M9.5 12.5 11 14l4-4"></path>
+            </svg>
+          </span>
+          <span class="topbar-chip-label" id="hud-policy-label"
+            >{bundle.ui.policyLabel}</span
+          >
+        </button>
+
+        <button
+          type="button"
+          class="topbar-chip topbar-chip--orbit hud-nav-toggle"
+          id="toggle-hud-orbits"
+          aria-label={bundle.ui.orbitToggleAria}
+          aria-pressed="false"
+        >
+          <span class="topbar-chip-icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 2v20"></path>
+              <path d="M2 12h20"></path>
+              <path d="m19 9-7 3 7 3"></path>
+              <path d="m5 15 7-3-5-3"></path>
+              <path d="m9 5 3 7 3-7"></path>
+              <path d="m15 19-3-7-3 7"></path>
+            </svg>
+          </span>
+          <span class="topbar-chip-label" id="toggle-hud-orbits-label"
+            >{bundle.ui.orbitToggleInactive}</span
+          >
+        </button>
+      </div>
+      <div class="hud-nav-additional-line" aria-hidden="true"></div>
+    </div>
+    <div class="hud-nav-header" id="hud-nav-header">
+      <div class="hud-nav-spectrum" id="hud-nav-spectrum" aria-hidden="true">
+        {
+          Array.from({ length: 32 }).map((_, i) => (
+            <div class="hud-nav-spectrum-bar" data-index={i} />
+          ))
+        }
+      </div>
+      <div class="hud-nav-header-copy">
+        <span class="hud-nav-kicker" id="hud-nav-kicker"
+          >{bundle.ui.sceneNavigation}</span
+        >
+        <strong id="hud-nav-title">{bundle.ui.jumpAcrossSections}</strong>
+      </div>
+    </div>
+    <div class="hud-nav-tree" id="hud-nav-tree"></div>
+
+    <div
+      class="hud-nav-about"
+      id="hud-nav-about"
+      aria-hidden="true"
+      style="display: none;"
+    >
+      <div class="privacy-section">
+        <div class="privacy-item">
+          <span class="privacy-kicker"
+            >{locale === 'pl' ? 'Stack technologiczny' : 'Tech Stack'}</span
+          >
+          <strong class="privacy-title" id="about-stack"
+            >{bundle.ui.aboutContent.stack}</strong
+          >
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-kicker"
+            >{locale === 'pl' ? 'Inżynieria' : 'System Engineering'}</span
+          >
+          <strong class="privacy-title" id="about-trivia"
+            >{bundle.ui.aboutContent.trivia}</strong
+          >
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-kicker">HARDWARE ACCELERATION</span>
+          <strong class="privacy-title" id="debug-gpu-name"
+            >Detecting GPU...</strong
+          >
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-kicker">MANIFOLD STATE</span>
+          <strong class="privacy-title" id="debug-manifold-data">Ready</strong>
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-kicker">{bundle.ui.aboutContent.build}</span>
+          <strong class="privacy-title" id="about-build"
+            >e7cfdd8 // {
+              new Date().toISOString().replace('T', ' ').split('.')[0]
+            } UTC</strong
+          >
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-kicker">{bundle.ui.aboutContent.runtime}</span>
+          <strong class="privacy-title" id="about-runtime"
+            >{bundle.ui.aboutContent.runtime}</strong
+          >
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-kicker">{bundle.ui.aboutContent.authorTime}</span
+          >
+          <strong class="privacy-title" id="about-time">--:--:--</strong>
+        </div>
+        <div class="privacy-item">
+          <button
+            type="button"
+            class="topbar-chip"
+            id="force-debug-overlay"
+            style="margin-top: 0.5rem; width: 100%;"
+            aria-label={bundle.ui.systemOverlayToggleAria}
+          >
+            <span class="topbar-chip-label"
+              >{bundle.ui.systemOverlayToggleInactive}</span
+            >
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="hud-nav-policy"
+      id="hud-nav-policy"
+      aria-hidden="true"
+      style="display: none;"
+    >
+      <p class="privacy-intro" id="policy-intro">
+        {bundle.ui.policyContent.intro}
+      </p>
+      <div class="privacy-section">
+        <div class="privacy-item">
+          <span class="privacy-kicker" id="policy-processing-title"
+            >{bundle.ui.policyContent.processingTitle}</span
+          >
+          <strong class="privacy-title" id="policy-processing-body"
+            >{bundle.ui.policyContent.processingBody}</strong
+          >
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-kicker" id="policy-storage-title"
+            >{bundle.ui.policyContent.storageTitle}</span
+          >
+          <strong class="privacy-title" id="policy-storage-body"
+            >{bundle.ui.policyContent.storageBody}</strong
+          >
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-kicker" id="policy-audio-title"
+            >{bundle.ui.policyContent.audioTitle}</span
+          >
+          <strong class="privacy-title" id="policy-audio-body"
+            >{bundle.ui.policyContent.audioBody}</strong
+          >
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-kicker" id="policy-telemetry-title"
+            >{bundle.ui.policyContent.telemetryTitle}</span
+          >
+          <strong class="privacy-title" id="policy-telemetry-body"
+            >{bundle.ui.policyContent.telemetryBody}</strong
+          >
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-kicker" id="policy-contact-title"
+            >{bundle.ui.policyContent.contactTitle}</span
+          >
+          <strong class="privacy-title" id="policy-contact-body"
+            >{bundle.ui.policyContent.contactBody}</strong
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hud-orbit hud-orbit--left" id="hud-section-orbit-tree"></div>
+<div
+  class="hud-orbit hud-orbit--right hud-orbit--cards"
+  id="hud-card-orbit-tree"
+>
+</div>
+
+<div class="hud" inert aria-hidden="true">
+  <div class="hud-side-readout hud-side-readout--left">
+    <div class="hud-side-stack hud-side-stack--left">
+      <div>
+        <span id="hud-velocity-label">{bundle.ui.scrollVelocity}</span>
+        <strong id="vel-readout">0.00</strong>
+      </div>
+      <div class="hud-coord-readout">
+        <span class="hud-coord-prefix" id="hud-coord-prefix"
+          >{bundle.ui.coord}</span
+        >
+        <span class="hud-coord-value"><strong id="coord">000.000</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hud-side-readout hud-side-readout--right">
+    <div class="hud-diag" id="diag-control" data-open="false">
+      <button
+        type="button"
+        class="hud-side-toggle"
+        id="diag-toggle"
+        aria-expanded="false"
+      >
+        <div class="hud-side-stack hud-side-stack--diag">
+          <div>
+            <span id="hud-fps-label">{bundle.ui.fps}</span>
+            <strong id="fps">00</strong>
+          </div>
+          <div>
+            <span id="hud-perf-label">{bundle.ui.perf}</span>
+            <strong id="perf-mode">{bundle.ui.fullRate}</strong>
+          </div>
+        </div>
+      </button>
+      <div class="hud-diag-popover" id="diag-popover" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <div class="hud-bottom">
+    <div class="hud-line hud-line--break">
+      <button
+        type="button"
+        class="hud-advance hud-advance--prev"
+        id="hud-advance-prev"
+        aria-label={bundle.ui.previousCardAria}
+      >
+        <span
+          class="hud-advance-glyph hud-advance-glyph--prev"
+          aria-hidden="true"><span></span><span></span></span
+        >
+      </button>
+      <span class="hud-line-segment" aria-hidden="true"></span>
+      <div class="hud-focus-stack">
+        <div class="hud-mode-picker" id="hud-mode-picker">
+          <button
+            type="button"
+            class="hud-mode-toggle"
+            id="hud-mode-toggle"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-label={bundle.ui.menuAriaLabel}
+          >
+            <span class="hud-mode-glyph hud-mode-glyph--left" aria-hidden="true"
+            ></span>
+            <span class="hud-mode-toggle-label" id="hud-mode-toggle-label"
+              >{bundle.ui.mode4D}</span
+            >
+            <span
+              class="hud-mode-glyph hud-mode-glyph--right"
+              aria-hidden="true"></span>
+          </button>
+          <div
+            class="hud-mode-menu"
+            id="hud-mode-menu"
+            role="listbox"
+            aria-hidden="true"
+          >
+            <button
+              type="button"
+              class="hud-mode-option"
+              id="hud-mode-option-2d"
+              data-mode-option="2d"
+              role="option"
+              aria-selected="false"
+            >
+              <span class="hud-mode-glyph hud-mode-glyph--2d" aria-hidden="true"
+              ></span>
+              <span>{bundle.ui.mode2D}</span>
+            </button>
+            <button
+              type="button"
+              class="hud-mode-option"
+              id="hud-mode-option-3d"
+              data-mode-option="3d"
+              role="option"
+              aria-selected="false"
+            >
+              <span class="hud-mode-glyph hud-mode-glyph--3d" aria-hidden="true"
+              ></span>
+              <span>{bundle.ui.mode3D}</span>
+            </button>
+            <button
+              type="button"
+              class="hud-mode-option"
+              id="hud-mode-option-4d"
+              data-mode-option="4d"
+              role="option"
+              aria-selected="true"
+            >
+              <span class="hud-mode-glyph hud-mode-glyph--4d" aria-hidden="true"
+              ></span>
+              <span>{bundle.ui.mode4D}</span>
+            </button>
+          </div>
+        </div>
+        <div class="hud-focus">
+          <div class="hud-focus-feedback" id="hud-focus-feedback"></div>
+          <button
+            type="button"
+            class="hud-focus-trigger"
+            id="hud-focus-trigger"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="hud-nav-overlay"
+          >
+            <span class="hud-focus-copy">
+              <span class="hud-focus-section" id="hud-section"
+                >{bundle.ui.scrollPrompt}</span
+              >
+              <strong class="hud-focus-card" id="hud-card">ACCESS</strong>
+            </span>
+          </button>
+        </div>
+      </div>
+      <span class="hud-line-segment" aria-hidden="true"></span>
+      <button
+        type="button"
+        class="hud-advance hud-advance--next"
+        id="hud-advance-next"
+        aria-label={bundle.ui.nextCardAria}
+      >
+        <span
+          class="hud-advance-glyph hud-advance-glyph--next"
+          aria-hidden="true"><span></span><span></span></span
+        >
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="intro-hint" id="intro-hint" aria-hidden="true">
+  <svg
+    class="intro-hint-line"
+    aria-hidden="true"
+    viewBox="0 0 100 100"
+    preserveAspectRatio="none"
+  >
+    <path class="intro-hint-path" id="intro-hint-path" d=""></path>
+    <circle class="intro-hint-dot" id="intro-hint-dot" cx="0" cy="0" r="0"
+    ></circle>
+  </svg>
+  <div class="intro-hint-copy">
+    <span class="intro-hint-kicker" id="intro-hint-kicker"
+      >{bundle.ui.entryPoint}</span
+    >
+    <strong id="intro-hint-title">{bundle.ui.enteringAutomatically}</strong>
+  </div>
+</div>
+
+<div class="intro-hint context-hint" id="context-hint" aria-hidden="true">
+  <svg
+    class="intro-hint-line"
+    aria-hidden="true"
+    viewBox="0 0 100 100"
+    preserveAspectRatio="none"
+  >
+    <path class="intro-hint-path" id="context-hint-path" d=""></path>
+    <circle class="intro-hint-dot" id="context-hint-dot" cx="0" cy="0" r="0"
+    ></circle>
+  </svg>
+  <div class="intro-hint-copy context-hint-copy">
+    <span class="intro-hint-kicker" id="context-hint-kicker"
+      >{bundle.ui.scrollToBrowse}</span
+    >
+    <strong id="context-hint-title">{bundle.ui.clickCardForDetails}</strong>
+  </div>
+</div>
+
+<div class="viewport" id="viewport">
+  <canvas
+    class="ambient-particle-layer"
+    id="ambient-particle-layer"
+    aria-hidden="true"></canvas>
+  <div class="world" id="world" inert aria-hidden="true"></div>
+  <canvas class="card-chrome-layer" id="card-chrome-layer" aria-hidden="true"
+  ></canvas>
+  <canvas class="four-d-wireframe" id="four-d-wireframe" aria-hidden="true"
+  ></canvas>
+  <div class="two-d-section-frame" id="two-d-section-frame" inert aria-hidden="true">
+    <div class="two-d-section-frame__tab">
+      <span class="two-d-section-frame__kicker" id="two-d-section-frame-kicker"
+        >{bundle.ui.twoDSection}</span
+      >
+      <strong class="two-d-section-frame__label" id="two-d-section-frame-label"
+        >PROFILE</strong
+      >
+    </div>
+    <div
+      class="two-d-section-frame__edge-cards"
+      data-two-d-edge-cards
+      aria-hidden="true"
+    >
+    </div>
+    <div class="two-d-section-frame__outline"></div>
+  </div>
+</div>
+
+<div class="scroll-proxy"></div>

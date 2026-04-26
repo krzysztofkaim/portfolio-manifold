@@ -1,0 +1,48 @@
+{
+  "name": "portfolio-webgpu",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host",
+    "build": "astro build",
+    "preview": "astro preview --host",
+    "optimize": "bash scripts/optimize-assets.sh",
+    "copy-basis": "bash scripts/copy-basis.sh",
+    "postinstall": "bun run copy-basis",
+    "lint": "eslint src --ext .ts,.astro",
+    "format": "prettier --write src",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:lighthouse": "lhci autorun --config=./lighthouserc.json"
+  },
+  "dependencies": {
+    "@chenglou/pretext": "^0.0.5",
+    "@studio-freight/lenis": "1.0.42",
+    "astro": "^6.1.5",
+    "three": "^0.183.2",
+    "three-mesh-bvh": "^0.9.9"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@eslint/js": "^10.0.1",
+    "@gltf-transform/cli": "^4.3.0",
+    "@lhci/cli": "^0.15.1",
+    "@typescript-eslint/eslint-plugin": "^8.58.1",
+    "@typescript-eslint/parser": "^8.58.1",
+    "@vitest/coverage-v8": "^4.1.4",
+    "astro-eslint-parser": "^1.4.0",
+    "eslint": "^10.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-astro": "^1.7.0",
+    "happy-dom": "^20.8.9",
+    "prettier": "^3.8.1",
+    "prettier-plugin-astro": "^0.14.1",
+    "rollup-plugin-visualizer": "^7.0.1",
+    "sharp": "^0.34.5",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.2",
+    "vite": "^7.3.1",
+    "vitest": "^4.1.3"
+  }
+}

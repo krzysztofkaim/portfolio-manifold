@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title>JK Portfolio</title>
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#081122" />
+      <stop offset="100%" stop-color="#0ed6b8" />
+    </linearGradient>
+    <linearGradient id="fg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#7dd3fc" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)" />
+  <path
+    d="M34 31h18v44c0 14-8 24-24 24h-8V84h5c6 0 9-3 9-10V31Zm32 0h18v22l20-22h22L96 63l33 34h-24L84 73v24H66V31Z"
+    fill="url(#fg)"
+  />
+</svg>

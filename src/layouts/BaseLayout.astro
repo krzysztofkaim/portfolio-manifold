@@ -1,0 +1,132 @@
+---
+import '../styles/global.css';
+import { getManifoldLocaleBundle, type ManifoldLocale } from '../i18n/manifoldLocale';
+import { getLocalePath } from '../i18n/localeRouting';
+import { siteMetadata } from '../config/siteMetadata';
+import manifoldModeScriptUrl from '../scripts/manifold-mode.ts?url';
+
+interface Props {
+  imageAlt?: string;
+  locale?: ManifoldLocale;
+  title: string;
+  description?: string;
+  structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
+}
+
+const {
+  imageAlt = 'Krzysztof Kaim portfolio social preview',
+  locale = 'en',
+  title,
+  description = 'Manifold hyper-scroll experience built with Astro.',
+  structuredData
+} = Astro.props;
+const documentStrings = getManifoldLocaleBundle(locale).document;
+const site = Astro.site ?? new URL('https://krzysztof.net');
+const canonicalUrl = new URL(Astro.url.pathname, site);
+const socialImageUrl = new URL(siteMetadata.socialImagePath, site);
+const alternates = {
+  en: new URL(getLocalePath('en'), site).toString(),
+  pl: new URL(getLocalePath('pl'), site).toString(),
+  xDefault: new URL(getLocalePath(siteMetadata.defaultLocale), site).toString()
+};
+const ogLocale = locale === 'pl' ? 'pl_PL' : 'en_US';
+const ogAlternateLocale = locale === 'pl' ? 'en_US' : 'pl_PL';
+const localeLiteral = locale;
+const structuredDataPayload = structuredData
+  ? JSON.stringify(
+      Array.isArray(structuredData)
+        ? { '@context': 'https://schema.org', '@graph': structuredData }
+        : structuredData
+    )
+  : '';
+---
+
+<!doctype html>
+<html lang={documentStrings.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} id="meta-description" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="author" content={siteMetadata.name} />
+    <meta name="keywords" content={siteMetadata.keywords.join(', ')} />
+    <meta name="theme-color" content="#030303" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="canonical" href={canonicalUrl.toString()} />
+    <link rel="alternate" hreflang="en" href={alternates.en} />
+    <link rel="alternate" hreflang="pl" href={alternates.pl} />
+    <link rel="alternate" hreflang="x-default" href={alternates.xDefault} />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta property="og:title" content={title} id="meta-og-title" />
+    <meta property="og:description" content={description} id="meta-og-description" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteMetadata.websiteName} />
+    <meta property="og:url" content={canonicalUrl.toString()} />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:locale:alternate" content={ogAlternateLocale} />
+    <meta property="og:image" content={socialImageUrl.toString()} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageUrl.toString()} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;800&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;800&display=swap" /></noscript>
+    <link rel="modulepreload" href={manifoldModeScriptUrl} />
+    <title>{title}</title>
+    <script is:inline define:vars={{ localeLiteral }}>
+      (() => {
+        try {
+          const raw = window.sessionStorage.getItem('manifold-locale-transition');
+          if (!raw) return;
+          const payload = JSON.parse(raw);
+          if (!payload || payload.locale !== localeLiteral) return;
+          document.documentElement.classList.add('locale-transition-active');
+        } catch {
+          return;
+        }
+      })();
+    </script>
+    {structuredDataPayload && (
+      <script is:inline type="application/ld+json" set:html={structuredDataPayload}></script>
+    )}
+    <script is:inline>
+      (() => {
+        try {
+          const ua = window.navigator.userAgent.toLowerCase();
+          const isChrome = ua.indexOf('chrome') > -1 || ua.indexOf('crios') > -1;
+          const isSafari = ua.indexOf('safari') > -1 && !isChrome;
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.platform) || 
+                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+          
+          if (isSafari) document.documentElement.classList.add('is-safari');
+          if (isIOS) document.documentElement.classList.add('is-ios');
+        } catch (e) {
+          console.error('Browser detection failed', e);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="locale-transition-overlay" id="locale-transition-overlay" aria-hidden="true"></div>
+    <script is:inline>
+      (() => {
+        if (document.documentElement.classList.contains('locale-transition-active')) {
+          document.body.classList.add('locale-transitioning-inbound');
+        }
+      })();
+    </script>
+    <slot />
+    <script type="module" src={manifoldModeScriptUrl} is:inline></script>
+  </body>
+</html>

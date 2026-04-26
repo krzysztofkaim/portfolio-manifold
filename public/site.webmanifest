@@ -1,0 +1,26 @@
+{
+  "name": "Krzysztof Kaim Portfolio",
+  "short_name": "Kaim Portfolio",
+  "description": "Interactive full-stack engineer portfolio built as a manifold mode hyper-scroll experience.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030303",
+  "theme_color": "#030303",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

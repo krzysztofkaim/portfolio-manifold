@@ -1,0 +1,85 @@
+---
+import { homePageSeoCopy, siteMetadata } from '../config/siteMetadata';
+import Hero from './Hero.astro';
+import { getManifoldLocaleBundle, type ManifoldLocale } from '../i18n/manifoldLocale';
+import { getLocalePath } from '../i18n/localeRouting';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  locale: ManifoldLocale;
+}
+
+const { locale } = Astro.props;
+const bundle = getManifoldLocaleBundle(locale);
+const documentStrings = bundle.document;
+const uiStrings = bundle.ui;
+const seoCopy = homePageSeoCopy[locale];
+const siteUrl = Astro.site?.toString() ?? 'https://krzysztof.net/';
+const localizedUrl = new URL(getLocalePath(locale), siteUrl).toString();
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteMetadata.websiteName,
+    url: siteUrl,
+    inLanguage: locale,
+    description: documentStrings.description
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: siteMetadata.name,
+    jobTitle: siteMetadata.profession,
+    url: localizedUrl,
+    email: `mailto:${uiStrings.contactEmail}`,
+    knowsAbout: siteMetadata.keywords,
+    ...(siteMetadata.sameAs.length > 0 ? { sameAs: siteMetadata.sameAs } : {})
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: documentStrings.title,
+    url: localizedUrl,
+    description: documentStrings.description,
+    inLanguage: locale,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: siteMetadata.websiteName,
+      url: siteUrl
+    }
+  }
+];
+---
+
+<BaseLayout
+  locale={locale}
+  title={documentStrings.title}
+  description={documentStrings.description}
+  imageAlt="Krzysztof Kaim portfolio preview with manifold mode navigation"
+  structuredData={structuredData}
+>
+  <main>
+    <section class="seo-content" aria-labelledby="seo-page-title">
+      <h1 id="seo-page-title">{seoCopy.headline}</h1>
+      <p>{seoCopy.intro}</p>
+      <ul>
+        {seoCopy.sections.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    </section>
+    <Hero locale={locale} />
+    <noscript>
+      <section class="seo-noscript">
+        <h2>{locale === 'pl' ? 'Interaktywne portfolio' : 'Interactive portfolio'}</h2>
+        <p>
+          {locale === 'pl'
+            ? 'To portfolio zostało zaprojektowane jako interaktywne doświadczenie manifold. Do przeglądania animowanej sceny i szczegółów kart wymagany jest JavaScript.'
+            : 'This portfolio is designed as an interactive manifold experience. JavaScript is required to browse the animated scene and card details.'}
+        </p>
+      </section>
+    </noscript>
+  </main>
+</BaseLayout>
+

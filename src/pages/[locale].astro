@@ -1,0 +1,21 @@
+---
+import HomePage from '../components/HomePage.astro';
+import { SUPPORTED_MANIFOLD_LOCALES, isSupportedManifoldLocale } from '../i18n/localeRouting';
+import type { ManifoldLocale } from '../i18n/manifoldLocale';
+
+export function getStaticPaths() {
+  return SUPPORTED_MANIFOLD_LOCALES.map((locale) => ({
+    params: { locale }
+  }));
+}
+
+const localeParam = Astro.params.locale?.toLowerCase() ?? 'en';
+
+if (!isSupportedManifoldLocale(localeParam)) {
+  return Astro.redirect('/en/');
+}
+
+const locale = localeParam as ManifoldLocale;
+---
+
+<HomePage locale={locale} />

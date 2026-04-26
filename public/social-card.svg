@@ -1,0 +1,34 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#04050A"/>
+  <rect x="28" y="28" width="1144" height="574" rx="18" fill="url(#panel)" stroke="#FFFFFF" stroke-opacity="0.12"/>
+  <circle cx="156" cy="140" r="88" fill="url(#glowA)" opacity="0.75"/>
+  <circle cx="1034" cy="498" r="120" fill="url(#glowB)" opacity="0.55"/>
+  <rect x="76" y="82" width="1048" height="466" rx="14" fill="#080C18" fill-opacity="0.72" stroke="#FF9748" stroke-opacity="0.28"/>
+  <rect x="116" y="136" width="156" height="156" fill="url(#accentPanel)"/>
+  <circle cx="194" cy="214" r="18" fill="#7A522B" fill-opacity="0.72"/>
+  <rect x="272" y="136" width="626" height="156" fill="#0C111B" fill-opacity="0.92" stroke="#FF9748" stroke-opacity="0.56"/>
+  <text x="322" y="188" fill="#FFAA63" font-size="24" font-family="'JetBrains Mono', monospace" letter-spacing="0.22em">KRZYSZTOF KAIM</text>
+  <text x="322" y="228" fill="#C8CDD7" font-size="22" font-family="'JetBrains Mono', monospace" letter-spacing="0.14em">FULL-STACK ENGINEER // MANIFOLD MODE</text>
+  <text x="322" y="272" fill="#F4EFE7" font-size="74" font-weight="800" font-family="'JetBrains Mono', monospace">PORTFOLIO</text>
+  <text x="118" y="404" fill="#FFAA63" font-size="22" font-family="'JetBrains Mono', monospace" letter-spacing="0.22em">REACT / TYPESCRIPT / .NET / DELIVERY / SECURITY</text>
+  <text x="118" y="454" fill="#D8DDE6" font-size="28" font-family="'JetBrains Mono', monospace" letter-spacing="0.08em">Interactive hyper-scroll portfolio focused on systems, product execution and architecture.</text>
+  <text x="118" y="516" fill="#A9AFBA" font-size="22" font-family="'JetBrains Mono', monospace" letter-spacing="0.14em">krzysztof.net</text>
+  <defs>
+    <linearGradient id="panel" x1="80" y1="64" x2="1114" y2="584" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A0E16"/>
+      <stop offset="1" stop-color="#05070C"/>
+    </linearGradient>
+    <linearGradient id="accentPanel" x1="116" y1="136" x2="272" y2="292" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC17A"/>
+      <stop offset="1" stop-color="#FF9748"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(156 140) rotate(90) scale(88)">
+      <stop stop-color="#FF9748"/>
+      <stop offset="1" stop-color="#FF9748" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1034 498) rotate(90) scale(120)">
+      <stop stop-color="#00F3FF"/>
+      <stop offset="1" stop-color="#00F3FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

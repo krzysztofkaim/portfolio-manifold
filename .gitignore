@@ -1,0 +1,50 @@
+# Tools & Scraper
+scripts/scraper.py
+scripts/scraped_llm_ready.txt
+scripts/optimi.py
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+out/
+
+# Runtime / Tooling
+.astro/
+.lighthouseci/results/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-debug.log*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Tests
+coverage/
+
+# Extras
+*.zip
+*.tar.gz
+
