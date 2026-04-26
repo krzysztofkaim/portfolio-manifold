@@ -1,5 +1,9 @@
 import { clamp } from '../utils/math';
 
+interface NavigatorWithDeviceMemory extends Navigator {
+  deviceMemory?: number;
+}
+
 /**
  * Manages adaptive rendering quality based on performance monitoring (FPS).
  * Adjusts Device Pixel Ratio (DPR) dynamically to maintain target performance.
@@ -8,11 +12,12 @@ export class AdaptiveQuality {
   private readonly samples = new Float32Array(120);
   private sampleIndex = 0;
   private sampleCount = 0;
+  private bootstrapChecked = false;
   private readonly maxDpr = Math.min(window.devicePixelRatio || 1, 2);
   currentDpr: number;
 
   constructor() {
-    const mem = (navigator as any).deviceMemory || 8;
+    const mem = (navigator as NavigatorWithDeviceMemory).deviceMemory || 8;
     const cpu = navigator.hardwareConcurrency || 8;
     
     // Heuristic: Start at lower quality on low-end hardware to ensure smooth initial experience
@@ -31,7 +36,8 @@ export class AdaptiveQuality {
     this.sampleCount = Math.min(this.sampleCount + 1, this.samples.length);
 
     // BOOTSTRAP PATH: After first 15 samples, throttle immediately if performing poorly
-    if (this.sampleCount === 15) {
+    if (!this.bootstrapChecked && this.sampleCount === 15) {
+      this.bootstrapChecked = true;
       let initialTotal = 0;
       for (let i = 0; i < 15; i++) initialTotal += this.samples[i];
       const initialFps = 15000 / initialTotal;

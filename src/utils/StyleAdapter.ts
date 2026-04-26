@@ -4,9 +4,26 @@
  * and standard string-based setProperty for others (Safari, Firefox).
  */
 
-const HAS_TYPED_OM = typeof (window as Window & { CSS?: { number?: unknown } }).CSS !== 'undefined' && 
-                     typeof (window as Window & { CSS?: { number?: unknown } }).CSS?.number !== 'undefined' &&
-                     'attributeStyleMap' in HTMLElement.prototype;
+type TypedCssUnit = 'px' | 'deg' | 'percent';
+
+interface CssTypedNumericFactory {
+  deg(value: number): unknown;
+  number(value: number): unknown;
+  percent(value: number): unknown;
+  px(value: number): unknown;
+}
+
+interface TypedStyleMapCapableElement extends HTMLElement {
+  attributeStyleMap: {
+    set(name: string, value: unknown): void;
+  };
+}
+
+const cssTypedFactory = (window as Window & { CSS?: Partial<CssTypedNumericFactory> }).CSS;
+const HAS_TYPED_OM =
+  typeof cssTypedFactory !== 'undefined' &&
+  typeof cssTypedFactory.number === 'function' &&
+  'attributeStyleMap' in HTMLElement.prototype;
 
 export class StyleAdapter {
   /**
@@ -17,10 +34,10 @@ export class StyleAdapter {
    * @param value Numerical value
    * @param unit Optional CSS unit (px, deg, percent)
    */
-  static setNumericProperty(el: HTMLElement, name: string, value: number, unit?: 'px' | 'deg' | 'percent'): void {
+  static setNumericProperty(el: HTMLElement, name: string, value: number, unit?: TypedCssUnit): void {
     if (HAS_TYPED_OM) {
       try {
-        (el as unknown as { attributeStyleMap: { set: (name: string, value: unknown) => void } }).attributeStyleMap.set(name, this.createTypedValue(value, unit));
+        (el as TypedStyleMapCapableElement).attributeStyleMap.set(name, this.createTypedValue(value, unit));
         return;
       } catch {
         // Fallback
@@ -52,9 +69,9 @@ export class StyleAdapter {
    * Updates multiple numeric CSS custom properties on an element in a single pass.
    * On Safari/Firefox, this can be significantly faster than individual calls.
    */
-  static setNumericProperties(el: HTMLElement, properties: Record<string, { value: number, unit?: 'px' | 'deg' | 'percent' }>): void {
+  static setNumericProperties(el: HTMLElement, properties: Record<string, { value: number, unit?: TypedCssUnit }>): void {
     if (HAS_TYPED_OM) {
-      const styleMap = (el as any).attributeStyleMap;
+      const styleMap = (el as TypedStyleMapCapableElement).attributeStyleMap;
       for (const [name, { value, unit }] of Object.entries(properties)) {
         try {
           styleMap.set(name, this.createTypedValue(value, unit));
@@ -77,13 +94,12 @@ export class StyleAdapter {
     }
   }
 
-  private static createTypedValue(value: number, unit?: 'px' | 'deg' | 'percent'): unknown {
-    const CSS = (window as any).CSS;
-    if (!CSS) return value;
-    if (!unit) return CSS.number(value);
-    if (unit === 'px') return CSS.px(value);
-    if (unit === 'deg') return CSS.deg(value);
-    if (unit === 'percent') return CSS.percent(value);
-    return CSS.number(value);
+  private static createTypedValue(value: number, unit?: TypedCssUnit): unknown {
+    if (!cssTypedFactory || typeof cssTypedFactory.number !== 'function') return value;
+    if (!unit) return cssTypedFactory.number(value);
+    if (unit === 'px' && typeof cssTypedFactory.px === 'function') return cssTypedFactory.px(value);
+    if (unit === 'deg' && typeof cssTypedFactory.deg === 'function') return cssTypedFactory.deg(value);
+    if (unit === 'percent' && typeof cssTypedFactory.percent === 'function') return cssTypedFactory.percent(value);
+    return cssTypedFactory.number(value);
   }
 }

@@ -322,7 +322,6 @@ export class ManifoldTwoDController {
     // Compress width harder than height so the grid still fits while body content stays readable.
     const cardWidth = baseWidth * widthScale;
     const cardHeight = baseHeightNative * heightScale;
-    const baseHeight = baseHeightNative;
 
     // Compress inter-card spacing more than the card body so the content stays legible.
     const spacingCompression = layoutState.isMobileViewport
@@ -671,7 +670,6 @@ export class ManifoldTwoDController {
       /* Edge preview cards should visually continue the exact same grid:
          same card width, same gap, same baseline, only faded and clipped. */
       const perceivedWidth = metrics.cardWidth * PERSPECTIVE_FACTOR;
-      const perceivedHeight = metrics.cardHeight * PERSPECTIVE_FACTOR;
       const visualGapX = Math.max(0, metrics.spacingX * PERSPECTIVE_FACTOR - perceivedWidth);
       const visualTop = row.minY;
       const compensationX = metrics.cardWidth * (1 - PERSPECTIVE_FACTOR) * 0.5;

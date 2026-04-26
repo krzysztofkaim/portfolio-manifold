@@ -1054,10 +1054,6 @@ export class ManifoldModeController {
     this.hudTimer += delta;
     const renderStartedAt = performance.now();
     let particlesMs = 0;
-    let fourDMs = 0;
-    let itemsMs = 0;
-    let sectionFrameMs = 0;
-    let interactionMs = 0;
     let hudCommitMs = 0;
     let visibleItems = 0;
     let visibleCards = 0;
@@ -1507,7 +1503,7 @@ export class ManifoldModeController {
     } else if (this.fourDFaceOverlaysActive) {
       this.destroyFourDFaceOverlays();
     }
-    fourDMs = performance.now() - fourDStartedAt;
+    const fourDMs = performance.now() - fourDStartedAt;
     const physicsContext: PhysicsContext = {
       activeFourDProgress,
       activeViewModeProgress,
@@ -1599,7 +1595,7 @@ export class ManifoldModeController {
         this.currentQuantizedSpectrum
       );
     }
-    itemsMs = performance.now() - itemsStartedAt;
+    const itemsMs = performance.now() - itemsStartedAt;
     this.gpuCardChromeMix = lerp(
       this.gpuCardChromeMix,
       gpuCardChromeTarget,
@@ -1632,7 +1628,7 @@ export class ManifoldModeController {
 
     const sectionFrameStartedAt = performance.now();
     this.update2DSectionFrame(twoDPresentationProgress, delta);
-    sectionFrameMs = performance.now() - sectionFrameStartedAt;
+    const sectionFrameMs = performance.now() - sectionFrameStartedAt;
 
     const interactionStartedAt = performance.now();
     if (!this.transitionPerformanceMode) {
@@ -1658,7 +1654,7 @@ export class ManifoldModeController {
       this.inputService.clearPointerDirty();
       this.updateCardHover();
     }
-    interactionMs = performance.now() - interactionStartedAt;
+    const interactionMs = performance.now() - interactionStartedAt;
 
     if (this.pendingHudSnapshot) {
       const hudCommitStartedAt = performance.now();

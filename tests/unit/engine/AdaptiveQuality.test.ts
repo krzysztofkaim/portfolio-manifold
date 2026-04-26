@@ -38,13 +38,27 @@ describe('AdaptiveQuality', () => {
   it('decreases DPR if FPS is low (< 24)', () => {
     // Start at DPR 2
     quality.currentDpr = 2;
-    // Fill with slow frames (50ms = 20 FPS)
-    for (let i = 0; i < 119; i++) {
-      quality.tick(50);
+    // Bootstrap path should react after the first 15 slow samples.
+    for (let i = 0; i < 14; i++) {
+      expect(quality.tick(50)).toBe(false);
     }
     const result = quality.tick(50);
     expect(result).toBe(true);
     expect(quality.currentDpr).toBe(1.5); // 2.0 - 0.5
+  });
+
+  it('runs the bootstrap quality throttle only once', () => {
+    quality.currentDpr = 2;
+
+    for (let i = 0; i < 15; i++) {
+      quality.tick(50);
+    }
+    expect(quality.currentDpr).toBe(1.5);
+
+    for (let i = 0; i < 30; i++) {
+      quality.tick(50);
+    }
+    expect(quality.currentDpr).toBe(1.5);
   });
 
   it('decreases DPR if FPS is moderate (< 35)', () => {

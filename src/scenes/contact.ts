@@ -110,10 +110,6 @@ export default function createContactScene(): SceneModule {
 
       sphereGeometry?.dispose();
       sphereMaterial?.dispose();
-      if (spheres) {
-        spheres.instanceMatrix = null as any;
-        spheres.instanceColor = null as any;
-      }
 
       root = null;
       sphereGeometry = null;

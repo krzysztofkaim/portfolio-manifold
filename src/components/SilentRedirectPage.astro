@@ -1,0 +1,44 @@
+---
+interface Props {
+  lang?: string;
+  target: string;
+  title?: string;
+}
+
+const {
+  lang = 'en',
+  target,
+  title = 'Loading'
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang} data-redirect-target={target}>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={target} />
+    <title>{title}</title>
+    <script is:inline src="/redirect.js"></script>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #04070d;
+      }
+
+      body {
+        display: none;
+      }
+    </style>
+  </head>
+  <body hidden aria-hidden="true"></body>
+</html>

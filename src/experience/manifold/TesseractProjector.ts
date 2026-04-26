@@ -17,6 +17,9 @@ export const TESSERACT_EDGES: readonly (readonly [number, number])[] = createTes
 export const TESSERACT_FACES: readonly TesseractFaceDefinition[] = createTesseractFaces(TESSERACT_VERTICES);
 
 export class TesseractProjector {
+  static readonly vertices = TESSERACT_VERTICES;
+  static readonly edges = TESSERACT_EDGES;
+  static readonly faces = TESSERACT_FACES;
 
   // Frame-level scene cache — key is built from quantized rotation angles.
   // Quantization slightly reduces geometric precision, but dramatically improves cache hit rate

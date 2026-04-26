@@ -261,7 +261,7 @@ export class SceneManager {
 
     const imported = await sceneLoaders[slot.name]();
     const moduleOrFactory = imported.default;
-    slot.module = typeof moduleOrFactory === 'function' ? (moduleOrFactory as any)() : moduleOrFactory;
+    slot.module = typeof moduleOrFactory === 'function' ? moduleOrFactory() : moduleOrFactory;
 
     this.refreshSlotBounds(slot);
     slot.ctx.width = Math.max(slot.bounds.width, 1);
