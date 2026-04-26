@@ -674,7 +674,6 @@ class ManifoldApp {
 
     window.setTimeout(() => {
       document.documentElement.classList.remove('locale-transition-active');
-      document.body.classList.remove('locale-transitioning-inbound');
       try {
         window.sessionStorage.removeItem('manifold-locale-transition');
       } catch {

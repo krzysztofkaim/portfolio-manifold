@@ -1,6 +1,5 @@
 ---
 import HomePage from '../components/HomePage.astro';
-import SilentRedirectPage from '../components/SilentRedirectPage.astro';
 import { SUPPORTED_MANIFOLD_LOCALES, isSupportedManifoldLocale } from '../i18n/localeRouting';
 import type { ManifoldLocale } from '../i18n/manifoldLocale';
 
@@ -13,6 +12,10 @@ export function getStaticPaths() {
 const localeParam = Astro.params.locale?.toLowerCase() ?? 'en';
 const isSupportedLocale = isSupportedManifoldLocale(localeParam);
 const locale = isSupportedLocale ? (localeParam as ManifoldLocale) : null;
+
+if (!isSupportedLocale || !locale) {
+  return Astro.redirect('/en/');
+}
 ---
 
-{isSupportedLocale && locale ? <HomePage locale={locale} /> : <SilentRedirectPage target="/en/" />}
+<HomePage locale={locale} />

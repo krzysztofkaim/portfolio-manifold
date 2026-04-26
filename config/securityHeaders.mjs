@@ -4,7 +4,7 @@ export const crossOriginIsolationHeaders = {
 };
 
 export const permissionsPolicy =
-  'accelerometer=(), ambient-light-sensor=(), autoplay=(self), camera=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=()';
+  'autoplay=(self), camera=(), fullscreen=(self), geolocation=(), microphone=(), payment=(), usb=()';
 
 export const contentSecurityPolicy =
   "default-src 'self'; " +

@@ -434,9 +434,7 @@ body.locale-transitioning .locale-transition-overlay {
 
 html.locale-transition-active .topbar-loader,
 body.locale-transitioning .topbar-loader,
-body.locale-transitioning-inbound .topbar-loader,
-html.locale-transition-active body:not(.boot-complete) .topbar-loader,
-body.locale-transitioning-inbound:not(.boot-complete) .topbar-loader {
+html.locale-transition-active body:not(.boot-complete) .topbar-loader {
   opacity: 0 !important;
   filter: blur(8px) !important;
   display: none !important;
@@ -891,26 +889,26 @@ body:not(.boot-complete) .topbar-loader {
   filter: blur(0);
 }
 
-body.locale-transitioning-inbound:not(.boot-complete) .top-ui {
+html.locale-transition-active body:not(.boot-complete) .top-ui {
   opacity: 0;
   filter: blur(10px);
 }
 
-body.locale-transitioning-inbound:not(.boot-complete) .topbar {
+html.locale-transition-active body:not(.boot-complete) .topbar {
   grid-template-columns: auto 1fr auto;
   gap: 0.95rem;
   min-height: 4.15rem;
   padding: 0.62rem 1.15rem 0.72rem;
 }
 
-body.locale-transitioning-inbound:not(.boot-complete) .liquid-gradient,
-body.locale-transitioning-inbound:not(.boot-complete) .viewport,
-body.locale-transitioning-inbound:not(.boot-complete) .hud,
-body.locale-transitioning-inbound:not(.boot-complete) .intro-hint,
-body.locale-transitioning-inbound:not(.boot-complete) .context-hint,
-body.locale-transitioning-inbound:not(.boot-complete) .scanlines,
-body.locale-transitioning-inbound:not(.boot-complete) .vignette,
-body.locale-transitioning-inbound:not(.boot-complete) .noise {
+html.locale-transition-active body:not(.boot-complete) .liquid-gradient,
+html.locale-transition-active body:not(.boot-complete) .viewport,
+html.locale-transition-active body:not(.boot-complete) .hud,
+html.locale-transition-active body:not(.boot-complete) .intro-hint,
+html.locale-transition-active body:not(.boot-complete) .context-hint,
+html.locale-transition-active body:not(.boot-complete) .scanlines,
+html.locale-transition-active body:not(.boot-complete) .vignette,
+html.locale-transition-active body:not(.boot-complete) .noise {
   opacity: 0;
   filter: blur(8px);
 }

@@ -30,7 +30,6 @@ const alternates = {
 };
 const ogLocale = locale === 'pl' ? 'pl_PL' : 'en_US';
 const ogAlternateLocale = locale === 'pl' ? 'en_US' : 'pl_PL';
-const localeLiteral = locale;
 const structuredDataPayload = structuredData
   ? JSON.stringify(
       Array.isArray(structuredData)
@@ -41,7 +40,7 @@ const structuredDataPayload = structuredData
 ---
 
 <!doctype html>
-<html lang={documentStrings.lang}>
+<html lang={documentStrings.lang} data-locale={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -77,54 +76,18 @@ const structuredDataPayload = structuredData
     <meta name="twitter:image:alt" content={imageAlt} />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline src="/boot.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;800&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;800&display=swap" /></noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;800&display=swap" />
 
     <title>{title}</title>
-    <script is:inline define:vars={{ localeLiteral }}>
-      (() => {
-        try {
-          const raw = window.sessionStorage.getItem('manifold-locale-transition');
-          if (!raw) return;
-          const payload = JSON.parse(raw);
-          if (!payload || payload.locale !== localeLiteral) return;
-          document.documentElement.classList.add('locale-transition-active');
-        } catch {
-          return;
-        }
-      })();
-    </script>
     {structuredDataPayload && (
       <script is:inline type="application/ld+json" set:html={structuredDataPayload}></script>
     )}
-    <script is:inline>
-      (() => {
-        try {
-          const ua = window.navigator.userAgent.toLowerCase();
-          const isChrome = ua.indexOf('chrome') > -1 || ua.indexOf('crios') > -1;
-          const isSafari = ua.indexOf('safari') > -1 && !isChrome;
-          const isIOS = /iPad|iPhone|iPod/.test(navigator.platform) || 
-                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-          
-          if (isSafari) document.documentElement.classList.add('is-safari');
-          if (isIOS) document.documentElement.classList.add('is-ios');
-        } catch (e) {
-          console.error('Browser detection failed', e);
-        }
-      })();
-    </script>
   </head>
   <body>
     <div class="locale-transition-overlay" id="locale-transition-overlay" aria-hidden="true"></div>
-    <script is:inline>
-      (() => {
-        if (document.documentElement.classList.contains('locale-transition-active')) {
-          document.body.classList.add('locale-transitioning-inbound');
-        }
-      })();
-    </script>
     <slot />
     <script>
       import '../scripts/manifold-mode.ts';
