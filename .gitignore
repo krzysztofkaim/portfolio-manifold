@@ -1,6 +1,6 @@
 # Tools & Scraper
-scripts/scraper.py
-scripts/scraped_llm_ready.txt
+scraper.py
+scraped_llm_ready.txt
 scripts/optimi.py
 
 # Dependencies
