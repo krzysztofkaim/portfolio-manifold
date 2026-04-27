@@ -1,6 +1,6 @@
 import { clamp, lerp } from '../utils/math';
 import { StyleAdapter } from '../utils/StyleAdapter';
-import { IS_SAFARI, SAFARI_VERSION } from '../utils/browserDetection';
+import { IS_IOS, IS_SAFARI, SAFARI_VERSION } from '../utils/browserDetection';
 import {
   MANIFOLD_MOBILE_BREAKPOINT,
   MANIFOLD_SCENE_CONFIG,
@@ -658,6 +658,15 @@ export class ManifoldModeController {
     this.particleField.resize(this.viewportWidth, this.viewportHeight, window.devicePixelRatio || 1);
     this.particleField.layout(this.loopSize, this.viewportWidth, this.viewportHeight);
     const initCardChrome = () => {
+      if (IS_IOS) {
+        // iOS WebKit can occasionally composite this fullscreen WebGL layer as opaque black
+        // after the first interaction. The CSS chrome underneath is enough to preserve the look.
+        this.gpuCardChromeDisabled = true;
+        elements.cardChromeLayer.style.display = 'none';
+        this.dom.removeBodyClass('has-gpu-card-chrome', 'has-gpu-card-chrome-active');
+        return;
+      }
+
       this.cardChromeRenderer = new ManifoldCardChromeRenderer(elements.cardChromeLayer, this.config.itemCount);
       if (this.cardChromeRenderer.isSupported()) {
         this.dom.addBodyClass('has-gpu-card-chrome');
