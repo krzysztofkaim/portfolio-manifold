@@ -12,26 +12,45 @@ export const contentSecurityPolicy =
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
   "font-src 'self' https://fonts.gstatic.com data:; " +
   "img-src 'self' data: blob:; " +
-  "connect-src 'self' https://fonts.googleapis.com; " +
+  "connect-src 'self'; " +
   "worker-src 'self' blob:; " +
   "object-src 'none'; " +
   "base-uri 'self'; " +
-  "frame-ancestors 'none'";
+  "frame-ancestors 'none'; " +
+  'upgrade-insecure-requests';
 
 export const securityHeaders = {
   ...crossOriginIsolationHeaders,
   'Content-Security-Policy': contentSecurityPolicy,
+  'Cross-Origin-Resource-Policy': 'same-origin',
   'Permissions-Policy': permissionsPolicy,
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY'
 };
 
-export function renderCloudflareHeadersFile(headers = securityHeaders, route = '/*') {
-  const lines = [
-    '# Generated from config/securityHeaders.mjs',
-    route,
-    ...Object.entries(headers).map(([name, value]) => `  ${name}: ${value}`)
-  ];
+export const cloudflareHeaderRules = [
+  {
+    route: '/*',
+    headers: securityHeaders
+  },
+  {
+    route: '/_astro/*',
+    headers: {
+      'Cache-Control': 'public, max-age=31536000, immutable'
+    }
+  }
+];
 
-  return `${lines.join('\n')}\n`;
+export function renderCloudflareHeadersFile(rules = cloudflareHeaderRules) {
+  const sections = ['# Generated from config/securityHeaders.mjs'];
+
+  for (const rule of rules) {
+    sections.push(
+      rule.route,
+      ...Object.entries(rule.headers).map(([name, value]) => `  ${name}: ${value}`)
+    );
+  }
+
+  return `${sections.join('\n')}\n`;
 }
