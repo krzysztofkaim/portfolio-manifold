@@ -14,7 +14,7 @@ const bundle = getManifoldLocaleBundle(locale);
 const documentStrings = bundle.document;
 const uiStrings = bundle.ui;
 const seoCopy = homePageSeoCopy[locale];
-const siteUrl = Astro.site?.toString() ?? 'https://krzysztof.net/';
+const siteUrl = Astro.site?.toString() ?? 'https://kaim.dev/';
 const localizedUrl = new URL(getLocalePath(locale), siteUrl).toString();
 
 const structuredData = [
@@ -56,7 +56,7 @@ const structuredData = [
   locale={locale}
   title={documentStrings.title}
   description={documentStrings.description}
-  imageAlt="Krzysztof Kaim portfolio preview with manifold mode navigation"
+  imageAlt="Krzysztof Kaim software engineer portfolio preview focused on React, .NET, MES and industrial systems"
   structuredData={structuredData}
 >
   <main>
@@ -82,4 +82,3 @@ const structuredData = [
     </noscript>
   </main>
 </BaseLayout>
-

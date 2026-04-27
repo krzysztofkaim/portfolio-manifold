@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 export const prerender = true;
 
 export const GET: APIRoute = ({ site }) => {
-  const baseUrl = site?.toString().replace(/\/$/, '') ?? 'https://krzysztof.net';
+  const baseUrl = site?.toString().replace(/\/$/, '') ?? 'https://kaim.dev';
   const body = [
     'User-agent: *',
     'Allow: /',

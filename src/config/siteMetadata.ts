@@ -21,8 +21,11 @@ export const siteMetadata = {
     'astro portfolio'
   ],
   name: 'Krzysztof Kaim',
-  profession: 'Full-Stack Software Engineer, Lead Engineer and Solution Architect specializing in React, .NET and enterprise rescue projects',
-  sameAs: [],
+  profession: 'Software Engineer, Lead Engineer and Solution Architect specializing in React, .NET, MES, ERP integrations and industrial systems',
+  sameAs: [
+    'https://github.com/krzysztofkaim',
+    'https://www.linkedin.com/in/krzysztofkaim/'
+  ],
   socialImagePath: '/social-card.png',
   titleTemplate: '%s | Krzysztof Kaim',
   websiteName: 'Krzysztof Kaim'
@@ -30,9 +33,9 @@ export const siteMetadata = {
 
 export const homePageSeoCopy = {
   en: {
-    headline: 'Krzysztof Kaim | Full-Stack Software Engineer Portfolio',
+    headline: 'Krzysztof Kaim | Software Engineer for React, .NET and Industrial Systems',
     intro:
-      'Portfolio of Krzysztof Kaim, a full-stack software engineer focused on React, .NET, systems architecture, distressed-project recovery, enterprise integrations and end-to-end delivery.',
+      'Krzysztof Kaim is a software engineer specializing in React, TypeScript, .NET, MES, ERP integrations, industrial systems, and distressed enterprise project recovery.',
     sections: [
       'Profile covering engineering focus, delivery style and technical range.',
       'Deployments covering production work in enterprise, consulting and education contexts.',
@@ -42,9 +45,9 @@ export const homePageSeoCopy = {
     ]
   },
   pl: {
-    headline: 'Krzysztof Kaim | Portfolio Full-Stack Software Engineera',
+    headline: 'Krzysztof Kaim | Software Engineer dla React, .NET i systemów przemysłowych',
     intro:
-      'Portfolio Krzysztofa Kaima, full-stack software engineera skupionego na React, .NET, architekturze systemów, ratowaniu trudnych projektów, integracjach enterprise i end-to-end delivery.',
+      'Krzysztof Kaim to software engineer specjalizujący się w React, TypeScript, .NET, systemach MES, integracjach ERP, systemach przemysłowych i ratowaniu trudnych projektów enterprise.',
     sections: [
       'Profil: fokus inżynierski, styl dowożenia i zakres techniczny.',
       'Wdrożenia: praca produkcyjna w środowiskach enterprise, consultingu i edukacji.',

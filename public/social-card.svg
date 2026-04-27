@@ -8,11 +8,11 @@
   <circle cx="194" cy="214" r="18" fill="#7A522B" fill-opacity="0.72"/>
   <rect x="272" y="136" width="626" height="156" fill="#0C111B" fill-opacity="0.92" stroke="#FF9748" stroke-opacity="0.56"/>
   <text x="322" y="188" fill="#FFAA63" font-size="24" font-family="'JetBrains Mono', monospace" letter-spacing="0.22em">KRZYSZTOF KAIM</text>
-  <text x="322" y="228" fill="#C8CDD7" font-size="22" font-family="'JetBrains Mono', monospace" letter-spacing="0.14em">FULL-STACK ENGINEER // MANIFOLD MODE</text>
-  <text x="322" y="272" fill="#F4EFE7" font-size="74" font-weight="800" font-family="'JetBrains Mono', monospace">PORTFOLIO</text>
-  <text x="118" y="404" fill="#FFAA63" font-size="22" font-family="'JetBrains Mono', monospace" letter-spacing="0.22em">REACT / TYPESCRIPT / .NET / DELIVERY / SECURITY</text>
-  <text x="118" y="454" fill="#D8DDE6" font-size="28" font-family="'JetBrains Mono', monospace" letter-spacing="0.08em">Interactive hyper-scroll portfolio focused on systems, product execution and architecture.</text>
-  <text x="118" y="516" fill="#A9AFBA" font-size="22" font-family="'JetBrains Mono', monospace" letter-spacing="0.14em">krzysztof.net</text>
+  <text x="322" y="220" fill="#C8CDD7" font-size="22" font-family="'JetBrains Mono', monospace" letter-spacing="0.14em">SOFTWARE ENGINEER // REACT / .NET / MES</text>
+  <text x="322" y="282" fill="#F4EFE7" font-size="68" font-weight="800" font-family="'JetBrains Mono', monospace">PORTFOLIO</text>
+  <text x="118" y="404" fill="#FFAA63" font-size="22" font-family="'JetBrains Mono', monospace" letter-spacing="0.22em">INDUSTRIAL SYSTEMS / ERP / DELIVERY / ARCHITECTURE</text>
+  <text x="118" y="454" fill="#D8DDE6" font-size="22" font-family="'JetBrains Mono', monospace" letter-spacing="0.05em">MES, ERP, industrial systems, project recovery.</text>
+  <text x="118" y="516" fill="#A9AFBA" font-size="22" font-family="'JetBrains Mono', monospace" letter-spacing="0.14em">kaim.dev</text>
   <defs>
     <linearGradient id="panel" x1="80" y1="64" x2="1114" y2="584" gradientUnits="userSpaceOnUse">
       <stop stop-color="#0A0E16"/>

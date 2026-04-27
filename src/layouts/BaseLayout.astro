@@ -13,14 +13,14 @@ interface Props {
 }
 
 const {
-  imageAlt = 'Krzysztof Kaim portfolio social preview',
+  imageAlt = 'Krzysztof Kaim software engineer portfolio preview focused on React, .NET, MES and industrial systems',
   locale = 'en',
   title,
   description = 'Manifold hyper-scroll experience built with Astro.',
   structuredData
 } = Astro.props;
 const documentStrings = getManifoldLocaleBundle(locale).document;
-const site = Astro.site ?? new URL('https://krzysztof.net');
+const site = Astro.site ?? new URL('https://kaim.dev');
 const canonicalUrl = new URL(Astro.url.pathname, site);
 const socialImageUrl = new URL(siteMetadata.socialImagePath, site);
 const alternates = {

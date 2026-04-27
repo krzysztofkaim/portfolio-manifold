@@ -515,9 +515,10 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
   document: {
     cvDownloadFileName: 'krzysztof_kaim_resume.pdf',
     cvDownloadHref: '/files/krzysztof_kaim_resume.pdf',
-    description: 'Pełnoekranowe portfolio manifold mode z dynamicznym hyper-scrolllem.',
+    description:
+      'Krzysztof Kaim to software engineer specjalizujący się w React, TypeScript, .NET, systemach MES, integracjach ERP i systemach przemysłowych.',
     lang: 'pl',
-    title: 'Krzysztof Kaim — Senior Software Engineer'
+    title: 'Krzysztof Kaim Software Engineer | React, .NET, MES'
   },
   sectionLabels: {
     PROFILE: 'PROFIL',
