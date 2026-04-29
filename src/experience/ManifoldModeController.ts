@@ -1335,7 +1335,7 @@ export class ManifoldModeController {
     const cameraZ = sceneScroll * this.config.camSpeed;
     const activeFourDProgress = this.introCompleted ? this.fourDProgress : 0;
     const visualFourDProgress = this.introCompleted ? this.fourDTransitionProgress : 0;
-    const particleRenderIntervalMs = this.transitionPerformanceMode
+    const baseParticleRenderIntervalMs = this.transitionPerformanceMode
       ? 1000 / 20
       : (
         this.targetViewMode === '3d'
@@ -1350,6 +1350,7 @@ export class ManifoldModeController {
               : 1000 / 36
           )
       );
+    const particleRenderIntervalMs = baseParticleRenderIntervalMs * (this.isMobileViewport ? 1.45 : 1);
     const shouldRenderParticles =
       this.lastParticleRenderAt === 0 ||
       time - this.lastParticleRenderAt >= particleRenderIntervalMs;
@@ -1814,6 +1815,7 @@ export class ManifoldModeController {
       this.expandedCard !== null || this.expandedProgress > 0.01 || this.expandedTarget > 0;
     const hudNavigationOpen = document.body.classList.contains('hud-nav-open');
     const lowEndDevice = this.deviceMemory <= 4 || this.hardwareThreads <= 4;
+    const mobileDevice = this.isMobileViewport;
     const twoDHeavy = this.is2DMode() || this.viewModeProgress > 0.5;
     const fourDHeavy = this.is4DMode() || this.fourDProgress > 0.22;
     const manifoldHeavy = twoDHeavy || fourDHeavy;
@@ -1822,16 +1824,24 @@ export class ManifoldModeController {
     const frameStress = this.frameTimeEma > highRefreshFrameBudget * 1.16 || this.frameTimeBurst > highRefreshFrameBudget * 1.9;
     const severeFrameStress =
       this.frameTimeEma > highRefreshFrameBudget * 1.42 || this.frameTimeBurst > highRefreshFrameBudget * 2.35;
-    const fullRatePixelScale = twoDHeavy
+    const fullRatePixelScaleBase = twoDHeavy
       ? (lowEndDevice ? 0.74 : 0.84)
       : manifoldHeavy
         ? (lowEndDevice ? 0.82 : 0.92)
         : lowEndDevice ? 0.94 : 1;
-    const fullRateBackgroundScale = twoDHeavy
+    const fullRateBackgroundScaleBase = twoDHeavy
       ? (lowEndDevice ? 0.18 : 0.22)
       : manifoldHeavy
         ? (lowEndDevice ? 0.22 : 0.26)
         : lowEndDevice ? 0.28 : 0.32;
+    const fullRatePixelScale = Math.max(
+      0.7,
+      fullRatePixelScaleBase - (mobileDevice ? (lowEndDevice ? 0.04 : 0.06) : 0)
+    );
+    const fullRateBackgroundScale = Math.max(
+      0.14,
+      fullRateBackgroundScaleBase - (mobileDevice ? (lowEndDevice ? 0.04 : 0.05) : 0)
+    );
 
     if (hudNavigationOpen) {
       this.adaptiveCooldownUntil = now + 2600;
@@ -2525,6 +2535,17 @@ export class ManifoldModeController {
     }
   }
 
+  private blurFocusedDescendant(element: HTMLElement): void {
+    const activeElement = document.activeElement;
+    if (!(activeElement instanceof HTMLElement)) {
+      return;
+    }
+
+    if (element.contains(activeElement)) {
+      activeElement.blur();
+    }
+  }
+
   private updateCardAccessibility(
     item: ItemState,
     input: {
@@ -2556,22 +2577,26 @@ export class ManifoldModeController {
       return;
     }
 
-    const activeElement = document.activeElement;
-    if (
-      !input.allowCardFocus &&
-      activeElement instanceof HTMLElement &&
-      item.fxEl.contains(activeElement)
-    ) {
-      activeElement.blur();
+    const allowCardFocus = input.allowCardFocus && !input.hiddenFromAccessibilityTree;
+    const allowExpandedPanel = input.allowExpandedPanel && !input.hiddenFromAccessibilityTree;
+    const allowExpandedControls =
+      input.allowExpandedControls && allowExpandedPanel;
+
+    if (!allowCardFocus || input.hiddenFromAccessibilityTree) {
+      this.blurFocusedDescendant(item.fxEl);
     }
 
-    item.fxEl.tabIndex = input.allowCardFocus ? 0 : -1;
+    item.fxEl.tabIndex = allowCardFocus ? 0 : -1;
     item.fxEl.setAttribute('aria-hidden', input.hiddenFromAccessibilityTree ? 'true' : 'false');
     this.setElementInert(item.fxEl, input.hiddenFromAccessibilityTree);
 
     const expandedPanel = item.expandedPanelEl;
     if (expandedPanel) {
-      expandedPanel.setAttribute('aria-hidden', input.allowExpandedPanel ? 'false' : 'true');
+      if (!allowExpandedPanel) {
+        this.blurFocusedDescendant(expandedPanel);
+      }
+
+      expandedPanel.setAttribute('aria-hidden', allowExpandedPanel ? 'false' : 'true');
     }
 
     const prevButton = item.mobilePrevNavEl;
@@ -2582,7 +2607,7 @@ export class ManifoldModeController {
         continue;
       }
 
-      if (input.allowExpandedControls && !button.disabled) {
+      if (allowExpandedControls && !button.disabled) {
         button.removeAttribute('tabindex');
       } else {
         button.setAttribute('tabindex', '-1');
@@ -3742,13 +3767,16 @@ export class ManifoldModeController {
 
   private setAccessibilityState(enabled: boolean): void {
     if (enabled) {
-      this.elements.hud.root.removeAttribute('inert');
-      this.elements.world.removeAttribute('inert');
-      this.elements.twoDSectionFrame.root.removeAttribute('inert');
+      this.setElementInert(this.elements.hud.root, false);
+      this.setElementInert(this.elements.world, false);
+      this.setElementInert(this.elements.twoDSectionFrame.root, false);
     } else {
-      this.elements.hud.root.setAttribute('inert', '');
-      this.elements.world.setAttribute('inert', '');
-      this.elements.twoDSectionFrame.root.setAttribute('inert', '');
+      this.blurFocusedDescendant(this.elements.hud.root);
+      this.blurFocusedDescendant(this.elements.world);
+      this.blurFocusedDescendant(this.elements.twoDSectionFrame.root);
+      this.setElementInert(this.elements.hud.root, true);
+      this.setElementInert(this.elements.world, true);
+      this.setElementInert(this.elements.twoDSectionFrame.root, true);
     }
   }
 

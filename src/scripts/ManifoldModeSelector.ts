@@ -29,6 +29,8 @@ interface ManifoldModeSelectorContext {
 
 export class ManifoldModeSelector {
   private elements: ModeToggleElements | null = null;
+  private readonly supportsHoverMenuInteractions =
+    window.matchMedia('(hover: hover)').matches && window.matchMedia('(pointer: fine)').matches;
   private localeStrings: ManifoldModeSelectorLocaleStrings = {
     currentModeAriaPrefix: 'Current manifold mode',
     menuAriaLabel: 'Mode selection',
@@ -96,7 +98,7 @@ export class ManifoldModeSelector {
       event.preventDefault();
       event.stopPropagation();
       this.applyModeSelection(mode);
-      closeModeMenu(true, true);
+      closeModeMenu(true, this.supportsHoverMenuInteractions);
     };
 
     const handleModeToggleClick = (event: MouseEvent) => {
@@ -105,6 +107,14 @@ export class ManifoldModeSelector {
       if (!this.context.getController()?.isIntroComplete()) {
         return;
       }
+
+      const isExpanded = elements.picker.dataset.expanded === 'true';
+      if (isExpanded) {
+        closeModeMenu(true, false);
+        return;
+      }
+
+      setModeMenuHoverLocked(!this.supportsHoverMenuInteractions);
       setModeMenuExpanded(true);
     };
 
@@ -156,6 +166,10 @@ export class ManifoldModeSelector {
         return;
       }
 
+      if (!this.supportsHoverMenuInteractions) {
+        return;
+      }
+
       if (elements.picker.dataset.hoverLocked === 'true') {
         return;
       }
@@ -190,16 +204,19 @@ export class ManifoldModeSelector {
     const handleModeOption4DClick = (event: MouseEvent) => handleModeOptionClick(event, '4d');
 
     elements.button.addEventListener('click', handleModeToggleClick);
-    elements.button.addEventListener('pointerenter', handleModeTogglePointerEnter);
     elements.option2D.addEventListener('click', handleModeOption2DClick);
     elements.option3D.addEventListener('click', handleModeOption3DClick);
     elements.option4D.addEventListener('click', handleModeOption4DClick);
-    elements.picker.addEventListener('pointerenter', handleModePickerPointerEnter);
-    elements.picker.addEventListener('pointerleave', handleModePickerPointerLeave);
-    elements.picker.addEventListener('pointermove', handleModePickerPointerMove);
     elements.picker.addEventListener('focusin', handleModePickerFocusIn);
     elements.picker.addEventListener('focusout', handleModePickerFocusOut);
     elements.menu.style.paddingBottom = '0.6rem';
+
+    if (this.supportsHoverMenuInteractions) {
+      elements.button.addEventListener('pointerenter', handleModeTogglePointerEnter);
+      elements.picker.addEventListener('pointerenter', handleModePickerPointerEnter);
+      elements.picker.addEventListener('pointerleave', handleModePickerPointerLeave);
+      elements.picker.addEventListener('pointermove', handleModePickerPointerMove);
+    }
 
     window.addEventListener('pointerdown', handleWindowPointerDown, { passive: true });
     this.syncModeToggleState();
@@ -209,15 +226,19 @@ export class ManifoldModeSelector {
 
     return () => {
       elements.button.removeEventListener('click', handleModeToggleClick);
-      elements.button.removeEventListener('pointerenter', handleModeTogglePointerEnter);
       elements.option2D.removeEventListener('click', handleModeOption2DClick);
       elements.option3D.removeEventListener('click', handleModeOption3DClick);
       elements.option4D.removeEventListener('click', handleModeOption4DClick);
-      elements.picker.removeEventListener('pointerenter', handleModePickerPointerEnter);
-      elements.picker.removeEventListener('pointerleave', handleModePickerPointerLeave);
-      elements.picker.removeEventListener('pointermove', handleModePickerPointerMove);
       elements.picker.removeEventListener('focusin', handleModePickerFocusIn);
       elements.picker.removeEventListener('focusout', handleModePickerFocusOut);
+
+      if (this.supportsHoverMenuInteractions) {
+        elements.button.removeEventListener('pointerenter', handleModeTogglePointerEnter);
+        elements.picker.removeEventListener('pointerenter', handleModePickerPointerEnter);
+        elements.picker.removeEventListener('pointerleave', handleModePickerPointerLeave);
+        elements.picker.removeEventListener('pointermove', handleModePickerPointerMove);
+      }
+
       window.removeEventListener('pointerdown', handleWindowPointerDown);
       this.elements = null;
     };

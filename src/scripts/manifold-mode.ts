@@ -105,6 +105,10 @@ class ManifoldApp {
   private controller: ManifoldModeController | null = null;
   private liquidGradient: LiquidGradientBackground | null = null;
   private running = false;
+  private readonly prefersMobilePerformanceBudget =
+    window.matchMedia('(pointer: coarse)').matches ||
+    navigator.maxTouchPoints > 0 ||
+    window.innerWidth <= 720;
 
   private lastPixelQuality = 1;
   private lastBackgroundQuality = 0.44;
@@ -226,15 +230,23 @@ class ManifoldApp {
       // Future: integrate with real ProfilerController here
     });
 
-    // Safari/iOS Optimization: Downscale initial quality to ensure stable frame times
-    if (IS_SAFARI) {
-      this.lastPixelQuality = IS_IOS ? 0.88 : 0.94;
-      this.lastBackgroundQuality = IS_IOS ? 0.38 : 0.42;
+    // Mobile/Safari Optimization: Start decorative layers with a safer quality budget.
+    if (IS_SAFARI || this.prefersMobilePerformanceBudget) {
+      this.lastPixelQuality = IS_IOS
+        ? 0.82
+        : this.prefersMobilePerformanceBudget
+          ? 0.86
+          : 0.94;
+      this.lastBackgroundQuality = IS_IOS
+        ? 0.24
+        : this.prefersMobilePerformanceBudget
+          ? 0.28
+          : 0.42;
       PixelCanvas.setGlobalQuality(this.lastPixelQuality);
     }
 
     this.liquidGradient = new LiquidGradientBackground(this.elements.liquidGradient);
-    if (IS_SAFARI) {
+    if (IS_SAFARI || this.prefersMobilePerformanceBudget) {
       this.liquidGradient.setQuality(this.lastBackgroundQuality);
     }
 
@@ -1130,7 +1142,11 @@ class ManifoldApp {
         }
       }
 
-      const backgroundInterval = perf.transitionActive ? 1000 / 36 : 0;
+      const backgroundInterval = this.prefersMobilePerformanceBudget
+        ? (perf.transitionActive ? 1000 / 24 : 1000 / 18)
+        : perf.transitionActive
+          ? 1000 / 36
+          : 0;
       if (!backgroundInterval || time - this.lastBackgroundRenderAt >= backgroundInterval) {
         const backgroundStartedAt = performance.now();
         this.liquidGradient?.update(time, this.scroll.getTargetVelocity());
@@ -1199,6 +1215,14 @@ class ManifoldApp {
       // to prioritize foreground fluidity and prevent compositing hangs.
       if (velocity > 0.22) {
         stressMultiplier *= 0.5;
+      }
+    }
+
+    if (this.prefersMobilePerformanceBudget) {
+      stressMultiplier *= document.body.classList.contains('is-frame-stressed') ? 0.82 : 0.92;
+
+      if (velocity > 0.12) {
+        stressMultiplier *= 0.82;
       }
     }
 

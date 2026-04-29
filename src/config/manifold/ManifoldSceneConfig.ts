@@ -82,9 +82,9 @@ export function createManifoldSceneRuntimeConfig(input: ManifoldSceneRuntimeConf
     starCount: input.prefersReducedMotion
       ? 18
       : input.deviceMemory <= 4 || input.hardwareThreads <= 4
-        ? 36
+        ? 24
         : input.isMobileViewport
-          ? 56
+          ? 32
           : MANIFOLD_SCENE_CONFIG.starCount,
     zGap: MANIFOLD_SCENE_CONFIG.zGap,
     camSpeed: MANIFOLD_SCENE_CONFIG.camSpeed,
