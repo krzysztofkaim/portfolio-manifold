@@ -24,9 +24,16 @@
       !ua.includes('crios') &&
       !ua.includes('fxios') &&
       !ua.includes('android');
+    const isIOS =
+      /iphone|ipad|ipod/.test(ua) ||
+      (ua.includes('mac') && 'ontouchend' in document);
 
     if (isSafari) {
       root.classList.add('is-safari');
+    }
+
+    if (isIOS) {
+      root.classList.add('is-ios');
     }
   } catch {
     // Ignore UA parsing failures and keep the default styling path.

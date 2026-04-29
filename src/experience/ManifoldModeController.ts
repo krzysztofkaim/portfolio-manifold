@@ -316,7 +316,13 @@ export class ManifoldModeController {
     this.adaptiveCooldownUntil = atlasState.adaptiveCooldownUntil;
 
     this.world = elements.world;
-    this.particleField = new ManifoldCanvasParticleField(elements.ambientParticleLayer, this.config.starCount);
+    if (IS_IOS) {
+      elements.ambientParticleLayer.style.display = 'none';
+    }
+    this.particleField = new ManifoldCanvasParticleField(
+      elements.ambientParticleLayer,
+      IS_IOS ? 0 : this.config.starCount
+    );
 
     this.chromeInstancesPool = createCardChromeInstancePool(this.config.itemCount);
     this.fourDWireframe = elements.fourDWireframe;

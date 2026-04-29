@@ -281,9 +281,14 @@ class ManifoldApp {
       PixelCanvas.setGlobalQuality(this.lastPixelQuality);
     }
 
-    this.liquidGradient = new LiquidGradientBackground(this.elements.liquidGradient);
-    if (IS_SAFARI || this.prefersMobilePerformanceBudget) {
-      this.liquidGradient.setQuality(this.lastBackgroundQuality);
+    if (IS_IOS) {
+      this.elements.liquidGradient.style.display = 'none';
+      this.lastBackgroundQuality = 0;
+    } else {
+      this.liquidGradient = new LiquidGradientBackground(this.elements.liquidGradient);
+      if (IS_SAFARI || this.prefersMobilePerformanceBudget) {
+        this.liquidGradient.setQuality(this.lastBackgroundQuality);
+      }
     }
 
     const preferredMode = this.resolvePreferredStartupMode();

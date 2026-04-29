@@ -456,6 +456,11 @@ html.locale-transition-active body.boot-complete .locale-transition-overlay {
   transform: translateZ(0);
 }
 
+html.is-ios .liquid-gradient,
+html.is-ios .ambient-particle-layer {
+  display: none;
+}
+
 .custom-cursor {
   position: fixed;
   inset: 0;
