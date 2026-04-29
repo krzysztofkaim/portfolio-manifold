@@ -1,4 +1,4 @@
-import { IS_SAFARI } from '../utils/browserDetection';
+import { IS_IOS, IS_SAFARI } from '../utils/browserDetection';
 
 interface PixelState {
   x: number;
@@ -176,6 +176,11 @@ export class PixelCanvas extends HTMLElement {
   }
 
   connectedCallback(): void {
+    if (IS_IOS) {
+      this.style.display = 'none';
+      return;
+    }
+
     if (this.shadowRoot) {
       return;
     }

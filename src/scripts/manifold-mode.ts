@@ -369,6 +369,11 @@ class ManifoldApp {
   }
 
   private setupLenis(): void {
+    if (IS_IOS) {
+      this.lenis = null;
+      return;
+    }
+
     const options: LenisOptions = {
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

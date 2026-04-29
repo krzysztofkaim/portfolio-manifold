@@ -353,6 +353,30 @@ html {
   background: #030303;
 }
 
+.bg-gradient,
+.bg-gradient-soft {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bg-gradient {
+  z-index: 0;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 151, 72, 0.18), transparent 30%),
+    radial-gradient(circle at 82% 18%, rgba(74, 123, 255, 0.14), transparent 28%),
+    radial-gradient(circle at 50% 78%, rgba(255, 188, 116, 0.08), transparent 34%),
+    linear-gradient(180deg, #05070d 0%, #070b16 46%, #060913 100%);
+}
+
+.bg-gradient-soft {
+  z-index: 0;
+  opacity: 0.78;
+  background:
+    linear-gradient(120deg, rgba(255, 151, 72, 0.04), transparent 24%),
+    linear-gradient(300deg, rgba(85, 110, 255, 0.05), transparent 26%);
+}
+
 /* Safari specific: prevent rubber-band effect that clashes with Lenis */
 html.is-safari,
 html.is-safari body {
@@ -459,6 +483,21 @@ html.locale-transition-active body.boot-complete .locale-transition-overlay {
 html.is-ios .liquid-gradient,
 html.is-ios .ambient-particle-layer {
   display: none;
+}
+
+html.is-ios .bg-gradient {
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255, 151, 72, 0.14), transparent 28%),
+    radial-gradient(circle at 82% 22%, rgba(92, 121, 255, 0.1), transparent 24%),
+    linear-gradient(180deg, #07090f 0%, #090d18 52%, #070a13 100%);
+}
+
+html.is-ios .bg-gradient-soft {
+  opacity: 0.62;
+}
+
+html.is-ios .card-pixel-canvas {
+  display: none !important;
 }
 
 .custom-cursor {
