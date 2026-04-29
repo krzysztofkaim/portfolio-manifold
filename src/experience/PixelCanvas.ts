@@ -1,4 +1,4 @@
-import { IS_IOS, IS_SAFARI } from '../utils/browserDetection';
+import { IS_ANDROID, IS_IOS, IS_SAFARI } from '../utils/browserDetection';
 
 interface PixelState {
   x: number;
@@ -176,7 +176,7 @@ export class PixelCanvas extends HTMLElement {
   }
 
   connectedCallback(): void {
-    if (IS_IOS) {
+    if (IS_IOS || IS_ANDROID) {
       this.style.display = 'none';
       return;
     }

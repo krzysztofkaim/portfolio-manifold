@@ -481,7 +481,9 @@ html.locale-transition-active body.boot-complete .locale-transition-overlay {
 }
 
 html.is-ios .liquid-gradient,
-html.is-ios .ambient-particle-layer {
+html.is-ios .ambient-particle-layer,
+html.is-android .liquid-gradient,
+html.is-android .ambient-particle-layer {
   display: none;
 }
 
@@ -492,11 +494,32 @@ html.is-ios .bg-gradient {
     linear-gradient(180deg, #07090f 0%, #090d18 52%, #070a13 100%);
 }
 
+html.is-android .bg-gradient {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 151, 72, 0.12), transparent 26%),
+    radial-gradient(circle at 84% 20%, rgba(92, 121, 255, 0.08), transparent 22%),
+    linear-gradient(180deg, #06080f 0%, #090d17 50%, #070a13 100%);
+}
+
 html.is-ios .bg-gradient-soft {
   opacity: 0.62;
 }
 
-html.is-ios .card-pixel-canvas {
+html.is-android .bg-gradient-soft {
+  opacity: 0.56;
+}
+
+html.is-ios .card-pixel-canvas,
+html.is-android .card-pixel-canvas {
+  display: none !important;
+}
+
+html.is-android-low-end .bg-gradient-soft {
+  opacity: 0.48;
+}
+
+html.is-android-low-end .card-chrome-layer,
+html.is-android-low-end .four-d-wireframe {
   display: none !important;
 }
 

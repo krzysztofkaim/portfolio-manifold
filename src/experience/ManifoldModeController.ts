@@ -1,6 +1,6 @@
 import { clamp, lerp } from '../utils/math';
 import { StyleAdapter } from '../utils/StyleAdapter';
-import { IS_IOS, IS_SAFARI, SAFARI_VERSION } from '../utils/browserDetection';
+import { IS_ANDROID, IS_ANDROID_LOW_END, IS_IOS, IS_SAFARI, SAFARI_VERSION } from '../utils/browserDetection';
 import {
   MANIFOLD_MOBILE_BREAKPOINT,
   MANIFOLD_SCENE_CONFIG,
@@ -154,6 +154,7 @@ export class ManifoldModeController {
       ? ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8)
       : 8;
   private readonly hardwareThreads = navigator.hardwareConcurrency || 8;
+  private readonly isAndroidLowEnd = IS_ANDROID_LOW_END;
   private isMobileViewport = false;
   private readonly prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   private locale: ManifoldLocale = 'en';
@@ -316,12 +317,16 @@ export class ManifoldModeController {
     this.adaptiveCooldownUntil = atlasState.adaptiveCooldownUntil;
 
     this.world = elements.world;
-    if (IS_IOS) {
+    if (IS_IOS || IS_ANDROID) {
       elements.ambientParticleLayer.style.display = 'none';
+    }
+    if (this.isAndroidLowEnd) {
+      elements.cardChromeLayer.style.display = 'none';
+      elements.fourDWireframe.style.display = 'none';
     }
     this.particleField = new ManifoldCanvasParticleField(
       elements.ambientParticleLayer,
-      IS_IOS ? 0 : this.config.starCount
+      IS_IOS || IS_ANDROID ? 0 : this.config.starCount
     );
 
     this.chromeInstancesPool = createCardChromeInstancePool(this.config.itemCount);
@@ -664,9 +669,10 @@ export class ManifoldModeController {
     this.particleField.resize(this.viewportWidth, this.viewportHeight, window.devicePixelRatio || 1);
     this.particleField.layout(this.loopSize, this.viewportWidth, this.viewportHeight);
     const initCardChrome = () => {
-      if (IS_IOS) {
+      if (IS_IOS || this.isAndroidLowEnd) {
         // iOS WebKit can occasionally composite this fullscreen WebGL layer as opaque black
-        // after the first interaction. The CSS chrome underneath is enough to preserve the look.
+        // after the first interaction. Low-end Android benefits from the same fallback because
+        // the decorative fullscreen pass is disproportionately expensive there.
         this.gpuCardChromeDisabled = true;
         elements.cardChromeLayer.style.display = 'none';
         this.dom.removeBodyClass('has-gpu-card-chrome', 'has-gpu-card-chrome-active');
@@ -1505,9 +1511,10 @@ export class ManifoldModeController {
         (!this.is2DMode() && this.inputService.isPointerActive() && !suppressHoverChecks) ||
         quiet2DPointerWindow
       );
+    const skipFourDVisuals = this.isAndroidLowEnd;
     const fourDStartedAt = performance.now();
     this.currentFourDScene =
-      visualFourDProgress > 0.001 ? this.computeFourDScene(sceneScroll, time, visualFourDProgress) : null;
+      !skipFourDVisuals && visualFourDProgress > 0.001 ? this.computeFourDScene(sceneScroll, time, visualFourDProgress) : null;
     this.renderFourDWireframe(this.currentFourDScene, visualFourDProgress);
     this.chromeInstancesActiveCount = 0;
 
@@ -1821,6 +1828,7 @@ export class ManifoldModeController {
       this.expandedCard !== null || this.expandedProgress > 0.01 || this.expandedTarget > 0;
     const hudNavigationOpen = document.body.classList.contains('hud-nav-open');
     const lowEndDevice = this.deviceMemory <= 4 || this.hardwareThreads <= 4;
+    const lowEndAndroid = this.isAndroidLowEnd;
     const mobileDevice = this.isMobileViewport;
     const twoDHeavy = this.is2DMode() || this.viewModeProgress > 0.5;
     const fourDHeavy = this.is4DMode() || this.fourDProgress > 0.22;
@@ -1841,12 +1849,12 @@ export class ManifoldModeController {
         ? (lowEndDevice ? 0.22 : 0.26)
         : lowEndDevice ? 0.28 : 0.32;
     const fullRatePixelScale = Math.max(
-      0.7,
-      fullRatePixelScaleBase - (mobileDevice ? (lowEndDevice ? 0.04 : 0.06) : 0)
+      lowEndAndroid ? 0.62 : 0.7,
+      fullRatePixelScaleBase - (mobileDevice ? (lowEndAndroid ? 0.12 : lowEndDevice ? 0.04 : 0.06) : 0)
     );
     const fullRateBackgroundScale = Math.max(
-      0.14,
-      fullRateBackgroundScaleBase - (mobileDevice ? (lowEndDevice ? 0.04 : 0.05) : 0)
+      lowEndAndroid ? 0.1 : 0.14,
+      fullRateBackgroundScaleBase - (mobileDevice ? (lowEndAndroid ? 0.1 : lowEndDevice ? 0.04 : 0.05) : 0)
     );
 
     if (hudNavigationOpen) {
@@ -1905,20 +1913,20 @@ export class ManifoldModeController {
 
     if (idleMs < 9000) {
       return {
-        frameInterval: 1000 / 60,
-        modeLabel: 'BALANCED',
-        pixelScale: manifoldHeavy ? (lowEndDevice ? 0.8 : 0.88) : lowEndDevice ? 0.88 : 0.92,
+        frameInterval: lowEndAndroid ? 1000 / 48 : 1000 / 60,
+        modeLabel: lowEndAndroid ? 'BALANCED ECO' : 'BALANCED',
+        pixelScale: manifoldHeavy ? (lowEndAndroid ? 0.72 : lowEndDevice ? 0.8 : 0.88) : lowEndAndroid ? 0.78 : lowEndDevice ? 0.88 : 0.92,
         transitionActive,
-        backgroundScale: manifoldHeavy ? (lowEndDevice ? 0.22 : 0.26) : lowEndDevice ? 0.26 : 0.3
+        backgroundScale: manifoldHeavy ? (lowEndAndroid ? 0.16 : lowEndDevice ? 0.22 : 0.26) : lowEndAndroid ? 0.18 : lowEndDevice ? 0.26 : 0.3
       };
     }
 
     return {
-      frameInterval: 1000 / 30,
-      modeLabel: 'POWER SAVE',
-      pixelScale: lowEndDevice ? 0.76 : 0.82,
+      frameInterval: lowEndAndroid ? 1000 / 24 : 1000 / 30,
+      modeLabel: lowEndAndroid ? 'POWER SAVE+' : 'POWER SAVE',
+      pixelScale: lowEndAndroid ? 0.68 : lowEndDevice ? 0.76 : 0.82,
       transitionActive,
-      backgroundScale: lowEndDevice ? 0.26 : 0.3
+      backgroundScale: lowEndAndroid ? 0.16 : lowEndDevice ? 0.26 : 0.3
     };
   }
 

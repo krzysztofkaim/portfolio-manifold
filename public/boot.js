@@ -27,6 +27,10 @@
     const isIOS =
       /iphone|ipad|ipod/.test(ua) ||
       (ua.includes('mac') && 'ontouchend' in document);
+    const isAndroid = ua.includes('android');
+    const hardwareThreads = window.navigator.hardwareConcurrency || 8;
+    const deviceMemory = typeof window.navigator.deviceMemory === 'number' ? window.navigator.deviceMemory : 8;
+    const isAndroidLowEnd = isAndroid && (deviceMemory <= 4 || hardwareThreads <= 4);
 
     if (isSafari) {
       root.classList.add('is-safari');
@@ -34,6 +38,14 @@
 
     if (isIOS) {
       root.classList.add('is-ios');
+    }
+
+    if (isAndroid) {
+      root.classList.add('is-android');
+    }
+
+    if (isAndroidLowEnd) {
+      root.classList.add('is-android-low-end');
     }
   } catch {
     // Ignore UA parsing failures and keep the default styling path.

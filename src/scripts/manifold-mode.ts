@@ -15,7 +15,7 @@ import { ManifoldAppDiagnostics, type DiagnosticsElements, type LoopTelemetry } 
 import { ManifoldAppScroll } from './ui/ManifoldAppScroll';
 import { StyleAdapter } from '../utils/StyleAdapter';
 import { EVENT_RECORD_PROFILE, type RecordProfileDetail } from '../config/manifold/ManifoldEvents';
-import { IS_IOS, IS_SAFARI } from '../utils/browserDetection';
+import { IS_ANDROID, IS_ANDROID_LOW_END, IS_IOS, IS_SAFARI } from '../utils/browserDetection';
 
 type HudSubviewView = 'about' | 'policy';
 
@@ -185,7 +185,7 @@ class ManifoldApp {
     uiMs: 0
   };
 
-  private activeMode: '2d' | '3d' | '4d' = '3d';
+  private activeMode: '2d' | '3d' | '4d' = IS_IOS || IS_ANDROID ? '2d' : '3d';
   private modeSelectorTeardown: (() => void) | null = null;
   private localeTeardown: (() => void) | null = null;
   private debugModeHotkeysTeardown: (() => void) | null = null;
@@ -281,7 +281,7 @@ class ManifoldApp {
       PixelCanvas.setGlobalQuality(this.lastPixelQuality);
     }
 
-    if (IS_IOS) {
+    if (IS_IOS || IS_ANDROID) {
       this.elements.liquidGradient.style.display = 'none';
       this.lastBackgroundQuality = 0;
     } else {
@@ -292,6 +292,7 @@ class ManifoldApp {
     }
 
     const preferredMode = this.resolvePreferredStartupMode();
+    this.activeMode = preferredMode;
 
     const dom = new BrowserDomAdapter();
     const runtime = new BrowserRuntimeAdapter();
@@ -369,7 +370,7 @@ class ManifoldApp {
   }
 
   private setupLenis(): void {
-    if (IS_IOS) {
+    if (IS_IOS || IS_ANDROID) {
       this.lenis = null;
       return;
     }
@@ -1832,7 +1833,14 @@ class ManifoldApp {
   }
 
   private resolvePreferredStartupMode(): '2d' | '3d' {
+    if (IS_IOS || IS_ANDROID) {
+      return '2d';
+    }
+
     const isLowSpec = ((navigator as { deviceMemory?: number }).deviceMemory ?? 8) <= 4 || navigator.hardwareConcurrency <= 4;
+    if (IS_ANDROID_LOW_END) {
+      return '2d';
+    }
     return (window.innerWidth <= 720 || isLowSpec) ? '2d' : '3d';
   }
 
