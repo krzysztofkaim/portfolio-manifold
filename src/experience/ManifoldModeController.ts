@@ -155,6 +155,7 @@ export class ManifoldModeController {
       : 8;
   private readonly hardwareThreads = navigator.hardwareConcurrency || 8;
   private readonly isAndroidLowEnd = IS_ANDROID_LOW_END;
+  private readonly shouldBypassIntro = IS_IOS || IS_ANDROID;
   private isMobileViewport = false;
   private readonly prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   private locale: ManifoldLocale = 'en';
@@ -693,6 +694,9 @@ export class ManifoldModeController {
       initCardChrome();
     }
     this.introScrollAnchor = this.getInitialScrollAnchor();
+    if (this.shouldBypassIntro) {
+      this.bootstrapDirectMobileView();
+    }
 
     this.inputService = new ManifoldInputService({
       advanceNext: () => this.elements.advanceButtons.next.click(),
@@ -746,7 +750,13 @@ export class ManifoldModeController {
     });
     this.dom.observeResize(this.resizeObserver, this.elements.viewport);
     this.inputController.attach();
-    this.dom.addBodyClass('is-intro-active');
+    if (this.shouldBypassIntro) {
+      this.setAccessibilityState(true);
+      this.dom.removeBodyClass('is-intro-active', 'is-entering-world');
+      this.dom.addBodyClass('intro-complete');
+    } else {
+      this.dom.addBodyClass('is-intro-active');
+    }
     this.setupInteractiveButtonHooks();
   }
 
@@ -807,6 +817,10 @@ export class ManifoldModeController {
   }
 
   getInitialScrollAnchor(): number {
+    if (this.shouldBypassIntro) {
+      return this.getFeaturedCardScrollAnchor();
+    }
+
     return this.getFeaturedCardScrollAnchor() - INITIAL_ENTRY_SCROLL_OFFSET_PX / this.config.camSpeed;
   }
 
@@ -3745,6 +3759,25 @@ export class ManifoldModeController {
     this.lastRawSceneOffset = 0;
     this.introTarget = 1;
     this.dom.addBodyClass('is-entering-world');
+  }
+
+  private bootstrapDirectMobileView(): void {
+    this.introCompleted = true;
+    this.introTarget = 1;
+    this.introProgress = 1;
+    this.pendingIntroExit = false;
+    this.exitReturnActive = false;
+    this.exitSceneOffset = 0;
+    this.stableSceneOffset = 0;
+    this.lastRawSceneOffset = 0;
+    this.continuousSceneScroll = 0;
+    this.lastSceneScrollForLoop = this.introScrollAnchor;
+    this.worldScrollReference = this.phaseState.scroll;
+    this.resetIncomingScrollContinuity(this.phaseState.scroll);
+    this.setFeaturedCardProfile('default', false);
+
+    const initialFocusCard = this.featuredItem?.cardIndex ?? this.config.featuredIndex;
+    this.focusCardIn2D(initialFocusCard, true);
   }
 
   private triggerIntroExit(): void {
