@@ -2788,6 +2788,13 @@ export class ManifoldModeController {
       fourDProgress
     ));
 
+    if (this.shouldBypassIntro && viewModeProgress > 0.9 && fourDProgress < 0.01) {
+      shiftZ = 0;
+      tiltX = 0;
+      tiltY = 0;
+      tz = 0;
+    }
+
     const introCardMix = item.isFeatured ? 1 - this.introProgress : 0;
     const introCardScale = item.isFeatured && !this.introCompleted
       ? lerp(MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.featuredIntroScale, 1, 1 - introCardMix)

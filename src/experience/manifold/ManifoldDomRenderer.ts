@@ -2,7 +2,7 @@ import { clamp, lerp } from '../../utils/math';
 import type { ItemState } from './ManifoldTypes';
 import { StyleAdapter } from '../../utils/StyleAdapter';
 import { scheduleCardTitleMarqueeSync } from './CardTitleMarquee';
-import { IS_SAFARI } from '../../utils/browserDetection';
+import { IS_IOS, IS_SAFARI } from '../../utils/browserDetection';
 
 const CARD_SPECTRUM_VARIABLES = Array.from({ length: 16 }, (_, index) => `--f-${index}`);
 
@@ -139,7 +139,10 @@ export class ManifoldDomRenderer {
       }
 
       const precision = IS_SAFARI ? 1 : 2;
-      const transform = `translate3d(${x.toFixed(precision)}px, ${y.toFixed(precision)}px, ${(z+shiftZ).toFixed(precision)}px) rotateZ(${rot.toFixed(precision)}deg)`;
+      const flatTransform = IS_IOS && Math.abs(z + shiftZ) < 0.05 && Math.abs(tiltX) < 0.05 && Math.abs(tiltY) < 0.05;
+      const transform = flatTransform
+        ? `translate(${x.toFixed(precision)}px, ${y.toFixed(precision)}px) rotate(${rot.toFixed(precision)}deg)`
+        : `translate3d(${x.toFixed(precision)}px, ${y.toFixed(precision)}px, ${(z + shiftZ).toFixed(precision)}px) rotateZ(${rot.toFixed(precision)}deg)`;
       item.el.style.transform = transform;
       
       // Also update rotation vars for the child .card if they changed significantly
@@ -252,9 +255,12 @@ export class ManifoldDomRenderer {
     if (key !== item.lastFxKey) {
       const precision = IS_SAFARI ? 1 : 2;
       const cardScale = item.currentCardScale || 1;
+      const flatTransform = IS_IOS && Math.abs(shiftZ) < 0.05 && Math.abs(tiltX) < 0.05 && Math.abs(tiltY) < 0.05;
       
       // We must include translate(-50%, -50%) because the card is absolutely positioned and centered
-      item.fxEl.style.transform = `translate3d(0, 0, ${shiftZ.toFixed(precision)}px) translate(-50%, -50%) rotateX(${tiltX.toFixed(precision)}deg) rotateY(${tiltY.toFixed(precision)}deg) rotateZ(${tiltZ.toFixed(precision)}deg) scale(${cardScale.toFixed(precision + 1)})`;
+      item.fxEl.style.transform = flatTransform
+        ? `translate(-50%, -50%) rotate(${tiltZ.toFixed(precision)}deg) scale(${cardScale.toFixed(precision + 1)})`
+        : `translate3d(0, 0, ${shiftZ.toFixed(precision)}px) translate(-50%, -50%) rotateX(${tiltX.toFixed(precision)}deg) rotateY(${tiltY.toFixed(precision)}deg) rotateZ(${tiltZ.toFixed(precision)}deg) scale(${cardScale.toFixed(precision + 1)})`;
       item.lastFxKey = key;
     }
   }
@@ -267,7 +273,9 @@ export class ManifoldDomRenderer {
 
     if (item.lastBasePosKey !== key) {
       const precision = IS_SAFARI ? 1 : 2;
-      item.el.style.transform = `translate3d(${tx.toFixed(precision)}px, ${ty.toFixed(precision)}px, ${tz.toFixed(precision)}px)`;
+      item.el.style.transform = IS_IOS && Math.abs(tz) < 0.05
+        ? `translate(${tx.toFixed(precision)}px, ${ty.toFixed(precision)}px)`
+        : `translate3d(${tx.toFixed(precision)}px, ${ty.toFixed(precision)}px, ${tz.toFixed(precision)}px)`;
       item.lastBasePosKey = key;
     }
   }

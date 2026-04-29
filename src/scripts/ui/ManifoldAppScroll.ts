@@ -34,6 +34,8 @@ export class ManifoldAppScroll {
   private touchStartY = 0;
   private touchRefreshGuardArmed = false;
   private readonly shouldBlockPullToRefresh = IS_IOS && IS_SAFARI;
+  private readonly useSimpleNativeScroll = IS_IOS;
+  private lastProxyHeightPx = -1;
 
   constructor(
     private readonly telemetry: LoopTelemetry,
@@ -72,12 +74,13 @@ export class ManifoldAppScroll {
   }
 
   initialize(initialLogicalScroll: number): void {
-    const centeredPhysicalScroll =
-      this.loopScrollLength > 0
+    const centeredPhysicalScroll = this.useSimpleNativeScroll
+      ? Math.max(0, initialLogicalScroll)
+      : this.loopScrollLength > 0
         ? this.loopScrollLength * MANIFOLD_LOOP_MULTIPLIER * 0.5
         : Math.max(0, initialLogicalScroll);
 
-    this.logicalOffset = initialLogicalScroll - centeredPhysicalScroll;
+    this.logicalOffset = this.useSimpleNativeScroll ? 0 : initialLogicalScroll - centeredPhysicalScroll;
     this.targetScroll = centeredPhysicalScroll;
     this.smoothScroll = centeredPhysicalScroll;
     this.activeScroll = centeredPhysicalScroll;
@@ -259,6 +262,11 @@ export class ManifoldAppScroll {
       lenis.scrollTo(scroll, { immediate: true, force: true });
       return;
     }
+
+    if (Math.abs((window.scrollY ?? 0) - scroll) < 1) {
+      return;
+    }
+
     window.scrollTo(0, scroll);
   }
 
@@ -269,11 +277,23 @@ export class ManifoldAppScroll {
 
     const viewportHeight = window.innerHeight;
     const proxyHeight =
-      this.loopScrollLength > 0
-        ? Math.max(viewportHeight + this.loopScrollLength * MANIFOLD_LOOP_MULTIPLIER, viewportHeight * 3)
-        : viewportHeight * 3;
+      this.useSimpleNativeScroll
+        ? (
+          this.loopScrollLength > 0
+            ? Math.max(viewportHeight + this.loopScrollLength + viewportHeight * 2, viewportHeight * 4)
+            : viewportHeight * 4
+        )
+        : (
+          this.loopScrollLength > 0
+            ? Math.max(viewportHeight + this.loopScrollLength * MANIFOLD_LOOP_MULTIPLIER, viewportHeight * 3)
+            : viewportHeight * 3
+        );
 
-    this.scrollProxy.style.height = `${Math.round(proxyHeight)}px`;
+    const roundedProxyHeight = Math.round(proxyHeight);
+    if (roundedProxyHeight !== this.lastProxyHeightPx) {
+      this.scrollProxy.style.height = `${roundedProxyHeight}px`;
+      this.lastProxyHeightPx = roundedProxyHeight;
+    }
     this.getLenis()?.resize(); // Force boundary update
   }
 
@@ -328,6 +348,13 @@ export class ManifoldAppScroll {
     physicalScroll: number,
     velocityMagnitude = 0
   ): { scroll: number; delta: number } {
+    if (this.useSimpleNativeScroll) {
+      return {
+        scroll: clampNumber(physicalScroll, 0, this.getSimpleNativeScrollMax()),
+        delta: 0
+      };
+    }
+
     if (this.loopScrollLength <= 0) {
       return { scroll: physicalScroll, delta: 0 };
     }
@@ -361,4 +388,17 @@ export class ManifoldAppScroll {
 
     return { scroll: physicalScroll, delta: 0 };
   }
+
+  private getSimpleNativeScrollMax(): number {
+    const viewportHeight = window.innerHeight;
+    return this.loopScrollLength > 0
+      ? Math.max(this.loopScrollLength + viewportHeight * 2, viewportHeight * 3)
+      : viewportHeight * 3;
+  }
+}
+
+function clampNumber(value: number, min: number, max: number): number {
+  if (value < min) return min;
+  if (value > max) return max;
+  return value;
 }

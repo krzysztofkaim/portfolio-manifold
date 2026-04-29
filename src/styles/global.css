@@ -505,6 +505,17 @@ html.is-ios .bg-gradient-soft {
   opacity: 0.62;
 }
 
+html.is-ios .viewport {
+  perspective: none !important;
+}
+
+html.is-ios .world,
+html.is-ios .item,
+html.is-ios .card {
+  transform-style: flat !important;
+  will-change: auto !important;
+}
+
 html.is-android .bg-gradient-soft {
   opacity: 0.56;
 }

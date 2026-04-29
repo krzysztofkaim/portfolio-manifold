@@ -1,6 +1,7 @@
 import { TITLE_SCRAMBLE_CHARS } from '../../config/manifold/ManifoldSceneConfig';
 import type { ItemState } from './ManifoldTypes';
 import { scheduleCardTitleMarqueeSync, setCardTitleText } from './CardTitleMarquee';
+import { IS_IOS } from '../../utils/browserDetection';
 
 export class ManifoldTextEffectManager {
   private readonly textScrambleRafs = new WeakMap<HTMLElement, number>();
@@ -36,6 +37,13 @@ export class ManifoldTextEffectManager {
   }
 
   private animateTextSwap(element: HTMLElement, target: string, force = false): void {
+    if (IS_IOS) {
+      this.textScrambleTargets.set(element, target);
+      element.classList.remove('is-title-scrambling');
+      element.textContent = target;
+      return;
+    }
+
     if (!force && this.textScrambleTargets.get(element) === target) {
       return;
     }
@@ -98,6 +106,14 @@ export class ManifoldTextEffectManager {
     const target = expanded ? item.expandedCardTitle || item.cardTitle : item.cardTitle;
     setCardTitleText(titleEl, titleEl.textContent ?? target);
 
+    if (IS_IOS) {
+      setCardTitleText(titleEl, target);
+      titleEl.classList.remove('is-title-scrambling');
+      item.titleScrambleTarget = target;
+      scheduleCardTitleMarqueeSync(titleEl);
+      return;
+    }
+
     if (item.titleScrambleTarget === target && titleEl.textContent === target) {
       scheduleCardTitleMarqueeSync(titleEl);
       return;
@@ -159,6 +175,13 @@ export class ManifoldTextEffectManager {
 
     const preview = handoffEl.dataset.previewHandoff ?? handoffEl.textContent ?? '';
     const target = expanded ? item.expandedHandoff || preview : preview;
+
+    if (IS_IOS) {
+      handoffEl.textContent = target;
+      handoffEl.classList.remove('is-title-scrambling');
+      item.handoffScrambleTarget = target;
+      return;
+    }
 
     if (item.handoffScrambleTarget === target && handoffEl.textContent === target) {
       return;

@@ -196,6 +196,7 @@ class ManifoldApp {
   private lastHudNavSignature = '';
   private lastBackgroundRenderAt = 0;
   private lastControllerRenderAt = 0;
+  private lastIosUiTickAt = 0;
   private lastInteractionBurstAt = 0;
   private hudOrbitsVisible = false;
   private activeHudSubView: 'about' | 'policy' | null = null;
@@ -1710,10 +1711,24 @@ class ManifoldApp {
         const forceResponsiveRate =
           scrollVelocity > 0.0035 ||
           time - this.lastInteractionBurstAt < 1400;
-        const shouldRunControllerPass =
-          perf.frameInterval <= 0 ||
-          forceResponsiveRate ||
-          time - this.lastControllerRenderAt >= perf.frameInterval;
+        const audioActive = this.audio.getAudioActiveState();
+        const iosInteractiveInterval = 1000 / (audioActive ? 18 : 20);
+        const iosIdleInterval = 1000 / 8;
+        const effectiveFrameInterval = IS_IOS
+          ? Math.max(
+            perf.frameInterval || 0,
+            forceResponsiveRate || perf.transitionActive || audioActive || this.cachedHasExpandedCard
+              ? iosInteractiveInterval
+              : iosIdleInterval
+          )
+          : perf.frameInterval;
+        const shouldRunControllerPass = IS_IOS
+          ? time - this.lastControllerRenderAt >= effectiveFrameInterval
+          : (
+            perf.frameInterval <= 0 ||
+            forceResponsiveRate ||
+            time - this.lastControllerRenderAt >= perf.frameInterval
+          );
 
         if (shouldRunControllerPass) {
           const controllerStartedAt = performance.now();
@@ -1748,8 +1763,15 @@ class ManifoldApp {
       const isInteracting = scrollVelocity > 0.0035 || time - this.lastInteractionBurstAt < 1400;
       const isMotionActive = perf.transitionActive || isInteracting;
       const shouldRefreshHud = isMotionActive ? (time - this.lastHudNavRenderAt > 120) : (time - this.lastHudNavRenderAt > 2400);
+      const audioActive = this.audio.getAudioActiveState();
+      const iosUiInterval = isMotionActive || audioActive ? 1000 / 16 : 1000 / 6;
+      const shouldRunIosUiPass = !IS_IOS || time - this.lastIosUiTickAt >= iosUiInterval;
 
       const uiStartedAt = performance.now();
+      if (shouldRunIosUiPass) {
+        this.lastIosUiTickAt = time;
+      }
+
       this.syncHudNavigationMode();
 
       if (shouldRefreshHud) {
@@ -1759,13 +1781,14 @@ class ManifoldApp {
       // Sync cached body class state once per frame (avoids repeated classList.contains in hot paths)
       this.cachedHasExpandedCard = document.body.classList.contains('has-expanded-card');
 
-      this.updateTopbarLoaderKicker();
-
-      this.updateQualities(perf, scrollVelocity);
-      this.cursor.update();
-      this.diagnostics?.update(time);
-      this.audio.updateAudioReactiveState(time);
-      this.updateHudSpectrum();
+      if (!IS_IOS || shouldRunIosUiPass) {
+        this.updateTopbarLoaderKicker();
+        this.updateQualities(perf, scrollVelocity);
+        this.cursor.update();
+        this.diagnostics?.update(time);
+        this.audio.updateAudioReactiveState(time);
+        this.updateHudSpectrum();
+      }
       this.telemetryState.uiMs = performance.now() - uiStartedAt;
 
       if (this.controller) {

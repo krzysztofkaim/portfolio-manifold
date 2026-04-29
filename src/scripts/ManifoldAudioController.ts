@@ -2,6 +2,7 @@ import { MANIFOLD_AUDIO_TARGET_VOLUME } from '../config/manifold/ManifoldBootCon
 import type { ManifoldModeController } from '../experience/ManifoldModeController';
 import type { ManifoldAudioLocaleStrings } from '../i18n/manifoldLocale';
 import { pretextLayoutService } from '../ui/text/PretextLayoutService';
+import { IS_IOS } from '../utils/browserDetection';
 
 interface AudioElements {
   audioButton: HTMLButtonElement | null;
@@ -205,7 +206,11 @@ export class ManifoldAudioController {
     });
     const currentWidth = this.lastAudioButtonWidthPx > 0 ? this.lastAudioButtonWidthPx : targetWidth;
 
-    if (immediate || currentWidth <= 0) {
+    if (this.lastAudioButtonWidthPx === targetWidth) {
+      return;
+    }
+
+    if (IS_IOS || immediate || currentWidth <= 0) {
       button.style.width = `${targetWidth}px`;
       this.lastAudioButtonWidthPx = targetWidth;
       return;
