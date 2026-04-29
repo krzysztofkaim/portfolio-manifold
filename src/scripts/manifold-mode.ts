@@ -1914,7 +1914,7 @@ class ManifoldApp {
         activeElement instanceof HTMLInputElement ||
         activeElement instanceof HTMLTextAreaElement ||
         activeElement instanceof HTMLSelectElement ||
-        activeElement?.isContentEditable
+        (activeElement as HTMLElement | null)?.isContentEditable
       ) {
         return;
       }
@@ -2083,11 +2083,11 @@ class ManifoldApp {
           this.updateManifoldState();
         }
 
-        const pagerState = this.hudSubviewPagers.get(this.activeHudSubView);
+        const pagerState = this.hudSubviewPagers.get(this.activeHudSubView!);
         if (pagerState) {
           pagerState.currentPage = 0;
         }
-        this.repaginateHudSubview(this.activeHudSubView, true);
+        this.repaginateHudSubview(this.activeHudSubView!, true);
       } else {
         if (this.hudSubViewUpdateInterval) {
           window.clearInterval(this.hudSubViewUpdateInterval);

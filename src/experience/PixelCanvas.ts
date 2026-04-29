@@ -166,7 +166,7 @@ export class PixelCanvas extends HTMLElement {
   }
 
   private get gap(): number {
-    const defaultGap = isSafari() ? 8 : 6;
+    const defaultGap = IS_SAFARI ? 8 : 6;
     const parsed = Number.parseInt(this.dataset.gap ?? String(defaultGap), 10);
     return clampNumber(Number.isNaN(parsed) ? defaultGap : parsed, 4, 50);
   }

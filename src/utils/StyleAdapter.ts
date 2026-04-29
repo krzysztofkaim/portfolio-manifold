@@ -13,7 +13,7 @@ interface CssTypedNumericFactory {
   px(value: number): unknown;
 }
 
-interface TypedStyleMapCapableElement extends HTMLElement {
+interface TypedStyleMapCapableElement {
   attributeStyleMap: {
     set(name: string, value: unknown): void;
   };

@@ -2635,7 +2635,7 @@ export class ManifoldModeController {
         continue;
       }
 
-      if (allowExpandedControls && !button.disabled) {
+      if (allowExpandedControls && !(button as HTMLButtonElement).disabled) {
         button.removeAttribute('tabindex');
       } else {
         button.setAttribute('tabindex', '-1');
@@ -2719,7 +2719,7 @@ export class ManifoldModeController {
     cardRenderLayout: CardRenderLayout,
     fourDScene: FourDSceneState | null,
     maintainScreenQuad: boolean,
-    sharedSpectrum: number[]
+    sharedSpectrum: ArrayLike<number>
   ): void {
     let tx: number;
     let ty: number;
