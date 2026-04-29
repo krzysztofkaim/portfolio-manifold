@@ -595,27 +595,41 @@ export const EN_BUNDLE: ManifoldLocaleBundle = {
     currentModeAriaPrefix: 'Current manifold mode',
     nextCardAria: 'Next card',
     nextCardSectionAria: 'Show next card section',
+    nextPageAria: 'Next page',
     orbitToggle: 'ORBITAL GUIDES',
     orbitToggleActive: 'Orbital guides: on',
     orbitToggleInactive: 'Orbital guides: off',
     orbitToggleAria: 'Toggle orbital navigation guides',
+    previousPageAria: 'Previous page',
     previousCardAria: 'Previous card',
     powerSave: 'POWER SAVE',
     perf: 'PERF',
     policyLabel: 'PRIVACY POLICY',
     policyCloseLabel: 'CLOSE POLICY',
     policyContent: {
-      intro: 'This scene runs mostly client-side. This disclosure is provided in accordance with transparency requirements (GDPR) regarding runtime data behavior.',
+      intro:
+        'PRIVACY NOTICE\n\nLast updated: 29 April 2026\n\nThis website is a personal web experience operated under the kaim.dev domain. It is designed to run mostly in your browser and to collect as little information as reasonably possible.',
       processingTitle: 'LOCAL PROCESSING',
-      processingBody: 'Rendering, diagnostics, GPU capability checks and interaction state run in your browser. Hardware details shown in debug views stay on-device unless telemetry is explicitly enabled.',
-      storageTitle: 'LOCAL STORAGE',
-      storageBody: 'The app stores selected language and orbital-guide visibility in localStorage, plus a short-lived locale transition flag in sessionStorage. No cookies are used by this experience.',
+      processingBody:
+        'Rendering, interaction state, diagnostics, GPU/browser capability checks and visual effects run locally in your browser. Debug information about your device or browser remains on your device unless telemetry is explicitly enabled.',
+      storageTitle: 'BROWSER STORAGE',
+      storageBody:
+        'The site uses localStorage to remember selected language and orbital-guide visibility, and sessionStorage for a short-lived locale transition flag. These values are used only to keep the interface consistent. This experience does not use cookies.',
       audioTitle: 'AUDIO PLAYBACK',
-      audioBody: 'Background audio is loaded only after you press the audio toggle. The site does not request microphone or camera access.',
+      audioBody:
+        'Background audio is loaded only after you press the audio toggle. The site does not request microphone or camera access.',
       telemetryTitle: 'OPTIONAL TELEMETRY',
-      telemetryBody: 'Analytics events are sent only when a telemetry endpoint is configured for this deployment. If enabled, the app sends event name, timestamp, current path and small interaction payloads such as mode switches or audio start.',
+      telemetryBody:
+        'If a telemetry endpoint is configured for this deployment, the app may send limited technical events such as event name, timestamp, current path and small interaction payloads, for example mode switches or audio start. This is used only to understand and improve the experience.',
+      performanceTitle: 'PERFORMANCE ANALYTICS',
+      performanceBody:
+        "This site may use Cloudflare Web Analytics / Real User Measurements (RUM) to measure real-world loading performance and reliability. When enabled, Cloudflare may load or inject a small JavaScript beacon that collects browser performance measurements such as page-load timing, navigation timing, resource timing, paint timing and Core Web Vitals, together with limited page context such as the current path or referrer. This performance measurement is used to diagnose and improve speed, rendering behavior and user-perceived performance. It is not used by this site for advertising, cross-site profiling or user identification. The legal basis, where required, is the operator's legitimate interest in maintaining and improving the technical quality of the website.",
       contactTitle: 'CONTACT ACTION',
-      contactBody: 'The contact link matches the active locale ("contact" or "kontakt"). To mitigate automated harvesting by scrapers and bots, the address is never stored as a static string and is injected into the mailto protocol only upon interaction.'
+      contactBody:
+        'The contact link matches the active locale ("contact" or "kontakt"). To reduce automated harvesting by scrapers and bots, the address is not stored as a static visible string and is injected into the mailto protocol only upon interaction.',
+      rightsTitle: 'YOUR RIGHTS',
+      rightsBody:
+        'Where GDPR applies, you may request access, correction, deletion, restriction or objection regarding personal data processed in connection with this site. Contact may be made through the contact action available on the website.'
     },
     privacyLabel: 'DEBUG OVERLAY',
     privacyCloseLabel: 'HIDE DEBUG',

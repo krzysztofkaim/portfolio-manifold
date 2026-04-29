@@ -8,6 +8,7 @@ import {
 import { createLenisRebaseAdapter } from '../LenisRebaseAdapter';
 import type { LoopTelemetry } from './ManifoldAppDiagnostics';
 import { computeDampedLerp } from '../../experience/manifold/HyperMath';
+import { IS_IOS, IS_SAFARI } from '../../utils/browserDetection';
 
 export interface ScrollController {
   getInitialScrollAnchor(): number;
@@ -29,6 +30,10 @@ export class ManifoldAppScroll {
   private lenisRebaseUnlockRaf = 0;
   private scrollProxy: HTMLElement | null = null;
   private lastUpdateTime = 0;
+  private touchStartX = 0;
+  private touchStartY = 0;
+  private touchRefreshGuardArmed = false;
+  private readonly shouldBlockPullToRefresh = IS_IOS && IS_SAFARI;
 
   constructor(
     private readonly telemetry: LoopTelemetry,
@@ -38,10 +43,19 @@ export class ManifoldAppScroll {
 
   setup(): void {
     window.addEventListener('scroll', this.handleNativeScroll);
+
+    if (this.shouldBlockPullToRefresh) {
+      document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
+      document.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+    }
   }
 
   destroy(): void {
     window.removeEventListener('scroll', this.handleNativeScroll);
+    if (this.shouldBlockPullToRefresh) {
+      document.removeEventListener('touchstart', this.handleTouchStart);
+      document.removeEventListener('touchmove', this.handleTouchMove);
+    }
     if (this.lenisRebaseUnlockRaf) {
       window.cancelAnimationFrame(this.lenisRebaseUnlockRaf);
     }
@@ -184,8 +198,58 @@ export class ManifoldAppScroll {
     this.targetScroll = window.scrollY;
   };
 
+  private handleTouchStart = (event: TouchEvent) => {
+    if (event.touches.length !== 1) {
+      this.touchRefreshGuardArmed = false;
+      return;
+    }
+
+    const touch = event.touches[0];
+    this.touchStartX = touch?.clientX ?? 0;
+    this.touchStartY = touch?.clientY ?? 0;
+    this.touchRefreshGuardArmed = this.shouldBlockTouchRefreshForTarget(event.target);
+  };
+
+  private handleTouchMove = (event: TouchEvent) => {
+    if (!this.touchRefreshGuardArmed || event.touches.length !== 1) {
+      return;
+    }
+
+    const touch = event.touches[0];
+    if (!touch) {
+      return;
+    }
+
+    const deltaX = Math.abs(touch.clientX - this.touchStartX);
+    const deltaY = touch.clientY - this.touchStartY;
+
+    // Only intercept a downward edge pull on iOS Safari; normal scrolling stays native.
+    if (deltaY < 14 || deltaY <= deltaX * 1.1) {
+      return;
+    }
+
+    if (this.isAtTopBoundary()) {
+      event.preventDefault();
+    }
+  };
+
   private toLogicalScroll(physicalScroll: number): number {
     return physicalScroll + this.logicalOffset;
+  }
+
+  private shouldBlockTouchRefreshForTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof Element)) {
+      return true;
+    }
+
+    return !target.closest(
+      'input, textarea, select, option, [contenteditable=""], [contenteditable="true"], [data-allow-pull-refresh]'
+    );
+  }
+
+  private isAtTopBoundary(): boolean {
+    const nativeScrollTop = document.scrollingElement?.scrollTop ?? window.scrollY ?? 0;
+    return nativeScrollTop <= 4;
   }
 
   private setPhysicalDocumentScroll(scroll: number): void {

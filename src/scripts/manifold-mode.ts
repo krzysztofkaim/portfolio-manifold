@@ -17,6 +17,35 @@ import { StyleAdapter } from '../utils/StyleAdapter';
 import { EVENT_RECORD_PROFILE, type RecordProfileDetail } from '../config/manifold/ManifoldEvents';
 import { IS_IOS, IS_SAFARI } from '../utils/browserDetection';
 
+type HudSubviewView = 'about' | 'policy';
+
+interface HudSubviewBlockDescriptor {
+  bodyText?: string;
+  kickerText?: string;
+  key: string;
+  source: HTMLElement;
+  type: 'action' | 'intro' | 'item';
+}
+
+interface HudSubviewPagerState {
+  currentPage: number;
+  effectTimeout: number;
+  lastContentSignature: string;
+  lastHeight: number;
+  lastWidth: number;
+  measurePage: HTMLElement;
+  nextButton: HTMLButtonElement;
+  pageCount: number;
+  pager: HTMLElement;
+  pages: HTMLElement[];
+  prevButton: HTMLButtonElement;
+  root: HTMLElement;
+  source: HTMLElement;
+  status: HTMLElement;
+  view: HudSubviewView;
+  viewport: HTMLElement;
+}
+
 interface BootElements extends LocaleElements {
   cursor: CursorElements;
   scrollProxy: HTMLElement;
@@ -69,8 +98,12 @@ interface BootElements extends LocaleElements {
     policyAudioBody: HTMLElement;
     policyTelemetryTitle: HTMLElement;
     policyTelemetryBody: HTMLElement;
+    policyPerformanceTitle: HTMLElement;
+    policyPerformanceBody: HTMLElement;
     policyContactTitle: HTMLElement;
     policyContactBody: HTMLElement;
+    policyRightsTitle: HTMLElement;
+    policyRightsBody: HTMLElement;
     header: HTMLElement;
     debugGpu: HTMLElement;
     debugManifold: HTMLElement;
@@ -156,6 +189,9 @@ class ManifoldApp {
   private modeSelectorTeardown: (() => void) | null = null;
   private localeTeardown: (() => void) | null = null;
   private debugModeHotkeysTeardown: (() => void) | null = null;
+  private readonly hudSubviewPagers = new Map<HudSubviewView, HudSubviewPagerState>();
+  private hudSubviewPaginationForce = false;
+  private hudSubviewPaginationRaf = 0;
   private lastHudNavRenderAt = 0;
   private lastHudNavSignature = '';
   private lastBackgroundRenderAt = 0;
@@ -675,6 +711,9 @@ class ManifoldApp {
     window.addEventListener('resize', () => {
       if (document.body.classList.contains('hud-nav-open')) {
         updateNavigationAnchor();
+        if (this.activeHudSubView) {
+          this.scheduleHudSubviewPagination(true);
+        }
       }
     });
   }
@@ -734,8 +773,10 @@ class ManifoldApp {
     } = this.elements.hudNav;
 
     debugGpu.textContent = this.detectGpu();
+    this.setupHudSubviewPager('about', this.elements.hudNav.aboutRoot);
+    this.setupHudSubviewPager('policy', this.elements.hudNav.policyRoot);
 
-    const toggleView = (view: 'about' | 'policy') => this.toggleHudSubView(view);
+    const toggleView = (view: HudSubviewView) => this.toggleHudSubView(view);
 
     aboutTrigger.addEventListener('click', (e) => { e.stopPropagation(); toggleView('about'); });
     policyTrigger.addEventListener('click', (e) => { e.stopPropagation(); toggleView('policy'); });
@@ -755,6 +796,535 @@ class ManifoldApp {
       }
     });
     observer.observe(this.elements.hudNav.overlay, { attributes: true, attributeFilter: ['aria-hidden'] });
+  }
+
+  public syncHudSubviewPagers(): void {
+    this.hudSubviewPagers.forEach((state) => {
+      this.updateHudSubviewPagerLabels(state);
+    });
+
+    if (this.activeHudSubView) {
+      this.repaginateHudSubview(this.activeHudSubView, true);
+    }
+  }
+
+  private setupHudSubviewPager(view: HudSubviewView, root: HTMLElement): void {
+    if (this.hudSubviewPagers.has(view)) {
+      return;
+    }
+
+    const source = document.createElement('div');
+    source.className = 'hud-subview-source';
+    source.hidden = true;
+    source.setAttribute('aria-hidden', 'true');
+
+    const pager = document.createElement('div');
+    pager.className = 'hud-subview-pager';
+    pager.dataset.view = view;
+
+    const surface = document.createElement('div');
+    surface.className = 'hud-subview-pager__surface';
+
+    const viewport = document.createElement('div');
+    viewport.className = 'hud-subview-pager__viewport';
+
+    const prevButton = document.createElement('button');
+    prevButton.type = 'button';
+    prevButton.className = 'hud-subview-pager__nav hud-subview-pager__nav--prev';
+    prevButton.innerHTML = '<span class="hud-subview-pager__nav-icon" aria-hidden="true">&#x2039;</span>';
+
+    const nextButton = document.createElement('button');
+    nextButton.type = 'button';
+    nextButton.className = 'hud-subview-pager__nav hud-subview-pager__nav--next';
+    nextButton.innerHTML = '<span class="hud-subview-pager__nav-icon" aria-hidden="true">&#x203A;</span>';
+
+    const status = document.createElement('div');
+    status.className = 'hud-subview-pager__status';
+    status.setAttribute('role', 'status');
+    status.setAttribute('aria-live', 'polite');
+
+    const measurePage = document.createElement('div');
+    measurePage.className = 'hud-subview-page hud-subview-page--measure';
+    measurePage.setAttribute('aria-hidden', 'true');
+
+    const children = Array.from(root.children);
+    source.replaceChildren(...children);
+    surface.append(viewport, prevButton, nextButton);
+    pager.append(surface, status, measurePage);
+    root.replaceChildren(source, pager);
+
+    const state: HudSubviewPagerState = {
+      currentPage: 0,
+      effectTimeout: 0,
+      lastContentSignature: '',
+      lastHeight: 0,
+      lastWidth: 0,
+      measurePage,
+      nextButton,
+      pageCount: 0,
+      pager,
+      pages: [],
+      prevButton,
+      root,
+      source,
+      status,
+      view,
+      viewport
+    };
+
+    prevButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.setHudSubviewPage(state, state.currentPage - 1);
+    });
+
+    nextButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.setHudSubviewPage(state, state.currentPage + 1);
+    });
+
+    this.hudSubviewPagers.set(view, state);
+    this.updateHudSubviewPagerLabels(state);
+  }
+
+  private collectHudSubviewBlocks(state: HudSubviewPagerState): HudSubviewBlockDescriptor[] {
+    const blocks: HudSubviewBlockDescriptor[] = [];
+    const intro = state.source.querySelector<HTMLElement>(':scope > .privacy-intro');
+    const introText = intro?.textContent?.trim() ?? '';
+    if (intro && introText) {
+      blocks.push({
+        bodyText: introText,
+        key: 'intro',
+        source: intro,
+        type: 'intro'
+      });
+    }
+
+    const items = Array.from(state.source.querySelectorAll<HTMLElement>(':scope > .privacy-section > .privacy-item'));
+    items.forEach((item, index) => {
+      const actionButton = item.querySelector<HTMLButtonElement>('button');
+      if (actionButton) {
+        blocks.push({
+          key: `action-${index}`,
+          source: item,
+          type: 'action'
+        });
+        return;
+      }
+
+      blocks.push({
+        bodyText: item.querySelector<HTMLElement>('.privacy-title')?.textContent?.trim() ?? '',
+        key: `item-${index}`,
+        kickerText: item.querySelector<HTMLElement>('.privacy-kicker')?.textContent?.trim() ?? '',
+        source: item,
+        type: 'item'
+      });
+    });
+
+    return blocks;
+  }
+
+  private buildHudSubviewContentSignature(blocks: HudSubviewBlockDescriptor[]): string {
+    return blocks
+      .map((block) => {
+        if (block.type === 'action') {
+          return `${block.key}:${block.source.textContent?.trim() ?? ''}`;
+        }
+        return `${block.key}:${block.kickerText ?? ''}:${block.bodyText ?? ''}`;
+      })
+      .join('|');
+  }
+
+  private scheduleHudSubviewPagination(force = false): void {
+    this.hudSubviewPaginationForce = this.hudSubviewPaginationForce || force;
+    if (this.hudSubviewPaginationRaf) {
+      return;
+    }
+
+    this.hudSubviewPaginationRaf = window.requestAnimationFrame(() => {
+      const shouldForce = this.hudSubviewPaginationForce;
+      this.hudSubviewPaginationForce = false;
+      this.hudSubviewPaginationRaf = 0;
+
+      if (!this.activeHudSubView) {
+        return;
+      }
+
+      this.repaginateHudSubview(this.activeHudSubView, shouldForce);
+    });
+  }
+
+  private repaginateHudSubview(view: HudSubviewView, force = false): void {
+    const state = this.hudSubviewPagers.get(view);
+    if (!state || state.root.style.display === 'none') {
+      return;
+    }
+
+    const blocks = this.collectHudSubviewBlocks(state);
+    const contentSignature = this.buildHudSubviewContentSignature(blocks);
+    const viewportWidth = Math.round(state.root.getBoundingClientRect().width);
+    const maxPageHeight = this.resolveHudSubviewPageHeight(state);
+
+    if (viewportWidth <= 0 || maxPageHeight <= 0) {
+      return;
+    }
+
+    if (
+      !force &&
+      state.lastWidth === viewportWidth &&
+      state.lastHeight === maxPageHeight &&
+      state.lastContentSignature === contentSignature
+    ) {
+      return;
+    }
+
+    state.lastWidth = viewportWidth;
+    state.lastHeight = maxPageHeight;
+    state.lastContentSignature = contentSignature;
+    state.viewport.style.maxHeight = `${maxPageHeight}px`;
+    state.measurePage.style.width = `${state.viewport.getBoundingClientRect().width || viewportWidth}px`;
+
+    const fragments = blocks.flatMap((block) => this.buildHudSubviewFragments(state, block, maxPageHeight));
+    const pages = this.groupHudSubviewFragmentsIntoPages(state, fragments, maxPageHeight);
+    const nextPages = pages.length > 0 ? pages : [[this.createHudSubviewFallbackNode()]];
+    const previousPage = force ? 0 : state.currentPage;
+
+    state.viewport.replaceChildren();
+    state.pages = nextPages.map((pageNodes) => {
+      const page = document.createElement('div');
+      page.className = 'hud-subview-page';
+      pageNodes.forEach((node) => page.appendChild(node));
+      state.viewport.appendChild(page);
+      return page;
+    });
+    state.pageCount = state.pages.length;
+    this.setHudSubviewPage(state, previousPage);
+  }
+
+  private resolveHudSubviewPageHeight(state: HudSubviewPagerState): number {
+    const panel = this.elements.hudNav.panel;
+    const panelStyle = window.getComputedStyle(panel);
+    const rootStyle = window.getComputedStyle(state.root);
+    const maxPanelHeight = parseFloat(panelStyle.maxHeight) || window.innerHeight * 0.85;
+    const panelPaddingY = parseFloat(panelStyle.paddingTop) + parseFloat(panelStyle.paddingBottom);
+    const rootPaddingY = parseFloat(rootStyle.paddingTop) + parseFloat(rootStyle.paddingBottom);
+    const pagerGap = 12;
+    const statusHeight = state.status.getBoundingClientRect().height || 18;
+    const siblingHeight = Array.from(panel.children).reduce((sum, child) => {
+      if (!(child instanceof HTMLElement) || child === state.root) {
+        return sum;
+      }
+
+      if (window.getComputedStyle(child).display === 'none') {
+        return sum;
+      }
+
+      return sum + child.getBoundingClientRect().height;
+    }, 0);
+
+    return Math.max(136, Math.floor(maxPanelHeight - panelPaddingY - rootPaddingY - siblingHeight - statusHeight - pagerGap));
+  }
+
+  private buildHudSubviewFragments(
+    state: HudSubviewPagerState,
+    block: HudSubviewBlockDescriptor,
+    maxPageHeight: number
+  ): HTMLElement[] {
+    const wholeNode = this.createHudSubviewNode(block);
+    if (this.measureHudSubviewNodeHeight(state, wholeNode) <= maxPageHeight) {
+      return [wholeNode];
+    }
+
+    if (block.type !== 'intro' && block.type !== 'item') {
+      return [wholeNode];
+    }
+
+    const text = block.bodyText?.trim() ?? '';
+    if (!text) {
+      return [wholeNode];
+    }
+
+    const tokens = this.tokenizeHudSubviewText(text);
+    if (tokens.length === 0) {
+      return [wholeNode];
+    }
+
+    const fragments: HTMLElement[] = [];
+    let start = 0;
+
+    while (start < tokens.length) {
+      const end = this.findHudSubviewTokenBreak(state, block, tokens, start, maxPageHeight);
+      const segmentText = this.joinHudSubviewTokens(tokens.slice(start, end));
+      if (!segmentText) {
+        break;
+      }
+
+      fragments.push(this.createHudSubviewNode(block, segmentText));
+      start = end;
+    }
+
+    return fragments.length > 0 ? fragments : [wholeNode];
+  }
+
+  private tokenizeHudSubviewText(text: string): string[] {
+    return text.match(/\n+|[^\s\n]+/gu) ?? [];
+  }
+
+  private joinHudSubviewTokens(tokens: string[]): string {
+    let output = '';
+    for (const token of tokens) {
+      if (token.includes('\n')) {
+        output = output.replace(/[ \t]+$/u, '');
+        output += token;
+      } else {
+        output += output && !output.endsWith('\n') ? ` ${token}` : token;
+      }
+    }
+
+    return output.trim();
+  }
+
+  private findHudSubviewTokenBreak(
+    state: HudSubviewPagerState,
+    block: HudSubviewBlockDescriptor,
+    tokens: string[],
+    start: number,
+    maxPageHeight: number
+  ): number {
+    let low = start + 1;
+    let high = tokens.length;
+    let best = start;
+
+    while (low <= high) {
+      const mid = Math.floor((low + high) / 2);
+      const node = this.createHudSubviewNode(block, this.joinHudSubviewTokens(tokens.slice(start, mid)));
+      if (this.measureHudSubviewNodeHeight(state, node) <= maxPageHeight) {
+        best = mid;
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+
+    if (best > start) {
+      return best;
+    }
+
+    const token = tokens[start] ?? '';
+    if (token.length <= 1) {
+      return start + 1;
+    }
+
+    let charLow = 1;
+    let charHigh = token.length;
+    let bestCharLength = 1;
+
+    while (charLow <= charHigh) {
+      const mid = Math.floor((charLow + charHigh) / 2);
+      const segmentTokens = [...tokens.slice(start, start + 1)];
+      segmentTokens[0] = token.slice(0, mid);
+      const node = this.createHudSubviewNode(block, this.joinHudSubviewTokens(segmentTokens));
+      if (this.measureHudSubviewNodeHeight(state, node) <= maxPageHeight) {
+        bestCharLength = mid;
+        charLow = mid + 1;
+      } else {
+        charHigh = mid - 1;
+      }
+    }
+
+    if (bestCharLength < token.length) {
+      tokens.splice(start, 1, token.slice(0, bestCharLength), token.slice(bestCharLength));
+    }
+
+    return start + 1;
+  }
+
+  private groupHudSubviewFragmentsIntoPages(
+    state: HudSubviewPagerState,
+    fragments: HTMLElement[],
+    maxPageHeight: number
+  ): HTMLElement[][] {
+    const pages: HTMLElement[][] = [];
+    let currentPage: HTMLElement[] = [];
+
+    fragments.forEach((fragment) => {
+      const candidatePage = [...currentPage, fragment];
+      if (currentPage.length > 0 && !this.doesHudSubviewPageFit(state, candidatePage, maxPageHeight)) {
+        pages.push(currentPage);
+        currentPage = [fragment];
+        return;
+      }
+
+      currentPage = candidatePage;
+    });
+
+    if (currentPage.length > 0) {
+      pages.push(currentPage);
+    }
+
+    return pages;
+  }
+
+  private doesHudSubviewPageFit(state: HudSubviewPagerState, nodes: HTMLElement[], maxPageHeight: number): boolean {
+    const measureNodes = nodes.map((node) => node.cloneNode(true) as HTMLElement);
+    state.measurePage.replaceChildren(...measureNodes);
+    const fits = state.measurePage.scrollHeight <= maxPageHeight + 1;
+    state.measurePage.replaceChildren();
+    return fits;
+  }
+
+  private measureHudSubviewNodeHeight(state: HudSubviewPagerState, node: HTMLElement): number {
+    state.measurePage.replaceChildren(node.cloneNode(true));
+    const height = state.measurePage.scrollHeight;
+    state.measurePage.replaceChildren();
+    return height;
+  }
+
+  private createHudSubviewNode(block: HudSubviewBlockDescriptor, bodyTextOverride?: string): HTMLElement {
+    if (block.type === 'intro') {
+      const intro = document.createElement('p');
+      intro.className = 'privacy-intro';
+      intro.textContent = bodyTextOverride ?? block.bodyText ?? '';
+      return intro;
+    }
+
+    if (block.type === 'action') {
+      const clone = block.source.cloneNode(true) as HTMLElement;
+      this.stripHudSubviewIdentifiers(clone);
+      const actionButton = clone.querySelector<HTMLButtonElement>('button');
+      if (actionButton) {
+        actionButton.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          this.elements.hudNav.debugForceButton.click();
+          this.scheduleHudSubviewPagination(true);
+        });
+      }
+      return clone;
+    }
+
+    const item = document.createElement('div');
+    item.className = 'privacy-item';
+
+    const kicker = document.createElement('span');
+    kicker.className = 'privacy-kicker';
+    kicker.textContent = block.kickerText ?? '';
+
+    const title = document.createElement('strong');
+    title.className = 'privacy-title';
+    title.textContent = bodyTextOverride ?? block.bodyText ?? '';
+
+    item.append(kicker, title);
+    return item;
+  }
+
+  private stripHudSubviewIdentifiers(node: HTMLElement): void {
+    node.removeAttribute('id');
+    node.removeAttribute('aria-hidden');
+    node.removeAttribute('inert');
+    node.hidden = false;
+
+    node.querySelectorAll<HTMLElement>('[id], [aria-hidden], [inert], [hidden]').forEach((element) => {
+      element.removeAttribute('id');
+      element.removeAttribute('aria-hidden');
+      element.removeAttribute('inert');
+      element.hidden = false;
+    });
+  }
+
+  private createHudSubviewFallbackNode(): HTMLElement {
+    const fallback = document.createElement('div');
+    fallback.className = 'privacy-item';
+    const body = document.createElement('strong');
+    body.className = 'privacy-title';
+    body.textContent = '...';
+    fallback.appendChild(body);
+    return fallback;
+  }
+
+  private setHudSubviewPage(state: HudSubviewPagerState, pageIndex: number): void {
+    const previousIndex = state.currentPage;
+    const maxIndex = Math.max(0, state.pages.length - 1);
+    const nextIndex = Math.min(maxIndex, Math.max(0, pageIndex));
+    state.currentPage = nextIndex;
+
+    state.pages.forEach((page, index) => {
+      page.classList.toggle('is-active', index === nextIndex);
+      page.hidden = index !== nextIndex;
+    });
+
+    const hasMultiplePages = state.pageCount > 1;
+    state.pager.classList.toggle('has-multiple-pages', hasMultiplePages);
+    state.prevButton.disabled = !hasMultiplePages || nextIndex === 0;
+    state.nextButton.disabled = !hasMultiplePages || nextIndex === maxIndex;
+    state.prevButton.tabIndex = hasMultiplePages ? 0 : -1;
+    state.nextButton.tabIndex = hasMultiplePages ? 0 : -1;
+    state.status.hidden = !hasMultiplePages;
+    state.status.textContent = hasMultiplePages
+      ? `${String(nextIndex + 1).padStart(2, '0')} / ${String(state.pageCount).padStart(2, '0')}`
+      : '';
+
+    if (hasMultiplePages && nextIndex !== previousIndex) {
+      this.playHudSubviewPagerTransition(state);
+    }
+  }
+
+  private updateHudSubviewPagerLabels(state: HudSubviewPagerState): void {
+    const { ui } = this.locale.getActiveLocaleBundle();
+    state.prevButton.setAttribute('aria-label', ui.previousPageAria);
+    state.nextButton.setAttribute('aria-label', ui.nextPageAria);
+  }
+
+  private playHudSubviewPagerTransition(state: HudSubviewPagerState): void {
+    const activePage = state.pages[state.currentPage];
+    if (!activePage) {
+      return;
+    }
+
+    if (state.effectTimeout) {
+      window.clearTimeout(state.effectTimeout);
+      state.effectTimeout = 0;
+    }
+
+    activePage.classList.remove('is-hacker-transition');
+    state.status.classList.remove('is-hacker-transition');
+    state.prevButton.classList.remove('is-hacker-transition');
+    state.nextButton.classList.remove('is-hacker-transition');
+
+    // Restart the short transition sequence reliably for rapid next/prev taps.
+    void activePage.offsetWidth;
+    void state.status.offsetWidth;
+
+    activePage.classList.add('is-hacker-transition');
+    state.status.classList.add('is-hacker-transition');
+    state.prevButton.classList.add('is-hacker-transition');
+    state.nextButton.classList.add('is-hacker-transition');
+
+    const statusText = state.status.textContent ?? '';
+    if (statusText) {
+      this.textEffectManager.setTextContent(state.status, statusText, true, true);
+    }
+
+    const kickers = Array.from(activePage.querySelectorAll<HTMLElement>('.privacy-kicker'));
+    kickers.slice(0, 6).forEach((element, index) => {
+      const target = element.dataset.originalText || element.textContent || '';
+      if (!element.dataset.originalText) {
+        element.dataset.originalText = target;
+      }
+
+      window.setTimeout(() => {
+        this.textEffectManager.setTextContent(element, target, true, true);
+      }, index * 28);
+    });
+
+    state.effectTimeout = window.setTimeout(() => {
+      activePage.classList.remove('is-hacker-transition');
+      state.status.classList.remove('is-hacker-transition');
+      state.prevButton.classList.remove('is-hacker-transition');
+      state.nextButton.classList.remove('is-hacker-transition');
+      state.effectTimeout = 0;
+    }, 340);
   }
 
   public syncToggledButtonLabels(): void {
@@ -786,7 +1356,7 @@ class ManifoldApp {
     if (this.diagnostics) {
       const isDiagOpen = this.diagnostics.isDiagnosticsOpen();
       const diagLabel = isDiagOpen ? bundle.ui.systemOverlayOn : bundle.ui.systemOverlayOff;
-      const labelEl = this.elements.hudNav.debugForceButton.querySelector('.hud-nav-label');
+      const labelEl = this.elements.hudNav.debugForceButton.querySelector('.topbar-chip-label, .hud-nav-label');
       if (labelEl && labelEl.textContent !== diagLabel) {
         this.textEffectManager.setTextContent(labelEl as HTMLElement, diagLabel, true);
       }
@@ -1078,6 +1648,13 @@ class ManifoldApp {
   }
 
   private closeHudNavigation(): void {
+    this.hudSubviewPagers.forEach((state) => {
+      if (state.effectTimeout) {
+        window.clearTimeout(state.effectTimeout);
+        state.effectTimeout = 0;
+      }
+    });
+
     if (this.activeHudSubView) {
       // const view = this.activeHudSubView;
       this.activeHudSubView = null;
@@ -1100,6 +1677,7 @@ class ManifoldApp {
     this.elements.hudNav.overlay.setAttribute('aria-hidden', 'true');
     this.lenis?.start();
     this.hudSubViewCooldown = 0;
+    this.hudSubviewPaginationForce = false;
   }
 
   private startLoop(): void {
@@ -1254,6 +1832,16 @@ class ManifoldApp {
       window.cancelAnimationFrame(this.loopMetricsUpdateRaf);
       this.loopMetricsUpdateRaf = 0;
     }
+    if (this.hudSubviewPaginationRaf) {
+      window.cancelAnimationFrame(this.hudSubviewPaginationRaf);
+      this.hudSubviewPaginationRaf = 0;
+    }
+    this.hudSubviewPagers.forEach((state) => {
+      if (state.effectTimeout) {
+        window.clearTimeout(state.effectTimeout);
+        state.effectTimeout = 0;
+      }
+    });
     this.modeSelectorTeardown?.();
     this.modeSelectorTeardown = null;
     this.localeTeardown?.();
@@ -1410,7 +1998,7 @@ class ManifoldApp {
     this.elements.hudNav.aboutTime.textContent = `${krakowTime} (Krakow, PL) // 50°03′42″N 19°56′15″E // [ ${status} ]`;
   }
 
-  public toggleHudSubView(view: 'about' | 'policy'): void {
+  public toggleHudSubView(view: HudSubviewView): void {
     const {
       aboutTrigger, aboutRoot,
       policyTrigger, policyRoot,
@@ -1444,6 +2032,7 @@ class ManifoldApp {
               this.updateAuthorStatus();
               this.updateRuntimeStatus();
               this.updateManifoldState();
+              this.scheduleHudSubviewPagination();
             }
           }, 1000);
         }
@@ -1452,6 +2041,12 @@ class ManifoldApp {
           this.updateRuntimeStatus();
           this.updateManifoldState();
         }
+
+        const pagerState = this.hudSubviewPagers.get(this.activeHudSubView);
+        if (pagerState) {
+          pagerState.currentPage = 0;
+        }
+        this.repaginateHudSubview(this.activeHudSubView, true);
       } else {
         if (this.hudSubViewUpdateInterval) {
           window.clearInterval(this.hudSubViewUpdateInterval);
@@ -1481,9 +2076,9 @@ class ManifoldApp {
       // Start High-Performance Staggered Text Scramble
       const root =
         this.activeHudSubView === 'about'
-          ? aboutRoot
+          ? aboutRoot.querySelector<HTMLElement>('.hud-subview-page.is-active') ?? aboutRoot
           : this.activeHudSubView === 'policy'
-            ? policyRoot
+            ? policyRoot.querySelector<HTMLElement>('.hud-subview-page.is-active') ?? policyRoot
             : header;
             
       const targetElements = Array.from(root.querySelectorAll('.privacy-kicker, .privacy-title, .privacy-intro, .hud-nav-kicker, strong'));
@@ -1623,8 +2218,12 @@ function getElements(): BootElements | null {
   const policyAudioBody = get<HTMLElement>('policy-audio-body');
   const policyTelemetryTitle = get<HTMLElement>('policy-telemetry-title');
   const policyTelemetryBody = get<HTMLElement>('policy-telemetry-body');
+  const policyPerformanceTitle = get<HTMLElement>('policy-performance-title');
+  const policyPerformanceBody = get<HTMLElement>('policy-performance-body');
   const policyContactTitle = get<HTMLElement>('policy-contact-title');
   const policyContactBody = get<HTMLElement>('policy-contact-body');
+  const policyRightsTitle = get<HTMLElement>('policy-rights-title');
+  const policyRightsBody = get<HTMLElement>('policy-rights-body');
   const hudNavOverlay = document.getElementById('hud-nav-overlay');
   const hudNavPanel = document.getElementById('hud-nav-panel');
   const hudNavHeader = document.getElementById('hud-nav-header');
@@ -1725,8 +2324,12 @@ function getElements(): BootElements | null {
   requireNode('policy-audio-body', policyAudioBody);
   requireNode('policy-telemetry-title', policyTelemetryTitle);
   requireNode('policy-telemetry-body', policyTelemetryBody);
+  requireNode('policy-performance-title', policyPerformanceTitle);
+  requireNode('policy-performance-body', policyPerformanceBody);
   requireNode('policy-contact-title', policyContactTitle);
   requireNode('policy-contact-body', policyContactBody);
+  requireNode('policy-rights-title', policyRightsTitle);
+  requireNode('policy-rights-body', policyRightsBody);
   requireNode('hud-nav-header', hudNavHeader);
   requireNode('hud-nav-title', hudNavTitle);
   requireNode('hud-nav-kicker', hudNavKicker);
@@ -1837,8 +2440,12 @@ function getElements(): BootElements | null {
       policyAudioBody,
       policyTelemetryTitle,
       policyTelemetryBody,
+      policyPerformanceTitle,
+      policyPerformanceBody,
       policyContactTitle,
       policyContactBody,
+      policyRightsTitle,
+      policyRightsBody,
       header: hudNavHeader,
       overlay: hudNavOverlay,
       panel: hudNavPanel,

@@ -70,10 +70,12 @@ export interface ManifoldUiLocaleStrings {
   currentModeAriaPrefix: string;
   nextCardAria: string;
   nextCardSectionAria: string;
+  nextPageAria: string;
   orbitToggle: string;
   orbitToggleActive: string;
   orbitToggleInactive: string;
   orbitToggleAria: string;
+  previousPageAria: string;
   previousCardAria: string;
   powerSave: string;
   perf: string;
@@ -89,8 +91,12 @@ export interface ManifoldUiLocaleStrings {
     audioBody: string;
     telemetryTitle: string;
     telemetryBody: string;
+    performanceTitle: string;
+    performanceBody: string;
     contactTitle: string;
     contactBody: string;
+    rightsTitle: string;
+    rightsBody: string;
   };
   privacyLabel: string;
   privacyCloseLabel: string;

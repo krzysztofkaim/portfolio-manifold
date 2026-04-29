@@ -73,8 +73,12 @@ export interface LocaleElements {
     policyAudioBody: HTMLElement;
     policyTelemetryTitle: HTMLElement;
     policyTelemetryBody: HTMLElement;
+    policyPerformanceTitle: HTMLElement;
+    policyPerformanceBody: HTMLElement;
     policyContactTitle: HTMLElement;
     policyContactBody: HTMLElement;
+    policyRightsTitle: HTMLElement;
+    policyRightsBody: HTMLElement;
   };
   exitButton: HTMLButtonElement;
   exitButtonLabel: HTMLElement;
@@ -100,6 +104,7 @@ export interface ModeSelectorLocaleController {
 
 export interface ManifoldAppSync {
   syncHudNavigationMode(): void;
+  syncHudSubviewPagers(): void;
   syncOrbitToggleLabel(): void;
   syncToggledButtonLabels(): void;
 }
@@ -176,6 +181,7 @@ export class ManifoldAppLocale {
     this.manifoldAppRef?.syncHudNavigationMode();
     this.manifoldAppRef?.syncOrbitToggleLabel();
     this.manifoldAppRef?.syncToggledButtonLabels();
+    this.manifoldAppRef?.syncHudSubviewPagers();
   }
 
   private navigateToLocale(locale: ManifoldLocale): void {
@@ -284,8 +290,12 @@ export class ManifoldAppLocale {
     if (el.hudNav.policyAudioBody) el.hudNav.policyAudioBody.textContent = ui.policyContent.audioBody;
     if (el.hudNav.policyTelemetryTitle) el.hudNav.policyTelemetryTitle.textContent = ui.policyContent.telemetryTitle;
     if (el.hudNav.policyTelemetryBody) el.hudNav.policyTelemetryBody.textContent = ui.policyContent.telemetryBody;
+    if (el.hudNav.policyPerformanceTitle) el.hudNav.policyPerformanceTitle.textContent = ui.policyContent.performanceTitle;
+    if (el.hudNav.policyPerformanceBody) el.hudNav.policyPerformanceBody.textContent = ui.policyContent.performanceBody;
     if (el.hudNav.policyContactTitle) el.hudNav.policyContactTitle.textContent = ui.policyContent.contactTitle;
     if (el.hudNav.policyContactBody) el.hudNav.policyContactBody.textContent = ui.policyContent.contactBody;
+    if (el.hudNav.policyRightsTitle) el.hudNav.policyRightsTitle.textContent = ui.policyContent.rightsTitle;
+    if (el.hudNav.policyRightsBody) el.hudNav.policyRightsBody.textContent = ui.policyContent.rightsBody;
     el.exitButton?.setAttribute('aria-label', ui.returnToEntryAria);
     if (el.exitButtonLabel) el.exitButtonLabel.textContent = ui.return;
     if (el.twoDSectionFrameKicker) el.twoDSectionFrameKicker.textContent = ui.twoDSection;

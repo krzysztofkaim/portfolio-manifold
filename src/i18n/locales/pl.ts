@@ -579,27 +579,41 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
     currentModeAriaPrefix: 'Aktualny tryb manifold',
     nextCardAria: 'Następna karta',
     nextCardSectionAria: 'Pokaż następną sekcję karty',
+    nextPageAria: 'Następna strona',
     orbitToggle: 'ORBITY',
     orbitToggleActive: 'Orbity: wł.',
     orbitToggleInactive: 'Orbity: wył.',
     orbitToggleAria: 'Przełącz orbity',
+    previousPageAria: 'Poprzednia strona',
     previousCardAria: 'Poprzednia karta',
     powerSave: 'OSZCZĘDZANIE',
     perf: 'TRYB',
     policyLabel: 'POLITYKA PRYWATNOŚCI',
     policyCloseLabel: 'ZAMKNIJ POLITYKĘ',
     policyContent: {
-      intro: 'Ta scena działa głównie po stronie klienta. Poniższa informacja została przygotowana zgodnie z wymogami przejrzystości (RODO) w zakresie przetwarzania danych technicznych.',
+      intro:
+        'POLITYKA PRYWATNOŚCI\n\nOstatnia aktualizacja: 29 kwietnia 2026 r.\n\nTa strona jest osobistym doświadczeniem webowym działającym w domenie kaim.dev. Została zaprojektowana tak, aby działać głównie w przeglądarce użytkownika i zbierać możliwie mało informacji.',
       processingTitle: 'PRZETWARZANIE LOKALNE',
-      processingBody: 'Renderowanie, diagnostyka, wykrywanie możliwości GPU i stan interakcji działają w przeglądarce. Dane sprzętowe pokazywane w debug views pozostają lokalne, chyba że w danym wdrożeniu jawnie włączono telemetrię.',
-      storageTitle: 'PAMIĘĆ LOKALNA',
-      storageBody: 'Aplikacja zapisuje w localStorage wybrany język i stan prowadnic orbit, a w sessionStorage krótki znacznik przejścia językowego. To doświadczenie nie używa cookies.',
+      processingBody:
+        'Renderowanie, stan interakcji, diagnostyka, sprawdzanie możliwości GPU/przeglądarki oraz efekty wizualne działają lokalnie w przeglądarce. Informacje debugowe o urządzeniu lub przeglądarce pozostają na urządzeniu użytkownika, chyba że telemetria zostanie wyraźnie włączona.',
+      storageTitle: 'PAMIĘĆ PRZEGLĄDARKI',
+      storageBody:
+        'Strona używa localStorage do zapamiętania wybranego języka i widoczności przewodnika orbitalnego oraz sessionStorage dla krótkotrwałej flagi przejścia językowego. Te wartości służą wyłącznie zachowaniu spójności interfejsu. Strona nie używa plików cookies.',
       audioTitle: 'ODTWARZANIE AUDIO',
-      audioBody: 'Muzyka w tle jest ładowana dopiero po użyciu przełącznika audio. Strona nie prosi o dostęp do mikrofonu ani kamery.',
+      audioBody:
+        'Dźwięk tła jest ładowany dopiero po użyciu przełącznika audio. Strona nie żąda dostępu do mikrofonu ani kamery.',
       telemetryTitle: 'OPCJONALNA TELEMETRIA',
-      telemetryBody: 'Zdarzenia analityczne są wysyłane tylko wtedy, gdy dla tego wdrożenia skonfigurowano endpoint telemetrii. Jeśli jest aktywny, aplikacja wysyła nazwę zdarzenia, czas, bieżącą ścieżkę i niewielki payload interakcji, np. zmianę trybu lub start audio.',
-      contactTitle: 'AKCJA KONTAKTOWA',
-      contactBody: 'Przycisk kontaktu dobiera alias („contact” lub „kontakt”) zależnie od języka. W celu ochrony przed zautomatyzowanym pozyskiwaniem danych (boty, crawlery), pełny adres nie jest przechowywany statycznie i jest wstrzykiwany do odnośnika mailto dopiero w momencie interakcji.'
+      telemetryBody:
+        'Jeżeli dla tej wersji wdrożenia skonfigurowano endpoint telemetryczny, aplikacja może wysyłać ograniczone zdarzenia techniczne, takie jak nazwa zdarzenia, znacznik czasu, aktualna ścieżka oraz niewielkie dane interakcji, np. zmiana trybu lub uruchomienie audio. Dane te służą wyłącznie zrozumieniu i poprawie działania strony.',
+      performanceTitle: 'ANALITYKA WYDAJNOŚCI',
+      performanceBody:
+        'Strona może używać Cloudflare Web Analytics / Real User Measurements (RUM) do pomiaru rzeczywistej szybkości ładowania i niezawodności. Po włączeniu tej funkcji Cloudflare może załadować lub automatycznie dodać niewielki skrypt JavaScript, który zbiera pomiary wydajności przeglądarki, takie jak czas ładowania strony, navigation timing, resource timing, paint timing i Core Web Vitals, wraz z ograniczonym kontekstem strony, takim jak aktualna ścieżka lub referrer. Ten pomiar wydajności służy diagnozowaniu i poprawie szybkości, renderowania oraz odczuwalnej jakości działania strony. Strona nie wykorzystuje tych danych do reklam, profilowania między stronami ani identyfikowania użytkowników. Podstawą prawną, tam gdzie jest wymagana, jest prawnie uzasadniony interes operatora polegający na utrzymaniu i poprawie jakości technicznej strony.',
+      contactTitle: 'KONTAKT',
+      contactBody:
+        'Link kontaktowy dopasowuje się do aktywnego języka ("contact" albo "kontakt"). Aby ograniczyć automatyczne zbieranie adresu przez scrapery i boty, adres nie jest przechowywany jako statyczny widoczny tekst i jest wstawiany do protokołu mailto dopiero po interakcji użytkownika.',
+      rightsTitle: 'TWOJE PRAWA',
+      rightsBody:
+        'Tam, gdzie zastosowanie ma RODO, możesz żądać dostępu, sprostowania, usunięcia, ograniczenia przetwarzania lub sprzeciwu wobec przetwarzania danych osobowych związanych z tą stroną. Kontakt jest możliwy przez akcję kontaktową dostępną na stronie.'
     },
     privacyLabel: 'DEBUG OVERLAY',
     privacyCloseLabel: 'UKRYJ DEBUG',
