@@ -2,6 +2,7 @@ import { clamp, lerp } from '../../utils/math';
 import { MANIFOLD_SECTION_TONES } from '../../config/manifold/ManifoldSceneConfig';
 import { MANIFOLD_CONSTANTS } from './ManifoldConstants';
 import { computeDampedLerp } from './HyperMath';
+import { IS_IOS, IS_SAFARI } from '../../utils/browserDetection';
 import type { ItemState, SectionFrameBounds, TwoDCardPose, TwoDGridMetrics } from './ManifoldTypes';
 
 export interface ManifoldTwoDControllerContext {
@@ -451,7 +452,10 @@ export class ManifoldTwoDController {
     const tabShadowYV = lerp(6, 10, stillness);
     const tabShadowBlurV = lerp(14, 24, stillness);
 
-    const frameVisualState = String(Math.round(stillness * 4095));
+    // Safari: Coarser quantization (256 steps vs 4096) to reduce CSS write frequency.
+    // Each write triggers 14 setProperty calls that invalidate the section frame subtree.
+    const quantizationSteps = IS_SAFARI ? 255 : 4095;
+    const frameVisualState = String(Math.round(stillness * quantizationSteps));
 
     if (frameVisualState !== frameState.lastFrameVisualState) {
       root.style.setProperty('--two-d-frame-outline-opacity', outlineOpacityV.toFixed(3));
@@ -561,7 +565,10 @@ export class ManifoldTwoDController {
       this.context.setFrameSamplingState({ lastLabel: localizedSectionTitle });
     }
 
-    if (this.context.isTransitionPerformanceMode()) {
+    if (this.context.isTransitionPerformanceMode() || IS_IOS) {
+      // iOS: Skip edge card rendering entirely — the single-column layout makes
+      // side previews invisible, and cloneNode(true) on cards creates ~50 DOM nodes
+      // per clone, causing memory pressure.
       this.setEdgeCardVisibility(0);
       return;
     }

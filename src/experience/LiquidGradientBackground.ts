@@ -1,9 +1,11 @@
 import { LiquidGradientKernel } from './liquid-gradient/LiquidGradientKernel';
+import { IS_SAFARI } from '../utils/browserDetection';
 
 type GradientWorkerMessage =
   | {
       type: 'init';
       canvas: OffscreenCanvas;
+      maxBlobs: number;
       quality: number;
       viewportHeight: number;
       viewportWidth: number;
@@ -40,8 +42,10 @@ export class LiquidGradientBackground {
   private lastScrollVelocity = 0;
   private isFallbackMode = false;
   private lastMainThreadRenderAt = 0;
+  private readonly maxBlobs: number;
 
   constructor(private readonly canvas: HTMLCanvasElement) {
+    this.maxBlobs = IS_SAFARI ? 4 : 6;
     this.worker = this.createWorker();
     this.isFallbackMode = !this.worker;
     this.kernel = this.worker ? null : this.createMainThreadKernel();
@@ -128,7 +132,7 @@ export class LiquidGradientBackground {
       throw new Error('2D canvas is not supported in this environment.');
     }
 
-    const kernel = new LiquidGradientKernel(this.canvas, context);
+    const kernel = new LiquidGradientKernel(this.canvas, context, this.maxBlobs);
     // Enforce safety quality for main-thread fallback to prevent hangs
     kernel.setQuality(Math.min(this.quality, 0.15));
     return kernel;
@@ -147,6 +151,7 @@ export class LiquidGradientBackground {
       const initMessage: GradientWorkerMessage = {
         type: 'init',
         canvas: offscreenCanvas,
+        maxBlobs: this.maxBlobs,
         quality: this.quality,
         viewportWidth: window.innerWidth,
         viewportHeight: window.innerHeight

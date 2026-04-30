@@ -4,6 +4,7 @@ type WorkerMessage =
   | {
       type: 'init';
       canvas: OffscreenCanvas;
+      maxBlobs: number;
       quality: number;
       viewportHeight: number;
       viewportWidth: number;
@@ -40,7 +41,7 @@ self.onmessage = (event: MessageEvent<WorkerMessage>) => {
         return;
       }
 
-      kernel = new LiquidGradientKernel(message.canvas, context);
+      kernel = new LiquidGradientKernel(message.canvas, context, message.maxBlobs);
       kernel.setQuality(message.quality);
       kernel.resize(message.viewportWidth, message.viewportHeight);
       return;

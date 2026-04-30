@@ -332,7 +332,11 @@ export class ManifoldModeController {
 
     this.chromeInstancesPool = createCardChromeInstancePool(this.config.itemCount);
     this.fourDWireframe = elements.fourDWireframe;
-    this.fourDWireframeContext = this.fourDWireframe.getContext('2d', { alpha: true, desynchronized: !IS_SAFARI || SAFARI_VERSION >= 17 });
+    // iOS: Skip 2D context creation — the canvas is hidden via CSS (display: none !important)
+    // but getContext() still allocates a GPU-backed buffer that wastes VRAM.
+    this.fourDWireframeContext = IS_IOS
+      ? null
+      : this.fourDWireframe.getContext('2d', { alpha: true, desynchronized: !IS_SAFARI || SAFARI_VERSION >= 17 });
     this.introHint = elements.introHint;
     this.introHintCopy = this.introHint.querySelector<HTMLElement>('#intro-hint-copy');
     this.introHintPath = this.introHint.querySelector<SVGPathElement>('#intro-hint-path');

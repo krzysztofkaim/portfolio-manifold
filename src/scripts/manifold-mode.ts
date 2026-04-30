@@ -1764,7 +1764,7 @@ class ManifoldApp {
       const isMotionActive = perf.transitionActive || isInteracting;
       const shouldRefreshHud = isMotionActive ? (time - this.lastHudNavRenderAt > 120) : (time - this.lastHudNavRenderAt > 2400);
       const audioActive = this.audio.getAudioActiveState();
-      const iosUiInterval = isMotionActive || audioActive ? 1000 / 16 : 1000 / 6;
+      const iosUiInterval = isMotionActive || audioActive ? 1000 / 12 : 1000 / 4;
       const shouldRunIosUiPass = !IS_IOS || time - this.lastIosUiTickAt >= iosUiInterval;
 
       const uiStartedAt = performance.now();

@@ -112,7 +112,7 @@
 
 @property --entry-grid-alpha {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
@@ -124,19 +124,19 @@
 
 @property --music-alpha {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --music-glow-alpha {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --music-blur {
   syntax: '<length>';
-  inherits: true;
+  inherits: false;
   initial-value: 0px;
 }
 
@@ -160,97 +160,97 @@
 
 @property --f-0 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-1 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-2 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-3 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-4 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-5 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-6 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-7 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-8 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-9 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-10 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-11 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-12 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-13 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-14 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
 @property --f-15 {
   syntax: '<number>';
-  inherits: true;
+  inherits: false;
   initial-value: 0;
 }
 
@@ -487,6 +487,12 @@ html.is-android .ambient-particle-layer {
   display: none;
 }
 
+/* iOS: Hide GPU-heavy canvas layers that cause memory exhaustion crashes */
+html.is-ios .four-d-wireframe,
+html.is-ios .card-chrome-layer {
+  display: none !important;
+}
+
 html.is-ios .bg-gradient {
   background:
     radial-gradient(circle at 20% 18%, rgba(255, 151, 72, 0.14), transparent 28%),
@@ -514,6 +520,64 @@ html.is-ios .item,
 html.is-ios .card {
   transform-style: flat !important;
   will-change: auto !important;
+}
+
+/* iOS: Disable all backdrop-filter to prevent compositor memory exhaustion */
+html.is-ios .topbar,
+html.is-ios .hud-focus-feedback,
+html.is-ios .hud-nav-panel,
+html.is-ios .hud-nav-backdrop,
+html.is-ios .locale-transition-overlay,
+html.is-ios .card-expanded-mobile-hint--prev,
+html.is-ios .card-expanded-mobile-hint--next {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Safari: Disable backdrop-filter globally to reduce compositor pressure */
+html.is-safari .topbar,
+html.is-safari .hud-focus-feedback,
+html.is-safari .hud-nav-panel,
+html.is-safari .locale-transition-overlay {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Safari: Disable audio spectrum visuals entirely to eliminate per-card CSS variable flood */
+html.is-safari .card {
+  --music-alpha: 0 !important;
+}
+
+/* Safari/iOS: Demote decorative elements from compositor layers to save GPU VRAM.
+   Each will-change forces a dedicated GPU texture; these elements don't benefit from
+   hardware promotion on WebKit where the compositor overhead exceeds any gain. */
+html.is-safari .hud-orbit__item,
+html.is-safari .two-d-section-frame,
+html.is-safari .two-d-section-frame__outline,
+html.is-safari .two-d-section-frame__tab,
+html.is-safari .intro-hint,
+html.is-safari .context-hint {
+  will-change: auto !important;
+}
+
+/* Safari: Replace animated filter:blur(calc(...)) on hints with static blur.
+   Runtime Gaussian blur rasterization on variable-driven calc() is expensive on WebKit. */
+html.is-safari .intro-hint {
+  filter: blur(0px) !important;
+}
+
+html.is-safari .context-hint {
+  filter: blur(0px) !important;
+}
+
+/* Safari: Disable custom cursor overlay to save compositor layers and per-frame transforms */
+html.is-safari .custom-cursor {
+  display: none !important;
+}
+
+html.is-safari body.has-custom-cursor,
+html.is-safari body.has-custom-cursor * {
+  cursor: auto !important;
 }
 
 html.is-android .bg-gradient-soft {
@@ -850,6 +914,15 @@ body.has-expanded-card .top-ui {
     filter 120ms linear,
     height 120ms linear,
     box-shadow 120ms linear;
+}
+
+/* Safari: Replace expensive animated filter:blur() with static blur + opacity */
+html.is-safari .topbar-glow-line {
+  filter: blur(1.2px);
+  transition:
+    width 120ms linear,
+    opacity 120ms linear,
+    height 120ms linear;
 }
 
 .topbar-loader,

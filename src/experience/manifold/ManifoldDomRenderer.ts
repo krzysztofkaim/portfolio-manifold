@@ -287,6 +287,10 @@ export class ManifoldDomRenderer {
     alpha: number,
     sharedSpectrum: ArrayLike<number>
   ): void {
+    // Safari: Audio spectrum visuals are disabled via CSS (--music-alpha: 0 !important)
+    // Skip all JS-side CSS variable writes to eliminate per-card style mutation pressure.
+    if (IS_SAFARI) return;
+
     const cardAlpha = alpha * (item.currentAlpha || 1.0);
     if (cardAlpha < 0.005) return;
 

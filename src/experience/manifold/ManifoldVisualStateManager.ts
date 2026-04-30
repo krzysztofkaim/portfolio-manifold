@@ -293,7 +293,7 @@ export class ManifoldVisualStateManager {
         ? Math.abs(twoDVisualMix - this.lastAppliedTwoDVisualMix)
         : Number.POSITIVE_INFINITY;
 
-      if (this.dynamicVarsRule && (!IS_SAFARI || cardFastnessDelta > 0.04 || visualMixDelta > 0.04)) {
+      if (this.dynamicVarsRule && (!IS_SAFARI || cardFastnessDelta > 0.08 || visualMixDelta > 0.08)) {
         const r = this.dynamicVarsRule;
         
         if (IS_SAFARI) {

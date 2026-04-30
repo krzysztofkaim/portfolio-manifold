@@ -1,3 +1,5 @@
+import { IS_SAFARI } from '../../utils/browserDetection';
+
 export interface CursorElements {
   root: HTMLElement;
   core: HTMLElement;
@@ -22,7 +24,9 @@ export class ManifoldAppCursor {
   }
 
   setup(): void {
-    this.enabled = window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(hover: none)').matches;
+    // Safari: Disable custom cursor entirely — the per-pointermove transforms
+    // and per-frame ring lerp add unnecessary compositor overhead.
+    this.enabled = !IS_SAFARI && window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(hover: none)').matches;
 
     if (!this.enabled) {
       if (this.elements.root) this.elements.root.hidden = true;

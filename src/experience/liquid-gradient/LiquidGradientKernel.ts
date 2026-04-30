@@ -111,7 +111,8 @@ export class LiquidGradientKernel {
       | OffscreenCanvas,
     private readonly context:
       | CanvasRenderingContext2D
-      | OffscreenCanvasRenderingContext2D
+      | OffscreenCanvasRenderingContext2D,
+    private readonly maxBlobs = SCHEME_ONE_BLOB_RUNTIME.length
   ) {
     this.context.imageSmoothingEnabled = true;
   }
@@ -153,7 +154,7 @@ export class LiquidGradientKernel {
     this.context.fillStyle = this.getBaseGradient();
     this.context.fillRect(0, 0, this.width, this.height);
 
-    for (let index = 0; index < SCHEME_ONE_BLOB_RUNTIME.length; index += 1) {
+    for (let index = 0; index < Math.min(SCHEME_ONE_BLOB_RUNTIME.length, this.maxBlobs); index += 1) {
       const blob = SCHEME_ONE_BLOB_RUNTIME[index];
       if (!blob) {
         continue;
