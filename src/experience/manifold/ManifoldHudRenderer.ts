@@ -7,7 +7,7 @@ const INITIAL_SECTION_PROMPT = 'SCROLL';
 const INITIAL_SECTION_REVEAL_DELAY_MS = 420;
 const SECTION_SCRAMBLE_DURATION_MS = 280;
 
-export interface ManifoldHudFocus {
+interface ManifoldHudFocus {
   card: string;
   section: string;
 }

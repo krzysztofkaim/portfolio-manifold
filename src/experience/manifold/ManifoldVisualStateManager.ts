@@ -2,7 +2,7 @@ import { lerp, clamp } from '../../utils/math';
 import { computeDampedLerp } from './HyperMath';
 import { MANIFOLD_CONSTANTS } from './ManifoldConstants';
 import type { ItemState } from './ManifoldTypes';
-import { IS_SAFARI } from '../../utils/browserDetection';
+import { IS_ANDROID, IS_SAFARI } from '../../utils/browserDetection';
 
 export interface VisualStateInput {
   delta: number;
@@ -126,6 +126,7 @@ export class ManifoldVisualStateManager {
     
     if (frameStressState !== this.lastFrameStressState) {
       this.context.toggleBodyClass('is-frame-stressed', frameStressState);
+      this.context.toggleRootClass('is-frame-stressed', frameStressState);
       this.lastFrameStressState = frameStressState;
     }
 
@@ -142,8 +143,9 @@ export class ManifoldVisualStateManager {
     const isScrolling = isVelocityActive || (now - this.lastScrollTime < 120);
 
     if (isScrolling !== this.lastIsScrollingState) {
-      if (IS_SAFARI) {
+      if (IS_SAFARI || IS_ANDROID) {
         this.context.toggleBodyClass('is-scrolling', isScrolling);
+        this.context.toggleRootClass('is-scrolling', isScrolling);
       }
       this.lastIsScrollingState = isScrolling;
     }

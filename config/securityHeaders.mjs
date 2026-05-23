@@ -1,12 +1,12 @@
-export const crossOriginIsolationHeaders = {
+const crossOriginIsolationHeaders = {
   'Cross-Origin-Opener-Policy': 'same-origin',
   'Cross-Origin-Embedder-Policy': 'require-corp'
 };
 
-export const permissionsPolicy =
+const permissionsPolicy =
   'autoplay=(self), camera=(), fullscreen=(self), geolocation=(), microphone=(), payment=(), usb=()';
 
-export const contentSecurityPolicy =
+const contentSecurityPolicy =
   "default-src 'self'; " +
   "script-src 'self' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; " +
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
@@ -29,7 +29,7 @@ export const securityHeaders = {
   'X-Frame-Options': 'DENY'
 };
 
-export const cloudflareHeaderRules = [
+const cloudflareHeaderRules = [
   {
     route: '/*',
     headers: securityHeaders

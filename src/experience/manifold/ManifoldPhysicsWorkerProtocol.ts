@@ -20,7 +20,7 @@ export interface PhysicsWorkerContext {
   contextRevealByType: Record<ItemType, number>;
 }
 
-export interface PhysicsWorkerItemSnapshot {
+interface PhysicsWorkerItemSnapshot {
   itemKey: number;
   baseZ: number;
   currentAlpha: number;
@@ -66,4 +66,3 @@ export type PhysicsWorkerResponse = {
   frameId: number;
   items: PhysicsWorkerItemResult[];
 };
-

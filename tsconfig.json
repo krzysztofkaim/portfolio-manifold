@@ -14,5 +14,6 @@
       "@styles/*": ["./src/styles/*"],
       "@scripts/*": ["./src/scripts/*"]
     }
-  }
+  },
+  "exclude": ["dist", "node_modules", "public/basis/basis_transcoder.js"]
 }

@@ -70,8 +70,11 @@ export class ManifoldCanvasParticleField {
 
   constructor(canvas: HTMLCanvasElement, count = DEFAULT_PARTICLE_COUNT) {
     this.canvas = canvas;
-    this.context = canvas.getContext('2d', { alpha: true, desynchronized: true });
-    this.particles = Array.from({ length: count }, (_, index) => ({
+    const particleCount = Math.max(0, Math.floor(count));
+    this.context = particleCount > 0
+      ? canvas.getContext('2d', { alpha: true, desynchronized: true })
+      : null;
+    this.particles = Array.from({ length: particleCount }, (_, index) => ({
       alpha: 0.2 + this.seed(index + 301) * 0.8,
       baseX: 0,
       baseY: 0,
@@ -84,6 +87,9 @@ export class ManifoldCanvasParticleField {
   }
 
   resize(width: number, height: number, dpr: number): void {
+    // Skip canvas buffer allocation when no particles are configured (iOS/Android).
+    // Setting canvas.width/height on a hidden element still allocates a GPU-backed buffer.
+    if (this.particles.length === 0) return;
     this.width = Math.max(1, Math.round(width));
     this.height = Math.max(1, Math.round(height));
     this.dpr = Math.max(1, dpr);

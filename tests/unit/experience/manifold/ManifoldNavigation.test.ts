@@ -79,8 +79,7 @@ describe('ManifoldNavigation', () => {
       getAnchorForCard: (item: any) => item.cardIndex * 10,
       getAnchorForItemIndex: (itemIndex: number) => itemIndex * 100,
       normalizeAnchor: (anchor: number) => anchor,
-      sectionHeadings: ['ONE', 'TWO'],
-      is2DMode: false
+      sectionHeadings: ['ONE', 'TWO']
     });
 
     expect(sections[0]).toMatchObject({ section: 'ONE', cards: [{ cardIndex: 1 }, { cardIndex: 2 }] });

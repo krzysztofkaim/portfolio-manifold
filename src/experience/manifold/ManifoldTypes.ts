@@ -1,4 +1,4 @@
-export interface CardFact {
+interface CardFact {
   label: string;
   value: string;
 }
@@ -75,8 +75,7 @@ export type ItemType = 'text' | 'card' | 'star';
 export type ViewMode = '2d' | '3d' | '4d';
 export type HyperVertex = readonly [number, number, number, number];
 export type HyperFaceVertices = readonly [number, number, number, number];
-export type ScreenQuadPoint = readonly [number, number];
-export type MutableScreenQuadPoint = [number, number];
+type MutableScreenQuadPoint = [number, number];
 export type MutableScreenQuad = [
   MutableScreenQuadPoint,
   MutableScreenQuadPoint,
@@ -161,8 +160,6 @@ export interface ItemState {
   lastShellFade: number;
   lastMusicAlpha?: number;
   lastMusicPresence?: number;
-  lastSpectrumActive: boolean;
-  lastSpectrumValues: Float32Array;
   lastX: number;
   lastY: number;
   lastZ: number;
@@ -281,20 +278,11 @@ export interface SectionFrameBounds {
   visibleCount: number;
 }
 
-export interface ViewportSize {
+interface ViewportSize {
   readonly width: number;
   readonly height: number;
 }
 
-
-export function createMutableScreenQuad(): MutableScreenQuad {
-  return [
-    [0, 0],
-    [0, 0],
-    [0, 0],
-    [0, 0]
-  ];
-}
 
 export interface TesseractProjectionInput {
   readonly fourDProgress: number;

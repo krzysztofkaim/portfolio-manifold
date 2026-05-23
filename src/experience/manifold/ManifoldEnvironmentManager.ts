@@ -7,7 +7,7 @@ import {
 import { MANIFOLD_CONSTANTS } from './ManifoldConstants';
 import type { ViewMode } from './ManifoldTypes';
 
-export interface ManifoldEnvironmentState {
+interface ManifoldEnvironmentState {
   currentPerspectiveDepth: number;
   currentWorldTiltX: number;
   currentWorldTiltY: number;

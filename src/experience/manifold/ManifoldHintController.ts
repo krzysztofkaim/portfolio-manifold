@@ -2,12 +2,12 @@ import { clamp, lerp } from '../../utils/math';
 import { pretextLayoutService } from '../../ui/text/PretextLayoutService';
 import type { FourDSceneState, ItemState } from './ManifoldTypes';
 
-export interface HintMeasurement {
+interface HintMeasurement {
   height: number;
   width: number;
 }
 
-export interface ItemScreenRect {
+interface ItemScreenRect {
   bottom: number;
   height: number;
   left: number;

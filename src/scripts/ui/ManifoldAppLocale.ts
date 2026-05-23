@@ -55,6 +55,7 @@ export interface LocaleElements {
     orbitToggleButton: HTMLButtonElement;
     orbitToggleLabel: HTMLElement;
     additionalLabel: HTMLElement;
+    debugForceButton: HTMLButtonElement;
     privacyTrigger: HTMLButtonElement;
     privacyLabel: HTMLElement;
     aboutTrigger: HTMLButtonElement;

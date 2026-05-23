@@ -16,13 +16,13 @@
 
   try {
     const ua = window.navigator.userAgent.toLowerCase();
-    const vendor = (window.navigator.vendor || '').toLowerCase();
     const isSafari =
-      vendor.includes('apple') &&
       ua.includes('safari') &&
       !ua.includes('chrome') &&
+      !ua.includes('chromium') &&
       !ua.includes('crios') &&
       !ua.includes('fxios') &&
+      !ua.includes('edg') &&
       !ua.includes('android');
     const isIOS =
       /iphone|ipad|ipod/.test(ua) ||
@@ -32,7 +32,7 @@
     const deviceMemory = typeof window.navigator.deviceMemory === 'number' ? window.navigator.deviceMemory : 8;
     const isAndroidLowEnd = isAndroid && (deviceMemory <= 4 || hardwareThreads <= 4);
 
-    if (isSafari) {
+    if (isSafari || isIOS) {
       root.classList.add('is-safari');
     }
 

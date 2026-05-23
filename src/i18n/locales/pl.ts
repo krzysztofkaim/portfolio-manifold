@@ -15,13 +15,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'Remote / Hybrid',
     previewRightLabel: 'KONTAKT',
     previewRight: 'krzysztof@kaim.dev',
-    eyebrow: 'Executive Summary // Tożsamość i zakres',
-    lead: 'Software developer i security consultant, który wyrósł na Lead Engineera i Solution Architecta od trudnych systemów produkcyjnych i enterprise.',
+    eyebrow: 'Profil zawodowy // Zakres odpowiedzialności',
+    lead: 'Krzysztof Kaim to inżynier o profilu full-stack, który łączy doświadczenie programistyczne, bezpieczeństwo aplikacji i odpowiedzialność architektoniczną za systemy produkcyjne oraz platformy dla dużych organizacji.',
     highlights: [
-      'Łączy frontend, backend, integracje i myślenie operacyjne w jeden model dostarczania.',
-      'Mocne dopasowanie do MES, ERP, platform wewnętrznych i odzyskiwania trudnych projektów.',
-      'Prowadzi architekturę, rewrite, upgrade platform i egzekucję na produkcję.',
-      'Pracuje z Krakowa i dobrze odnajduje się zarówno w niezależnej konsultacji, jak i w roli osadzonego technicznego lidera.'
+      'Największą wartość wnosi tam, gdzie produkt wymaga jednocześnie dobrego interfejsu, solidnego backendu i zrozumienia operacji.',
+      'Ma doświadczenie w systemach MES, integracjach ERP, platformach wewnętrznych oraz stabilizowaniu projektów wymagających uporządkowania.',
+      'Prowadzi decyzje architektoniczne, modernizacje, przepisywanie kluczowych modułów i doprowadzanie rozwiązań do produkcji.',
+      'Dobrze odnajduje się zarówno jako niezależny konsultant, jak i techniczny lider osadzony blisko zespołu oraz biznesu.'
     ],
     facts: [
       { label: 'Rola', value: 'Lead / Architekt' },
@@ -31,7 +31,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Executive Fit',
     surfaceValue: 'FULL-STACK',
-    surfaceText: 'Architektura, delivery, integracje i utrzymanie nowoczesnych systemów produktowych.'
+    surfaceText: 'Architektura, implementacja, integracje i utrzymanie systemów, które muszą działać w realnym środowisku biznesowym.'
   },
   {
     title: '#DLACZEGO',
@@ -46,13 +46,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'Rescue / Rewrite',
     previewRightLabel: 'ZASIĘG',
     previewRight: 'UX do backendu',
-    eyebrow: 'Zakres techniczny // Przecięcie UX i backendu',
-    lead: 'Najmocniejsze połączenie pojawia się tam, gdzie UX produktu spotyka się z poprawnością backendu i ograniczeniami przemysłowymi lub enterprise.',
+    eyebrow: 'Zakres techniczny // Produkt, backend i ograniczenia domeny',
+    lead: 'Jego naturalnym obszarem pracy są produkty, w których doświadczenie użytkownika musi wynikać z dobrze zaprojektowanej logiki backendowej i realnych ograniczeń domeny.',
     highlights: [
-      'Komfortowo dowozi od architektury i wymagań do deploymentu i utrzymania.',
-      'Nowoczesne systemy UI w React z uporządkowanym stanem i przepływem danych.',
-      'Krytyczna logika backendowa w .NET z naciskiem na wydajność i bezpieczeństwo.',
-      'Silne przecięcie między UX delivery, integracją enterprise i poprawnością domenową.'
+      'Pracuje w pełnym przekroju: od rozpoznania wymagań i architektury po wdrożenie, monitoring i dalsze utrzymanie.',
+      'Buduje nowoczesne interfejsy w React, dbając o przewidywalny stan, czytelny przepływ danych i wydajność.',
+      'Projektuje backend w .NET z naciskiem na poprawność domenową, bezpieczeństwo i kontrolę kosztu obliczeniowego.',
+      'Najlepiej sprawdza się na styku produktu, integracji korporacyjnych i systemów, w których błąd ma konsekwencje operacyjne.'
     ],
     facts: [
       { label: 'Przemysł', value: 'MES, planowanie, role kioskowe' },
@@ -62,7 +62,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Obecny Tor',
     surfaceValue: 'PRODUKT',
-    surfaceText: 'Najmocniejsze dopasowanie jest tam, gdzie UX produktu spotyka backend i ograniczenia enterprise.'
+    surfaceText: 'Najmocniejsze dopasowanie: produkt, backend, integracje i odpowiedzialność za działanie w produkcji.'
   },
   {
     title: '#JAK',
@@ -77,23 +77,23 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'Systems Thinking',
     previewRightLabel: 'STYL',
     previewRight: 'Pragmatic Dowożenie',
-    eyebrow: 'Model delivery // Od produktu do produkcji',
-    lead: 'Pracuje w modelu pragmatycznego product engineeringu: dowozić kompletne systemy, nie izolowane warstwy lub tickety.',
+    eyebrow: 'Model pracy // Od decyzji do stabilnego wdrożenia',
+    lead: 'Pracuje pragmatycznie: najpierw porządkuje cel i ryzyka, potem dobiera architekturę, zakres i sposób dostarczenia, który da się utrzymać po wdrożeniu.',
     highlights: [
-      'Koncentruje się na rozwiązywaniu złożonych problemów biznesowych, a nie tylko realizacji ticketów.',
-      'Dba o cały zakres operacyjny: deployment, dokumentację, support i release flow.',
-      'Łączy wymagania interesariuszy z egzekucją techniczną bez utraty tempa delivery.',
-      'Traktuje niezawodność i utrzymanie jako część engineeringu produktu, a nie cleanup.'
+      'Koncentruje się na rozwiązaniu problemu biznesowego, a nie na mechanicznym zamykaniu listy zadań.',
+      'Dba o pełny cykl życia rozwiązania: wdrożenia, dokumentację, wsparcie, release flow i możliwość dalszego rozwoju.',
+      'Potrafi przełożyć oczekiwania interesariuszy na decyzje techniczne bez utraty tempa pracy.',
+      'Traktuje niezawodność, bezpieczeństwo i utrzymanie jako część projektu od pierwszych decyzji, nie jako późniejszy porządek.'
     ],
     facts: [
       { label: 'Mindset', value: 'Pragmatic engineering' },
       { label: 'Docs', value: 'OpenAPI, remediation, KB' },
-      { label: 'Cel', value: 'Stabilne delivery pod presją' },
+      { label: 'Cel', value: 'Stabilne dowożenie pod presją' },
       { label: 'Zakres', value: 'Od produktu do produkcji' }
     ],
     surfaceKicker: 'Model Operacyjny',
     surfaceValue: 'SYSTEMY',
-    surfaceText: 'Rozwiązywanie problemów biznesowych przez kompletne systemy, a nie wycinki implementacji.'
+    surfaceText: 'Budowanie kompletnych rozwiązań, które mają sens techniczny, biznesowy i operacyjny.'
   },
   {
     title: '#NDA',
@@ -108,13 +108,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'Sep 2025 - Present',
     previewRightLabel: 'ROLA',
     previewRight: 'Lead / Architect',
-    eyebrow: 'Textile MES // Rewrite i upgrade',
-    lead: 'Przejąłem upadający projekt textile MES i poprowadziłem pełny rewrite oraz upgrade platformy.',
+    eyebrow: 'Textile MES // Modernizacja systemu produkcyjnego',
+    lead: 'Objął odpowiedzialność za krytyczny projekt MES dla produkcji tekstylnej i przeprowadził go przez uporządkowanie architektury, przepisanie kluczowych obszarów oraz modernizację platformy.',
     highlights: [
       'System obsługuje 58 maszyn w 5 halach produkcyjnych, ponad 205 rekordów virtual stock i 180 integracji ERP-MES.',
-      'Zmniejszyłem użycie zasobów serwera o około 80% przez usunięcie dużych hotspotów N+1 i profilowanie w OpenTelemetry.',
-      'Zbudowałem bezpieczne warstwy backendu i dostępu do danych z JWT, BCrypt, RBAC, EF Core i Postgres.',
-      'Dostarczyłem role-based frontend dla planowania i wykonania, obsługujący 13 ról biznesowych i 9 person kioskowych.'
+      'Ograniczył użycie zasobów serwera o około 80%, eliminując główne hotspoty N+1 i profilując przepływy w OpenTelemetry.',
+      'Zaprojektował bezpieczne warstwy backendu oraz dostępu do danych z JWT, BCrypt, RBAC, EF Core i PostgreSQL.',
+      'Dostarczył frontend oparty o role użytkowników dla planowania i wykonania, obsługujący 13 ról biznesowych oraz 9 person kioskowych.'
     ],
     facts: [
       { label: 'Backend', value: '.NET 8, EF Core, PostgreSQL, MSSQL' },
@@ -124,7 +124,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Klasa Wdrozenia',
     surfaceValue: 'MES',
-    surfaceText: 'Silnik produkcyjny, brama ERP, dashboardy planistyczne i solver-driven domain logic.'
+    surfaceText: 'System produkcyjny, integracja ERP, panele planistyczne i logika domenowa podporządkowana realnym procesom na hali.'
   },
   {
     title: '#NTA',
@@ -139,13 +139,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'Feb 2025 - Sep 2025',
     previewRightLabel: 'ROLA',
     previewRight: 'Kontrakt',
-    eyebrow: 'NATA Automation // Ratowanie systemu',
-    lead: 'Wszedłem jako backend .NET engineer, a szybko przejąłem pełną odpowiedzialność za cały stack techniczny trudnego projektu automatyki.',
+    eyebrow: 'NATA Automation // Stabilizacja projektu automatyki',
+    lead: 'Dołączył do projektu jako backend .NET engineer, a następnie przejął odpowiedzialność za szerszy zakres techniczny, stabilizując system automatyki wymagający szybkich decyzji i konsekwentnej egzekucji.',
     highlights: [
-      'Zbudowałem narzędzie drag-and-drop do deploymentu, skracając czas releasu o około 95%.',
-      'Przepisałem UI w React 18 i Feature-Sliced Design, usuwając dependency cycles i dług architektoniczny.',
-      'Wdrożyłem RTK Query i server-side pagination, redukując zużycie RAM przeglądarki o około 70% na dużych datasetach.',
-      'Przebudowałem security z BCrypt i rotacją JWT, eliminując krytyczne problemy odziedziczone po legacy AES storage.'
+      'Zbudował narzędzie drag-and-drop do deploymentu, skracając czas releasu o około 95%.',
+      'Przepisał interfejs w React 18 i Feature-Sliced Design, usuwając cykle zależności oraz istotny dług architektoniczny.',
+      'Wdrożył RTK Query i paginację po stronie serwera, ograniczając zużycie pamięci przeglądarki o około 70% na dużych zbiorach danych.',
+      'Przebudował warstwę bezpieczeństwa z BCrypt i rotacją JWT, usuwając krytyczne problemy odziedziczone po legacy AES storage.'
     ],
     facts: [
       { label: 'Stack', value: 'React 18, Vite, RTK Query, .NET 8' },
@@ -155,7 +155,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Tryb Odzyskiwania',
     surfaceValue: 'STABILIZACJA',
-    surfaceText: 'Stabilizacja infrastruktury, rewrite frontendu i odzyskanie logiki biznesowej.'
+    surfaceText: 'Stabilizacja infrastruktury, modernizacja frontendu i odzyskanie kontroli nad logiką krytyczną dla biznesu.'
   },
   {
     title: '#VPT',
@@ -170,13 +170,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'May 2020 - Jan 2025',
     previewRightLabel: 'DOMENA',
     previewRight: 'Travel / Medical',
-    eyebrow: 'Vapture // Systemy travel i medical',
-    lead: 'Prowadziłem niezależną konsultację obsługującą 5 długoterminowych klientów pod NDA w obszarach travel i medical.',
+    eyebrow: 'Vapture // Systemy dla branży travel i medical',
+    lead: 'Prowadził niezależną działalność konsultingową, wspierając pięciu długoterminowych klientów pod NDA w obszarach travel, medical i systemów wewnętrznych.',
     highlights: [
-      'Brałem odpowiedzialność za pełny SDLC: od architektury i zbierania wymagań po deployment i utrzymanie.',
-      'Zaprojektowałem własną bramę SMS przez Google Cloud do przypomnień o wizytach pacjentów.',
-      'Wdrażałem własne auth, relacyjne i NoSQL persistence oraz szybkie portale z wynikami 90+ w Lighthouse.',
-      'Standaryzowałem DevOps przez Docker, skracając przygotowanie środowisk z dni do minut.'
+      'Brał odpowiedzialność za pełny cykl SDLC: od architektury i zbierania wymagań po wdrożenie oraz utrzymanie.',
+      'Zaprojektował bramę SMS opartą o Google Cloud do obsługi przypomnień o wizytach pacjentów.',
+      'Wdrażał autorskie mechanizmy uwierzytelniania, warstwy danych relacyjnych i NoSQL oraz szybkie portale osiągające 90+ w Lighthouse.',
+      'Standaryzował środowiska przez Docker, skracając przygotowanie projektów z dni do minut.'
     ],
     facts: [
       { label: 'Backend', value: 'ASP.NET Core, Node.js, PostgreSQL' },
@@ -184,9 +184,9 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'DevOps', value: 'Docker, AWS, OpenAPI' },
       { label: 'Dowożenie', value: 'Od architektury do utrzymania' }
     ],
-    surfaceKicker: 'Tor enterprise',
+    surfaceKicker: 'Tor systemowy',
     surfaceValue: 'B2B',
-    surfaceText: 'Systemy travel i medical dostarczane w pełnym zakresie SDLC.'
+    surfaceText: 'Systemy dla branży travel i medical prowadzone od decyzji architektonicznych po utrzymanie produkcyjne.'
   },
   {
     title: '#WSEI',
@@ -201,13 +201,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'Oct 2016 - May 2020',
     previewRightLabel: 'MIEJSCE',
     previewRight: 'Krakow',
-    eyebrow: 'WSEI // Rozwój i chmura',
-    lead: 'Rozwijałem wewnętrzny ekosystem uczelni i współprowadziłem duże hackathony oraz środowiska eventowe.',
+    eyebrow: 'WSEI // Aplikacje wewnętrzne i infrastruktura wydarzeń',
+    lead: 'Rozwijał wewnętrzny ekosystem technologiczny uczelni, łącząc pracę programistyczną z odpowiedzialnością za chmurę, komunikację i wydarzenia o wysokim natężeniu ruchu.',
     highlights: [
-      'Rozwijałem i utrzymywałem system CRM uczelni, strony eventowe WordPress i platformy komunikacji hackathonowej.',
-      'Prowadziłem cross-funkcyjny zespół 20 osób przy organizacji SheepYourHack i WSEICraft.',
-      'Zarządzałem infrastrukturą Azure przygotowaną na wysoki ruch podczas wydarzeń 100+.',
-      'Automatyzowałem komunikację mailową i obniżałem narzut administracyjny.'
+      'Rozwijał i utrzymywał system CRM uczelni, strony eventowe WordPress oraz platformy komunikacji hackathonowej.',
+      'Prowadził cross-funkcyjny zespół 20 osób przy organizacji SheepYourHack i WSEICraft.',
+      'Zarządzał infrastrukturą Azure przygotowaną na wysoki ruch podczas wydarzeń z udziałem 100+ uczestników.',
+      'Automatyzował komunikację mailową, ograniczając narzut administracyjny i ryzyko błędów operacyjnych.'
     ],
     facts: [
       { label: 'Stack', value: 'ASP.NET Core, C#, React, Bootstrap' },
@@ -217,7 +217,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Warstwa Operacyjna',
     surfaceValue: 'CLOUD',
-    surfaceText: 'Aplikacje wewnętrzne, odpowiedzialność za chmurę i infrastrukturę klasy eventowej.'
+    surfaceText: 'Aplikacje wewnętrzne, odpowiedzialność za chmurę i infrastruktura przygotowana na intensywne wydarzenia.'
   },
   {
     title: '#ARCH',
@@ -232,13 +232,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'Sep 2018 - Sep 2019',
     previewRightLabel: 'MIEJSCE',
     previewRight: 'Krakow',
-    eyebrow: 'Bezpieczeństwo // Testy black-box ECM',
-    lead: 'Prowadziłem black-box penetration testing i konsulting security dla proprietarnej platformy ECM.',
+    eyebrow: 'Bezpieczeństwo // Audyt platformy ECM',
+    lead: 'Realizował testy penetracyjne black-box i konsultacje bezpieczeństwa dla proprietarnej platformy ECM, koncentrując się na praktycznie wykorzystywalnych ryzykach.',
     highlights: [
-      'Pracowałem z Burp Suite, Nmap i OWASP ZAP, identyfikując praktycznie wykorzystywalne słabości.',
-      'Prowadziłem audyty podatności i zgodności oraz dostarczałem wskazówki remediacyjne dla engineeringu.',
-      'Dokumentowałem problemy z obszaru OWASP Top 10 i luki przed wdrożeniem produkcyjnym.',
-      'Łączyłem praktyczne testy z dokumentacją security i oceną gotowości do wdrożenia.'
+      'Pracował z Burp Suite, Nmap i OWASP ZAP, identyfikując podatności istotne z perspektywy realnego ataku.',
+      'Prowadził audyty podatności i zgodności, dostarczając zespołom technicznym konkretne rekomendacje remediacyjne.',
+      'Dokumentował problemy z obszaru OWASP Top 10 oraz luki wymagające zamknięcia przed produkcją.',
+      'Łączył praktyczne testowanie z dokumentacją bezpieczeństwa i oceną gotowości wdrożeniowej.'
     ],
     facts: [
       { label: 'Narzędzia', value: 'Burp Suite, Nmap, ZAP' },
@@ -248,7 +248,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Perspektywa bezpieczeństwa',
     surfaceValue: 'AUDYT',
-    surfaceText: 'Testy, raportowanie, remediation i feedback loop dla bezpiecznego engineeringu.'
+    surfaceText: 'Testy, raportowanie, rekomendacje naprawcze i praktyczny feedback dla bezpiecznego wytwarzania oprogramowania.'
   },
   {
     title: '#WLCK',
@@ -263,13 +263,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'Jul 2015 - Aug 2016',
     previewRightLabel: 'MIEJSCE',
     previewRight: 'Wieliczka',
-    eyebrow: 'Dane i sieci // Wczesne fundamenty',
-    lead: 'Wczesne role fundamentowe obejmujące zarządzanie bazami enterprise i topologią sieci na miejscu.',
+    eyebrow: 'Dane i sieci // Fundamenty operacyjne',
+    lead: 'Wczesne doświadczenie operacyjne zbudowało solidną podstawę w pracy z danymi, infrastrukturą lokalną i odpowiedzialnością za stabilność środowisk technicznych.',
     highlights: [
-      'Realizowałem złożone migracje danych w środowiskach Oracle Database.',
-      'Projektowałem i dokumentowałem mapy topologii sieci dla rozszerzeń systemu.',
-      'Zbudowałem mocną bazę w zakresie integralności danych i administracji sieciowej.',
-      'Wypracowałem operacyjne nawyki, które później przełożyły się na pracę nad niezawodnością systemów.'
+      'Realizował złożone migracje danych w środowiskach Oracle Database.',
+      'Projektował i dokumentował mapy topologii sieci dla rozszerzeń systemów.',
+      'Zbudował praktyczne zrozumienie integralności danych, administracji sieciowej i pracy blisko infrastruktury.',
+      'Wypracował operacyjne nawyki, które później przełożyły się na projektowanie niezawodnych systemów aplikacyjnych.'
     ],
     facts: [
       { label: 'Baza', value: 'Oracle Database (SQL)' },
@@ -279,7 +279,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Warstwa Fundamentów',
     surfaceValue: 'OPS',
-    surfaceText: 'Opieka nad bazą, migracje i mapowanie sieci zanim pojawiła się warstwa aplikacyjna.'
+    surfaceText: 'Bazy danych, migracje i topologie sieci jako fundament późniejszej pracy nad systemami aplikacyjnymi.'
   },
   {
     title: '#FE',
@@ -294,13 +294,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'React / TypeScript',
     previewRightLabel: 'BUILD',
     previewRight: 'Vite / FSD / MUI',
-    eyebrow: 'Frontend // Typowane systemy UI',
-    lead: 'Budowanie skalowalnych, typowanych interfejsów z naciskiem na czytelność, wydajność i utrzymanie.',
+    eyebrow: 'Frontend // Interfejsy dla złożonych produktów',
+    lead: 'Projektuje i rozwija interfejsy, które mają być nie tylko estetyczne, ale przede wszystkim czytelne, szybkie i możliwe do utrzymania w długim cyklu życia produktu.',
     highlights: [
-      'Biegła praca w React 18, TypeScript i Next.js dla złożonych kontekstów delivery.',
-      'Przewidywalna orkiestracja stanu przez Redux Toolkit i RTK Query.',
-      'Feature-Sliced Design oraz responsywne, tematyzowane layouty w MUI.',
-      'Interfejsy projektowane pod czytelność w realnej presji delivery.'
+      'Biegła praca w React 18, TypeScript i Next.js przy produktach o dużej liczbie stanów i scenariuszy użytkownika.',
+      'Przewidywalna orkiestracja danych i stanu z wykorzystaniem Redux Toolkit oraz RTK Query.',
+      'Feature-Sliced Design, responsywne layouty i komponenty MUI dopasowane do wymagań produktu, nie odwrotnie.',
+      'Interfejsy projektowane pod czytelność decyzji, wydajność i szybkie diagnozowanie problemów.'
     ],
     facts: [
       { label: 'Rdzeń', value: 'React 18, TypeScript, Next.js' },
@@ -310,7 +310,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Warstwa Kompetencji',
     surfaceValue: 'FRONTEND',
-    surfaceText: 'Typowane interfejsy, skalowalne systemy UI i przewidywalna architektura klienta.'
+    surfaceText: 'Typowane interfejsy, skalowalne systemy UI i architektura klienta przygotowana na rozwój produktu.'
   },
   {
     title: '#BE',
@@ -325,13 +325,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: '.NET 8 / Node.js',
     previewRightLabel: 'PATTERNS',
     previewRight: 'DDD / CQRS',
-    eyebrow: 'Backend // Główna logika i dane',
-    lead: 'Dostarczanie krytycznych API, silników symulacyjnych i niezawodnych warstw danych.',
+    eyebrow: 'Backend // Logika domenowa i dane',
+    lead: 'Buduje backendy, które porządkują logikę biznesową, chronią dane i dają produktowi stabilny fundament techniczny.',
     highlights: [
-      'Szerokie wykorzystanie .NET 8 i ASP.NET Core do wysokowydajnych serwisów.',
-      'Mocne modelowanie danych z EF Core, PostgreSQL, MSSQL i MongoDB.',
-      'Granice domain-driven i dekompozycja serwisów tam, gdzie pomagają delivery.',
-      'Backendy budowane pod poprawność, utrzymanie i wsparcie operacyjne.'
+      'Szerokie wykorzystanie .NET 8 i ASP.NET Core do serwisów, w których liczy się wydajność, poprawność i bezpieczeństwo.',
+      'Modelowanie danych z EF Core, PostgreSQL, MSSQL i MongoDB, z naciskiem na spójność oraz czytelność warstw.',
+      'Granice domenowe i dekompozycja usług stosowane tam, gdzie realnie upraszczają rozwój oraz utrzymanie.',
+      'Backendy projektowane pod testowalność, monitoring, diagnozowanie błędów i wsparcie operacyjne.'
     ],
     facts: [
       { label: 'Frameworki', value: '.NET 8, ASP.NET Core, Node.js' },
@@ -341,7 +341,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Warstwa Kompetencji',
     surfaceValue: 'BACKEND',
-    surfaceText: 'API, logika domenowa, silniki i warstwy danych dla krytycznych systemów.'
+    surfaceText: 'API, logika domenowa, silniki i warstwy danych budowane z myślą o poprawności oraz odporności.'
   },
   {
     title: '#INF',
@@ -353,16 +353,16 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     chip: 'Infra',
     id: 'ID-INF12',
     previewLeftLabel: 'FOKUS',
-    previewLeft: 'Perymetr delivery',
+    previewLeft: 'Zakres wdrożeniowy',
     previewRightLabel: 'TOOLS',
     previewRight: 'Docker / AWS / Auth',
-    eyebrow: 'Infra // Perymetr delivery',
-    lead: 'Deployment, hosting, security i tooling jako integralna część dowożonego produktu.',
+    eyebrow: 'Infra // Operacyjna jakość produktu',
+    lead: 'Traktuje deployment, hosting, bezpieczeństwo i narzędzia developerskie jako element jakości produktu, a nie osobny etap po zakończeniu implementacji.',
     highlights: [
-      'Praktyczna praca z Dockerem, AWS, CI/CD i release flows.',
-      'Silne zrozumienie auth, bezpieczeństwa API i perimeteru operacyjnego.',
-      'Budowanie workflow deploymentowych wtedy, gdy ograniczenia projektu tego wymagają.',
-      'Dbanie, by produkty były nie tylko zbudowane, ale też utrzymywalne i uruchamialne.'
+      'Praktyczna praca z Dockerem, AWS, CI/CD i procesami release w projektach wymagających kontroli wdrożeń.',
+      'Dobre zrozumienie uwierzytelniania, bezpieczeństwa API i operacyjnego perymetru systemu.',
+      'Budowanie workflow deploymentowych wtedy, gdy ograniczenia projektu wymagają narzędzi szytych pod kontekst.',
+      'Dbanie o to, by system był nie tylko napisany, ale też uruchamialny, obserwowalny i utrzymywalny.'
     ],
     facts: [
       { label: 'Platformy', value: 'Docker, AWS, Linux' },
@@ -370,9 +370,9 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Dowożenie', value: 'CI/CD, release flow, hosting' },
       { label: 'Tryb', value: 'Operacje gotowe na produkt' }
     ],
-    surfaceKicker: 'Warstwa delivery',
+    surfaceKicker: 'Warstwa wdrożeniowa',
     surfaceValue: 'INFRA',
-    surfaceText: 'Infra, security i tooling domykające delivery całego produktu.'
+    surfaceText: 'Infrastruktura, bezpieczeństwo i tooling domykające odpowiedzialność za cały produkt.'
   },
   {
     title: '#EDU',
@@ -388,12 +388,12 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'KIERUNEK',
     previewRight: 'Doktorat w toku',
     eyebrow: 'Edukacja // Formalne zaplecze',
-    lead: 'Formalne wykształcenie inżynierskie uzupełnione technicznymi i security certyfikatami użytecznymi w praktyce delivery.',
+    lead: 'Formalne wykształcenie inżynierskie stanowi dla niego podstawę pracy praktycznej, uzupełnioną certyfikatami technicznymi i bezpieczeństwa.',
     highlights: [
       'Bachelor of Engineering in Mobile and Web Application Programming, WSEI Kraków, rocznik 2020.',
       'IT Technician, Technikum Łączności nr 14 w Krakowie, rocznik 2016.',
       'Microsoft MTA 98-375 i 98-364 oraz państwowe potwierdzenie kwalifikacji IT Technician.',
-      'CV zawiera też Google Cybersecurity i IBM Full Stack w sekcji relevant certificates.'
+      'CV obejmuje również Google Cybersecurity i IBM Full Stack jako certyfikaty wzmacniające praktyczny profil zawodowy.'
     ],
     facts: [
       { label: 'Stopień', value: 'BEng, rocznik 2020' },
@@ -403,7 +403,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Podstawa Formalna',
     surfaceValue: 'EDU',
-    surfaceText: 'Wykształcenie akademickie wsparte praktyką produktową i kierunkiem badawczym.'
+    surfaceText: 'Wykształcenie techniczne wsparte praktyką produktową, bezpieczeństwem i ciągłym rozwojem zawodowym.'
   },
   {
     title: '#COM',
@@ -418,13 +418,13 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewLeft: 'Leadership / Events',
     previewRightLabel: 'SKALA',
     previewRight: 'Zespół / 100+',
-    eyebrow: 'Aktywność // Leadership i organizacja',
-    lead: 'Doświadczenie liderskie i organizacyjne obejmujące hackathony, reprezentację studentów i koordynację zespołów cross-funkcyjnych.',
+    eyebrow: 'Aktywność // Liderstwo i odpowiedzialność zespołowa',
+    lead: 'Doświadczenie organizacyjne i liderskie uzupełnia jego profil techniczny o umiejętność prowadzenia ludzi, komunikacji i spokojnej koordynacji pracy pod presją.',
     highlights: [
-      'Współorganizowałem SheepYourHack i WSEICraft jako technical lead i mentor.',
-      'Zarządzałem 20-osobowym zespołem wolontariuszy i koordynowałem pracę ze sponsorami.',
-      'Pełniłem funkcję prezesa i wiceprezesa samorządu studenckiego w latach 2017-2020.',
-      'Wypracowałem spokojny, zadaniowy styl leadershipu w środowiskach wysokiej presji.'
+      'Współorganizował SheepYourHack i WSEICraft jako lider techniczny oraz mentor.',
+      'Zarządzał 20-osobowym zespołem wolontariuszy i koordynował współpracę ze sponsorami.',
+      'Pełnił funkcję prezesa i wiceprezesa samorządu studenckiego w latach 2017-2020.',
+      'Wypracował spokojny, zadaniowy styl prowadzenia zespołów w środowiskach wysokiej presji.'
     ],
     facts: [
       { label: 'Wydarzenia', value: 'SheepYourHack, WSEICraft' },
@@ -434,7 +434,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Warstwa Leadershipu',
     surfaceValue: 'LEAD',
-    surfaceText: 'Mentoring, organizacja wydarzeń, reprezentacja i spokojne prowadzenie zespołu.'
+    surfaceText: 'Mentoring, organizacja wydarzeń, reprezentacja i odpowiedzialne prowadzenie zespołów.'
   },
   {
     title: '#GDPR',
@@ -450,12 +450,12 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'PODEJŚCIE',
     previewRight: 'Practical',
     eyebrow: 'Zgodność // Bezpieczeństwo i prywatność',
-    lead: 'Warstwa dokumentacyjna gotowa do rekrutacji: zgoda GDPR, referencje i dwujęzyczna zgodność formalna.',
+    lead: 'Warstwa formalna jest przygotowana pod rozmowy rekrutacyjne i współpracę B2B: zgody, referencje oraz spójna komunikacja w języku polskim i angielskim.',
     highlights: [
       'Zgoda na przetwarzanie danych osobowych do celów rekrutacyjnych zgodnie z GDPR / RODO.',
       'Referencje od klientów z uratowanych projektów są dostępne na życzenie.',
       'Treść formalna utrzymywana jest zarówno w języku polskim, jak i angielskim.',
-      'Warstwa dokumentacyjna pozostaje spójna z oczekiwaniami rekrutacyjnymi i compliance.'
+      'Dokumentacja pozostaje spójna z oczekiwaniami rekrutacyjnymi, prywatnością danych i standardami formalnej komunikacji.'
     ],
     facts: [
       { label: 'Regulacja', value: 'EU GDPR 2016/679' },
@@ -465,7 +465,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Warstwa Formalna',
     surfaceValue: 'GDPR',
-    surfaceText: 'Zgoda GDPR, referencje i gotowość dokumentacyjna do procesu rekrutacyjnego.'
+    surfaceText: 'Zgoda GDPR, referencje i formalna gotowość do procesu rekrutacyjnego lub współpracy B2B.'
   }
 ];
 
@@ -483,22 +483,22 @@ export const PL_FEATURED_INTRO_CARD: CvCardContent = {
   previewRightLabel: 'AKCJA',
   previewRight: 'Inicjalizacja',
   eyebrow: 'Węzeł wejścia // Przejście ze splasha do głównej sceny manifold',
-  lead: 'Główna karta dostępu uruchamiająca portfolio i przechodząca z intro do pełnej nawigacji.',
+  lead: 'Karta wejściowa pełni rolę świadomego progu między ekranem startowym a właściwym portfolio, prowadząc użytkownika do głównej nawigacji.',
   highlights: [
     'Aktywuje widok świata i odblokowuje warstwy nawigacyjne.',
-    'Przełącza kartę głównego fokusu z profilu startowego na portfolio.',
-    'Działa jako wizualny handoff między ładowaniem a główną sceną.',
-    'Utrzymuje wejście jako czytelny i kinetyczny moment startowy.'
+    'Przełącza kartę głównego fokusu z profilu startowego na właściwą prezentację portfolio.',
+    'Buduje wizualne przejście między ładowaniem a główną sceną.',
+    'Utrzymuje start jako czytelny, kontrolowany i intencjonalny moment wejścia.'
   ],
   facts: [
-    { label: 'Tryb', value: 'Intro / handoff' },
+    { label: 'Tryb', value: 'Intro / przejście' },
     { label: 'Trigger', value: 'Wskaźnik lub klawiatura' },
     { label: 'Stan', value: 'Sekwencja boot gotowa' },
     { label: 'Efekt', value: 'Wejście do manifold' }
   ],
   surfaceKicker: 'Powierzchnia startu',
   surfaceValue: 'WEJŚCIE',
-  surfaceText: 'Dedykowany profil intro, który po wejściu przekształca się w główną kartę.'
+  surfaceText: 'Dedykowany próg wejścia, który po aktywacji przechodzi w główną prezentację portfolio.'
 };
 
 export const PL_BUNDLE: ManifoldLocaleBundle = {
@@ -516,7 +516,7 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
     cvDownloadFileName: 'krzysztof_kaim_resume.pdf',
     cvDownloadHref: '/files/krzysztof_kaim_resume.pdf',
     description:
-      'Krzysztof Kaim to software engineer specjalizujący się w React, TypeScript, .NET, systemach MES, integracjach ERP i systemach przemysłowych.',
+      'Krzysztof Kaim to inżynier oprogramowania full-stack specjalizujący się w React, TypeScript, .NET, systemach MES, integracjach ERP i projektach wymagających odpowiedzialności architektonicznej.',
     lang: 'pl',
     title: 'Krzysztof Kaim Software Engineer | React, .NET, MES'
   },
@@ -630,7 +630,7 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
     scrollPrompt: 'SCROLL',
     sectionKicker: 'Sekcja',
     systemLoader: 'System Loader',
-    topbarRole: 'full-stack software engineer / lead architect',
+    topbarRole: 'inżynier oprogramowania full-stack / lead architect',
     twoDSection: 'Sekcja 2D',
     systemOverlayToggleAria: 'Przełącz overlay systemowy',
     systemOverlayToggleActive: 'Overlay systemowy: włączony',

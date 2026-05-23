@@ -2,7 +2,7 @@ import { TITLE_SCRAMBLE_CHARS } from '../../config/manifold/ManifoldSceneConfig'
 import { MANIFOLD_CONSTANTS } from './ManifoldConstants';
 import type { ItemState, ViewMode } from './ManifoldTypes';
 
-export interface RevealLayers {
+interface RevealLayers {
   front: HTMLSpanElement;
   ghost: HTMLSpanElement;
   staticText: HTMLSpanElement;

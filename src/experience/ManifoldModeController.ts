@@ -82,6 +82,7 @@ const CARD_ACCESSIBILITY_ALLOW_FOCUS = 1 << 0;
 const CARD_ACCESSIBILITY_ALLOW_EXPANDED_PANEL = 1 << 1;
 const CARD_ACCESSIBILITY_ALLOW_EXPANDED_CONTROLS = 1 << 2;
 const CARD_ACCESSIBILITY_HIDDEN = 1 << 3;
+const CARD_SPECTRUM_VARIABLES = Array.from({ length: 16 }, (_, index) => `--f-${index}`);
 
 interface HintCopyMeasurement {
   height: number;
@@ -241,6 +242,7 @@ export class ManifoldModeController {
   private audioActive = false;
   private sharedSpectrumActive = false;
   private currentQuantizedSpectrum = new Float32Array(16).fill(0.01);
+  private readonly lastAppliedSharedSpectrum = new Float32Array(16).fill(Number.NaN);
   private lastIntroHintGeometry = '';
   private introHintMeasurement: HintCopyMeasurement = { width: 0, height: 0 };
   private lastContextHintAlpha = '';
@@ -292,6 +294,7 @@ export class ManifoldModeController {
   private lastParticleRenderAt = 0;
   private rawScrollVelocity = 0;
   private programmaticJumpActive = false;
+  private readonly localizedSectionTitleCache = new Map<string, string>();
 
   constructor(
     private readonly elements: ControllerElements,
@@ -334,7 +337,7 @@ export class ManifoldModeController {
     this.fourDWireframe = elements.fourDWireframe;
     // iOS: Skip 2D context creation — the canvas is hidden via CSS (display: none !important)
     // but getContext() still allocates a GPU-backed buffer that wastes VRAM.
-    this.fourDWireframeContext = IS_IOS
+    this.fourDWireframeContext = (IS_IOS || this.isAndroidLowEnd)
       ? null
       : this.fourDWireframe.getContext('2d', { alpha: true, desynchronized: !IS_SAFARI || SAFARI_VERSION >= 17 });
     this.introHint = elements.introHint;
@@ -862,6 +865,7 @@ export class ManifoldModeController {
     }
 
     this.locale = locale;
+    this.localizedSectionTitleCache.clear();
     const ui = getManifoldLocaleBundle(locale).ui;
     this.introHintKickerText = ui.entryPoint;
     this.introHintTitleText = ui.enteringAutomatically;
@@ -1026,6 +1030,7 @@ export class ManifoldModeController {
 
       this.currentQuantizedSpectrum.fill(0.01);
       this.sharedSpectrumActive = false;
+      this.syncSharedSpectrumCss();
       return;
     }
 
@@ -1033,6 +1038,21 @@ export class ManifoldModeController {
       this.currentQuantizedSpectrum[i] = Math.max(0.01, Math.round((spectrum[i] ?? 0) * 100) / 100);
     }
     this.sharedSpectrumActive = true;
+    this.syncSharedSpectrumCss();
+  }
+
+  private syncSharedSpectrumCss(): void {
+    if (IS_SAFARI) {
+      return;
+    }
+
+    for (let i = 0; i < 16; i += 1) {
+      const value = this.currentQuantizedSpectrum[i] ?? 0.01;
+      if (this.lastAppliedSharedSpectrum[i] !== value) {
+        this.lastAppliedSharedSpectrum[i] = value;
+        StyleAdapter.setNumericProperty(this.world, CARD_SPECTRUM_VARIABLES[i]!, value);
+      }
+    }
   }
 
   getSceneNavigationTargets(): SceneNavigationSection[] {
@@ -1041,8 +1061,7 @@ export class ManifoldModeController {
       getAnchorForCard: (item) => this.getAnchorForCard(item),
       getAnchorForItemIndex: (itemIndex) => this.getScrollAnchorForItemIndex(itemIndex),
       normalizeAnchor: (anchor, mode) => this.normalizeLoopAnchor(anchor, this.getSectionNavigationReferenceScroll(), mode),
-      sectionHeadings: MANIFOLD_SECTION_HEADINGS,
-      is2DMode: this.is2DMode()
+      sectionHeadings: MANIFOLD_SECTION_HEADINGS
     }).map((section) => ({
       ...section,
       section: this.getLocalizedSectionTitle(section.section)
@@ -1529,7 +1548,7 @@ export class ManifoldModeController {
         (!this.is2DMode() && this.inputService.isPointerActive() && !suppressHoverChecks) ||
         quiet2DPointerWindow
       );
-    const skipFourDVisuals = this.isAndroidLowEnd;
+    const skipFourDVisuals = IS_IOS || this.isAndroidLowEnd;
     const fourDStartedAt = performance.now();
     this.currentFourDScene =
       !skipFourDVisuals && visualFourDProgress > 0.001 ? this.computeFourDScene(sceneScroll, time, visualFourDProgress) : null;
@@ -1632,8 +1651,7 @@ export class ManifoldModeController {
         twoDGridMetrics,
         cardRenderLayout,
         this.currentFourDScene,
-        shouldMaintainCardScreenQuads || (this.expandedCard === item) || reversePrewarmCard,
-        this.currentQuantizedSpectrum
+        shouldMaintainCardScreenQuads || (this.expandedCard === item) || reversePrewarmCard
       );
     }
     const itemsMs = performance.now() - itemsStartedAt;
@@ -2267,8 +2285,6 @@ export class ManifoldModeController {
       lastCardHeight: '',
       lastLayoutFade: Number.NaN,
       lastShellFade: Number.NaN,
-      lastSpectrumActive: false,
-      lastSpectrumValues: new Float32Array(16).fill(0.01),
       lastX: Number.NaN,
       lastY: Number.NaN,
       lastZ: Number.NaN,
@@ -2722,8 +2738,7 @@ export class ManifoldModeController {
     twoDGridMetrics: TwoDGridMetrics | null,
     cardRenderLayout: CardRenderLayout,
     fourDScene: FourDSceneState | null,
-    maintainScreenQuad: boolean,
-    sharedSpectrum: ArrayLike<number>
+    maintainScreenQuad: boolean
   ): void {
     let tx: number;
     let ty: number;
@@ -2946,8 +2961,7 @@ export class ManifoldModeController {
         item,
         this.currentAudioSpectrum,
         this.currentAudioEnergy,
-        item.currentAlpha,
-        sharedSpectrum
+        item.currentAlpha
       );
     }
 
@@ -4139,7 +4153,14 @@ export class ManifoldModeController {
   }
 
   private getLocalizedSectionTitle(sectionTitle: string): string {
-    return localizeSectionTitle(sectionTitle, this.locale);
+    const cached = this.localizedSectionTitleCache.get(sectionTitle);
+    if (cached) {
+      return cached;
+    }
+
+    const localized = localizeSectionTitle(sectionTitle, this.locale);
+    this.localizedSectionTitleCache.set(sectionTitle, localized);
+    return localized;
   }
 
   private applyLocalizedCardChrome(item: ItemState): void {

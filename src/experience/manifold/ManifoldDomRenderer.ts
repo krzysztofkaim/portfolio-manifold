@@ -4,8 +4,6 @@ import { StyleAdapter } from '../../utils/StyleAdapter';
 import { scheduleCardTitleMarqueeSync } from './CardTitleMarquee';
 import { IS_IOS, IS_SAFARI } from '../../utils/browserDetection';
 
-const CARD_SPECTRUM_VARIABLES = Array.from({ length: 16 }, (_, index) => `--f-${index}`);
-
 export interface RendererContext {
   viewportWidth: number;
   viewportHeight: number;
@@ -284,8 +282,7 @@ export class ManifoldDomRenderer {
     item: ItemState,
     spectrum: Float32Array | null,
     energy: number,
-    alpha: number,
-    sharedSpectrum: ArrayLike<number>
+    alpha: number
   ): void {
     // Safari: Audio spectrum visuals are disabled via CSS (--music-alpha: 0 !important)
     // Skip all JS-side CSS variable writes to eliminate per-card style mutation pressure.
@@ -306,7 +303,6 @@ export class ManifoldDomRenderer {
         StyleAdapter.setNumericProperty(item.fxEl, '--music-alpha', 0);
         item.lastMusicAlpha = 0;
       }
-      item.lastSpectrumActive = false;
       return;
     }
 
@@ -316,32 +312,9 @@ export class ManifoldDomRenderer {
 
     const alphaDelta = Math.abs(quantizedMusicAlpha - (item.lastMusicAlpha ?? -1));
     const shouldUpdateAlpha = alphaDelta > 0.019;
-    const shouldSyncSpectrum = targetPresence > 0 && (!item.lastSpectrumActive || this.syncSpectrumValues(item, sharedSpectrum));
-
     if (shouldUpdateAlpha) {
       StyleAdapter.setNumericProperty(item.fxEl, '--music-alpha', quantizedMusicAlpha);
       item.lastMusicAlpha = quantizedMusicAlpha;
     }
-
-    if (shouldSyncSpectrum) {
-      for (let i = 0; i < 16; i += 1) {
-        StyleAdapter.setNumericProperty(item.fxEl, CARD_SPECTRUM_VARIABLES[i]!, item.lastSpectrumValues[i] ?? 0.01);
-      }
-      item.lastSpectrumActive = true;
-    }
-  }
-
-  private syncSpectrumValues(item: ItemState, sharedSpectrum: ArrayLike<number>): boolean {
-    let hasDelta = false;
-
-    for (let i = 0; i < 16; i += 1) {
-      const nextValue = sharedSpectrum[i] ?? 0.01;
-      if (item.lastSpectrumValues[i] !== nextValue) {
-        item.lastSpectrumValues[i] = nextValue;
-        hasDelta = true;
-      }
-    }
-
-    return hasDelta;
   }
 }

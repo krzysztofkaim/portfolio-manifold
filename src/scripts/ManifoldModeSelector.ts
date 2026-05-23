@@ -29,6 +29,7 @@ interface ManifoldModeSelectorContext {
 
 export class ManifoldModeSelector {
   private elements: ModeToggleElements | null = null;
+  private optionElements: readonly HTMLButtonElement[] = [];
   private readonly supportsHoverMenuInteractions =
     window.matchMedia('(hover: hover)').matches && window.matchMedia('(pointer: fine)').matches;
   private localeStrings: ManifoldModeSelectorLocaleStrings = {
@@ -59,6 +60,7 @@ export class ManifoldModeSelector {
 
   setup(elements: ModeToggleElements): () => void {
     this.elements = elements;
+    this.optionElements = [elements.option2D, elements.option3D, elements.option4D];
 
     const setModeMenuExpanded = (expanded: boolean) => {
       elements.picker.dataset.expanded = expanded ? 'true' : 'false';
@@ -276,8 +278,7 @@ export class ManifoldModeSelector {
 
   private cacheOptionRects(): void {
     if (!this.elements || this.optionRectsCache) return;
-    const options = [this.elements.option2D, this.elements.option3D, this.elements.option4D];
-    this.optionRectsCache = options.map(opt => {
+    this.optionRectsCache = this.optionElements.map(opt => {
       const rect = opt.getBoundingClientRect();
       return { left: rect.left, width: rect.width };
     });
@@ -292,7 +293,6 @@ export class ManifoldModeSelector {
     this.cacheOptionRects();
     if (!this.optionRectsCache) return;
 
-    const options = [this.elements.option2D, this.elements.option3D, this.elements.option4D];
     const rects = this.optionRectsCache;
 
     // Use requestAnimationFrame to throttle CSS writes to display sync
@@ -302,7 +302,7 @@ export class ManifoldModeSelector {
 
     this.lastUpdateFrame = requestAnimationFrame(() => {
       // WRITE Phase - entirely decoupled from layout reads!
-      for (let i = 0; i < options.length; i++) {
+      for (let i = 0; i < this.optionElements.length; i++) {
         const rect = rects[i];
         const centerX = rect.left + rect.width * 0.5;
         const distance = Math.abs(clientX - centerX);
@@ -310,8 +310,8 @@ export class ManifoldModeSelector {
         const scale = 1 + normalized * 0.095;
         const lift = normalized * 0.05;
 
-        options[i].style.setProperty('--mode-dock-scale', scale.toFixed(3));
-        options[i].style.setProperty('--mode-dock-lift', `${lift.toFixed(3)}rem`);
+        this.optionElements[i]?.style.setProperty('--mode-dock-scale', scale.toFixed(3));
+        this.optionElements[i]?.style.setProperty('--mode-dock-lift', `${lift.toFixed(3)}rem`);
       }
       this.lastUpdateFrame = 0;
     });
@@ -324,12 +324,10 @@ export class ManifoldModeSelector {
       return;
     }
 
-    this.elements.option2D.style.removeProperty('--mode-dock-scale');
-    this.elements.option3D.style.removeProperty('--mode-dock-scale');
-    this.elements.option4D.style.removeProperty('--mode-dock-scale');
-    this.elements.option2D.style.removeProperty('--mode-dock-lift');
-    this.elements.option3D.style.removeProperty('--mode-dock-lift');
-    this.elements.option4D.style.removeProperty('--mode-dock-lift');
+    for (const option of this.optionElements) {
+      option.style.removeProperty('--mode-dock-scale');
+      option.style.removeProperty('--mode-dock-lift');
+    }
   }
 
   private applyModeSelection(nextMode: ViewMode): void {

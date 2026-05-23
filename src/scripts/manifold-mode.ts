@@ -208,6 +208,9 @@ class ManifoldApp {
   private lastHudSpectrumAlpha = -1;
   private lastHudSpectrumShiftY = Number.NaN;
   private readonly lastHudSpectrumBarScales: number[] = [];
+  private lastHudNavigationModeSignature = '';
+  private lastHudOrbitVisibilitySignature = '';
+  private lastOrbitToggleLabel = '';
   // Cached body class state — avoids classList.contains() in hot paths
   private cachedIsNavOpen = false;
   private cachedHasExpandedCard = false;
@@ -760,6 +763,18 @@ class ManifoldApp {
   private applyHudOrbitVisibility(): void {
     const is4DMode = this.controller?.is4DMode() ?? false;
     const effectiveOrbitVisibility = !is4DMode && this.hudOrbitsVisible;
+    const signature = [
+      this.locale.getActiveLocale(),
+      is4DMode ? '4d' : 'linear',
+      this.hudOrbitsVisible ? 'requested' : 'hidden',
+      effectiveOrbitVisibility ? 'visible' : 'collapsed'
+    ].join(':');
+
+    if (signature === this.lastHudOrbitVisibilitySignature) {
+      return;
+    }
+
+    this.lastHudOrbitVisibilitySignature = signature;
     document.body.classList.toggle('hud-orbits-hidden', !effectiveOrbitVisibility);
     this.elements.hudNav.orbitToggleButton.setAttribute('aria-pressed', effectiveOrbitVisibility ? 'true' : 'false');
     this.elements.hudNav.orbitToggleButton.dataset.state = effectiveOrbitVisibility ? 'on' : 'off';
@@ -1379,7 +1394,10 @@ class ManifoldApp {
     const bundle = this.locale.getActiveLocaleBundle();
     const is4DMode = this.controller?.is4DMode() ?? false;
     const label = !is4DMode && this.hudOrbitsVisible ? bundle.ui.orbitToggleActive : bundle.ui.orbitToggleInactive;
-    this.elements.hudNav.orbitToggleLabel.textContent = label;
+    if (this.lastOrbitToggleLabel !== label || this.elements.hudNav.orbitToggleLabel.textContent !== label) {
+      this.lastOrbitToggleLabel = label;
+      this.elements.hudNav.orbitToggleLabel.textContent = label;
+    }
     this.syncToggledButtonLabels();
   }
 
@@ -1391,8 +1409,12 @@ class ManifoldApp {
       this.persistOrbitVisibility();
     }
 
-    this.elements.hudNav.panel.classList.toggle('is-section-navigation-hidden', is4DMode);
-    this.elements.hudNav.orbitToggleButton.hidden = is4DMode;
+    const signature = is4DMode ? '4d' : 'section';
+    if (signature !== this.lastHudNavigationModeSignature) {
+      this.lastHudNavigationModeSignature = signature;
+      this.elements.hudNav.panel.classList.toggle('is-section-navigation-hidden', is4DMode);
+      this.elements.hudNav.orbitToggleButton.hidden = is4DMode;
+    }
     this.applyHudOrbitVisibility();
   }
 
@@ -1712,7 +1734,7 @@ class ManifoldApp {
           scrollVelocity > 0.0035 ||
           time - this.lastInteractionBurstAt < 1400;
         const audioActive = this.audio.getAudioActiveState();
-        const iosInteractiveInterval = 1000 / (audioActive ? 18 : 20);
+        const iosInteractiveInterval = 1000 / (audioActive ? 18 : 16);
         const iosIdleInterval = 1000 / 8;
         const effectiveFrameInterval = IS_IOS
           ? Math.max(
@@ -1762,26 +1784,30 @@ class ManifoldApp {
 
       const isInteracting = scrollVelocity > 0.0035 || time - this.lastInteractionBurstAt < 1400;
       const isMotionActive = perf.transitionActive || isInteracting;
-      const shouldRefreshHud = isMotionActive ? (time - this.lastHudNavRenderAt > 120) : (time - this.lastHudNavRenderAt > 2400);
       const audioActive = this.audio.getAudioActiveState();
       const iosUiInterval = isMotionActive || audioActive ? 1000 / 12 : 1000 / 4;
       const shouldRunIosUiPass = !IS_IOS || time - this.lastIosUiTickAt >= iosUiInterval;
+
+      // On iOS, skip HUD refresh when both controller pass AND UI pass were skipped
+      // to minimize main-thread work on idle frames.
+      const shouldRefreshHud = shouldRunIosUiPass
+        ? (isMotionActive ? (time - this.lastHudNavRenderAt > 120) : (time - this.lastHudNavRenderAt > 2400))
+        : false;
 
       const uiStartedAt = performance.now();
       if (shouldRunIosUiPass) {
         this.lastIosUiTickAt = time;
       }
 
-      this.syncHudNavigationMode();
-
-      if (shouldRefreshHud) {
-        this.renderHudNavigation();
-      }
-
-      // Sync cached body class state once per frame (avoids repeated classList.contains in hot paths)
-      this.cachedHasExpandedCard = document.body.classList.contains('has-expanded-card');
-
       if (!IS_IOS || shouldRunIosUiPass) {
+        this.syncHudNavigationMode();
+
+        if (shouldRefreshHud) {
+          this.renderHudNavigation();
+        }
+
+        // Sync cached body class state with the rest of the UI pass.
+        this.cachedHasExpandedCard = document.body.classList.contains('has-expanded-card');
         this.updateTopbarLoaderKicker();
         this.updateQualities(perf, scrollVelocity);
         this.cursor.update();
@@ -1958,19 +1984,35 @@ class ManifoldApp {
     return this.diagnostics;
   }
 
+  private cachedGpuName: string | null = null;
   private detectGpu(): string {
+    if (this.cachedGpuName !== null) return this.cachedGpuName;
+    if (IS_IOS) {
+      this.cachedGpuName = 'WEBKIT_SAFE_MODE';
+      return this.cachedGpuName;
+    }
+
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-      if (!gl) return 'SOFTWARE_EMULATION';
+      if (!gl) {
+        this.cachedGpuName = 'SOFTWARE_EMULATION';
+        return this.cachedGpuName;
+      }
       const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info');
       if (debugInfo) {
         const renderer = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-        return `${renderer} (${'gpu' in navigator ? 'WebGPU' : 'WebGL2'})`;
+        this.cachedGpuName = `${renderer} (${'gpu' in navigator ? 'WebGPU' : 'WebGL2'})`;
+      } else {
+        this.cachedGpuName = `GENERIC_ACCELERATOR (${'gpu' in navigator ? 'WebGPU' : 'WebGL2'})`;
       }
-      return `GENERIC_ACCELERATOR (${'gpu' in navigator ? 'WebGPU' : 'WebGL2'})`;
+      // Explicitly lose the context to free the GPU-backed buffer immediately
+      const loseCtx = (gl as WebGLRenderingContext).getExtension('WEBGL_lose_context');
+      loseCtx?.loseContext();
+      return this.cachedGpuName;
     } catch {
-      return 'HARDWARE_UNKNOWN';
+      this.cachedGpuName = 'HARDWARE_UNKNOWN';
+      return this.cachedGpuName;
     }
   }
 
@@ -1978,7 +2020,14 @@ class ManifoldApp {
     if (this.activeHudSubView !== 'about') return;
 
     const ua = navigator.userAgent;
-    const platform = (navigator as Navigator & { userAgentData?: { platform: string } }).userAgentData?.platform || navigator.platform;
+    const userAgentDataPlatform = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform;
+    const platform = userAgentDataPlatform || (/iPad|iPhone|iPod/.test(ua) || (ua.includes('Mac') && navigator.maxTouchPoints > 1)
+      ? 'iOS / iPadOS'
+      : ua.includes('Android')
+        ? 'Android'
+        : ua.includes('Mac')
+          ? 'macOS'
+          : 'Unknown platform');
     const cores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} Cores` : 'Cores unknown';
     let browser = 'Unknown Browser';
     if (ua.includes('Firefox')) browser = 'Firefox';

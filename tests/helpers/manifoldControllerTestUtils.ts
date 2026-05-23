@@ -98,7 +98,7 @@ function createHintElement(idPrefix: string): HTMLElement {
   return root;
 }
 
-export function createControllerElements(): ControllerElements {
+function createControllerElements(): ControllerElements {
   const viewport = document.createElement('div');
   const world = document.createElement('div');
   const ambientParticleLayer = document.createElement('canvas');
@@ -129,7 +129,6 @@ export function createControllerElements(): ControllerElements {
       coord: document.createElement('div'),
       fps: document.createElement('div'),
       perfMode: document.createElement('div'),
-      perfModeSidebar: document.createElement('div'),
       section: document.createElement('div'),
       velocity: document.createElement('div')
     },

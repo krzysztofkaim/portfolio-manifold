@@ -123,13 +123,24 @@ export function getSectionNavigationTargets(input: {
   getAnchorForItemIndex: (itemIndex: number) => number;
   normalizeAnchor: (anchor: number, mode: NavigationAnchorMode) => number;
   sectionHeadings: readonly string[];
-  is2DMode: boolean;
 }): SceneNavigationSection[] {
   const sections: SceneNavigationSection[] = [];
+  const itemsBySection = new Map<string, ItemState[]>();
+
+  for (const sectionTitle of input.sectionHeadings) {
+    itemsBySection.set(sectionTitle, []);
+  }
+
+  for (const item of input.cardItems) {
+    const sectionItems = itemsBySection.get(item.sectionTitle);
+    if (sectionItems) {
+      sectionItems.push(item);
+    }
+  }
 
   for (let sectionIndex = 0; sectionIndex < input.sectionHeadings.length; sectionIndex += 1) {
     const sectionTitle = input.sectionHeadings[sectionIndex] ?? 'PROFILE';
-    const sectionItems = input.cardItems.filter(item => item.sectionTitle === sectionTitle);
+    const sectionItems = itemsBySection.get(sectionTitle) ?? [];
     
     let bestAnchor: number;
     const firstCard = sectionItems.find(item => item.type === 'card') || sectionItems[0];

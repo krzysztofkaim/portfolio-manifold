@@ -1,4 +1,4 @@
-export interface BlobConfig {
+interface BlobConfig {
   color: string;
   composite: GlobalCompositeOperation;
   radius: number;

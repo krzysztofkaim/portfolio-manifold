@@ -4,7 +4,7 @@ import { EN_BUNDLE, EN_CV_CARDS, EN_FEATURED_INTRO_CARD } from './locales/en';
 import { PL_BUNDLE, PL_CV_CARDS, PL_FEATURED_INTRO_CARD } from './locales/pl';
 
 export type ManifoldLocale = 'en' | 'pl';
-export type ManifoldSectionKey = (typeof MANIFOLD_SECTION_HEADINGS)[number];
+type ManifoldSectionKey = (typeof MANIFOLD_SECTION_HEADINGS)[number];
 export const MANIFOLD_LOCALE_STORAGE_KEY = 'manifold-locale';
 
 export interface ManifoldAudioLocaleStrings {
@@ -18,7 +18,7 @@ export interface ManifoldAudioLocaleStrings {
   zenLabel: string;
 }
 
-export interface ManifoldUiLocaleStrings {
+interface ManifoldUiLocaleStrings {
   additionalOptions: string;
   additionalOptionsHint: string;
   aboutLabel: string;
@@ -123,7 +123,7 @@ export interface ManifoldUiLocaleStrings {
   zenLock: string;
 }
 
-export interface ManifoldDocumentLocaleStrings {
+interface ManifoldDocumentLocaleStrings {
   cvDownloadFileName: string;
   cvDownloadHref: string;
   description: string;

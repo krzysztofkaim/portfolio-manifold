@@ -160,97 +160,97 @@
 
 @property --f-0 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-1 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-2 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-3 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-4 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-5 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-6 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-7 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-8 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-9 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-10 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-11 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-12 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-13 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-14 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
 @property --f-15 {
   syntax: '<number>';
-  inherits: false;
+  inherits: true;
   initial-value: 0;
 }
 
@@ -406,7 +406,7 @@ body {
   cursor: crosshair;
 }
 
-body.is-safari {
+html.is-safari body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -595,6 +595,21 @@ html.is-android-low-end .bg-gradient-soft {
 
 html.is-android-low-end .card-chrome-layer,
 html.is-android-low-end .four-d-wireframe {
+  display: none !important;
+}
+
+/* Android low-end: Disable noise overlay entirely — feTurbulence forces software rasterization */
+html.is-android-low-end .noise {
+  display: none !important;
+}
+
+html.is-android-low-end .vignette {
+  opacity: 0.5;
+}
+
+/* Safari/WebKit: full-screen SVG turbulence is a repeat offender for memory
+   pressure on mobile WebKit, and it is purely decorative. */
+html.is-safari .noise {
   display: none !important;
 }
 
@@ -792,22 +807,29 @@ body::-webkit-scrollbar {
 /* Aggressive Safari Optimization: Disable expensive filters and shadows when scrolling or stressed */
 html.is-safari:not(.boot-complete) .noise,
 html.is-safari.is-frame-stressed .noise,
-body.is-safari.is-scrolling .noise {
+html.is-safari body.is-scrolling .noise,
+html.is-android body.is-scrolling .noise {
   display: none !important;
 }
 
 html.is-safari.is-frame-stressed .vignette,
-body.is-safari.is-scrolling .vignette {
+html.is-safari body.is-scrolling .vignette,
+html.is-android body.is-scrolling .vignette {
   display: none !important;
 }
 
-body.is-safari.is-scrolling .card-shell,
-body.is-safari.is-scrolling .card-chrome,
-body.is-safari.is-scrolling .topbar,
-body.is-safari.is-scrolling .hud-nav-panel,
-body.is-safari.is-scrolling .hud-side-readout {
+html.is-safari body.is-scrolling .card-shell,
+html.is-safari body.is-scrolling .card-chrome,
+html.is-safari body.is-scrolling .topbar,
+html.is-safari body.is-scrolling .hud-nav-panel,
+html.is-safari body.is-scrolling .hud-side-readout {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Android: Disable box-shadows on cards during scrolling to reduce compositing cost */
+html.is-android body.is-scrolling .card-shell {
   box-shadow: none !important;
 }
 
@@ -828,7 +850,7 @@ body.is-safari.is-scrolling .hud-side-readout {
 }
 
 .is-safari .top-ui {
-  will-change: transform;
+  will-change: auto;
 }
 
 .is-safari .hud-nav-panel,
@@ -2014,6 +2036,10 @@ body.has-expanded-card .topbar-actions {
 .hud-mode-toggle[data-manifold-mode='4d'] .hud-mode-glyph--right,
 .hud-mode-option[data-mode-option='4d'] .hud-mode-glyph--4d {
   animation: hud-mode-tesseract-spin 3.6s linear infinite;
+}
+
+html.is-ios .hud-mode-glyph {
+  animation: none !important;
 }
 
 .hud-mode-toggle[data-manifold-mode='2d'] .hud-mode-glyph--left::before,
@@ -5463,6 +5489,13 @@ body.is-frame-stressed.is-4d-mode .card.is-four-d-face .card-core-glow {
   animation: card-title-marquee-right-fade var(--card-title-marquee-duration, 9s) linear infinite alternate;
 }
 
+html.is-ios .card-title.is-title-overflowing:not(.is-title-scrambling) .card-title-track,
+html.is-ios .card-title.is-title-overflowing:not(.is-title-scrambling)::before,
+html.is-ios .card-title.is-title-overflowing:not(.is-title-scrambling)::after {
+  animation: none !important;
+  will-change: auto !important;
+}
+
 .card-title.is-title-scrambling {
   color: rgba(255, 243, 230, 0.96);
 }
@@ -5956,6 +5989,12 @@ body.is-frame-stressed.is-4d-mode .card.is-four-d-face .card-core-glow {
   transform: translate3d(calc(var(--music-shift) * 0.9), 0, 0);
   opacity: calc(var(--music-alpha) * 0.9);
   text-shadow: 0 0 5px rgba(255, 111, 44, calc(var(--music-glow-alpha) * 0.32));
+}
+
+html.is-safari .big-text::before,
+html.is-safari .big-text::after {
+  filter: none !important;
+  text-shadow: none !important;
 }
 
 .star {
