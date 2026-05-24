@@ -543,9 +543,14 @@ html.is-safari .locale-transition-overlay {
   -webkit-backdrop-filter: none !important;
 }
 
-/* Safari: Disable audio spectrum visuals entirely to eliminate per-card CSS variable flood */
-html.is-safari .card {
+/* Safari: Disable audio spectrum visuals entirely to eliminate per-card CSS variable flood. */
+html.is-safari .card,
+html.is-safari .card-spectrum {
   --music-alpha: 0 !important;
+}
+
+html.is-safari .card-spectrum {
+  opacity: 0 !important;
 }
 
 /* Safari/iOS: Demote decorative elements from compositor layers to save GPU VRAM.

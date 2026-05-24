@@ -97,6 +97,7 @@ export interface ItemState {
   el: HTMLElement;
   fxEl: HTMLElement;
   pixelCanvasEl: PixelCanvasHost | null;
+  spectrumEl: HTMLElement | null;
   titleEl: HTMLElement | null;
   expandedPanelEl: HTMLElement | null;
   mobilePrevNavEl: HTMLElement | null;

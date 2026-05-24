@@ -2174,6 +2174,7 @@ export class ManifoldModeController {
       state.titleEl = card.querySelector<HTMLElement>('.card-title');
       state.handoffEl = card.querySelector<HTMLElement>('.card-handoff');
       state.pixelCanvasEl = card.querySelector<PixelCanvasHost>('pixel-canvas');
+      state.spectrumEl = card.querySelector<HTMLElement>('.card-spectrum');
       state.expandedPanelEl = card.querySelector<HTMLElement>('.card-expanded-panel');
       state.mobilePrevNavEl = mobilePrevTap;
       state.mobileNextNavEl = mobileNextTap;
@@ -2224,6 +2225,7 @@ export class ManifoldModeController {
       el,
       fxEl,
       pixelCanvasEl: null,
+      spectrumEl: null,
       titleEl: null,
       expandedPanelEl: null,
       mobilePrevNavEl: null,

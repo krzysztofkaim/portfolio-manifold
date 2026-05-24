@@ -105,6 +105,7 @@ export function createItemState(overrides: Partial<ItemState> = {}): ItemState {
     mobilePage: 0,
     mobilePrevNavEl: null,
     pendingTitleMarqueeSync: false,
+    spectrumEl: null,
     response: 0.1,
     rot: 0,
     sectionTitle: 'PROFILE',

@@ -1,0 +1,32 @@
+---
+import { siteMetadata } from '../config/siteMetadata';
+
+const site = Astro.site ?? new URL('https://kaim.dev');
+const targetUrl = new URL('/en/', site).toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="theme-color" content="#030303" />
+    <link rel="canonical" href={targetUrl} />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta http-equiv="refresh" content="0;url=/en/" />
+    <script is:inline src="/redirect.js"></script>
+    <title>{siteMetadata.websiteName}</title>
+    <style is:inline>
+      html,
+      body {
+        width: 100%;
+        min-height: 100%;
+        margin: 0;
+        background: #030303;
+      }
+    </style>
+  </head>
+  <body aria-hidden="true"></body>
+</html>

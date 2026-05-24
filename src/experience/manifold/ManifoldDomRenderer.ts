@@ -288,6 +288,9 @@ export class ManifoldDomRenderer {
     // Skip all JS-side CSS variable writes to eliminate per-card style mutation pressure.
     if (IS_SAFARI) return;
 
+    const spectrumEl = item.spectrumEl;
+    if (!spectrumEl) return;
+
     const cardAlpha = alpha * (item.currentAlpha || 1.0);
     if (cardAlpha < 0.005) return;
 
@@ -300,7 +303,7 @@ export class ManifoldDomRenderer {
 
     if (nextPresence < 0.01) {
       if (item.lastMusicAlpha !== 0) {
-        StyleAdapter.setNumericProperty(item.fxEl, '--music-alpha', 0);
+        StyleAdapter.setNumericProperty(spectrumEl, '--music-alpha', 0);
         item.lastMusicAlpha = 0;
       }
       return;
@@ -313,7 +316,7 @@ export class ManifoldDomRenderer {
     const alphaDelta = Math.abs(quantizedMusicAlpha - (item.lastMusicAlpha ?? -1));
     const shouldUpdateAlpha = alphaDelta > 0.019;
     if (shouldUpdateAlpha) {
-      StyleAdapter.setNumericProperty(item.fxEl, '--music-alpha', quantizedMusicAlpha);
+      StyleAdapter.setNumericProperty(spectrumEl, '--music-alpha', quantizedMusicAlpha);
       item.lastMusicAlpha = quantizedMusicAlpha;
     }
   }
