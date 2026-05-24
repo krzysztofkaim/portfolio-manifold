@@ -10,6 +10,11 @@ import type { LoopTelemetry } from './ManifoldAppDiagnostics';
 import { computeDampedLerp } from '../../experience/manifold/HyperMath';
 import { IS_IOS, IS_SAFARI } from '../../utils/browserDetection';
 
+const IOS_NATIVE_LOOP_MULTIPLIER = 14;
+const IOS_LOOP_REBASE_MARGIN_LOOPS = 2;
+const IOS_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS = 0.75;
+const IOS_LOOP_REBASE_DEFER_VELOCITY = 1.8;
+
 export interface ScrollController {
   getInitialScrollAnchor(): number;
   setScroll(scroll: number, velocity: number): void;
@@ -33,8 +38,8 @@ export class ManifoldAppScroll {
   private touchStartX = 0;
   private touchStartY = 0;
   private touchRefreshGuardArmed = false;
+  private resizeSyncRaf = 0;
   private readonly shouldBlockPullToRefresh = IS_IOS && IS_SAFARI;
-  private readonly useSimpleNativeScroll = IS_IOS;
   private lastProxyHeightPx = -1;
 
   constructor(
@@ -45,6 +50,8 @@ export class ManifoldAppScroll {
 
   setup(): void {
     window.addEventListener('scroll', this.handleNativeScroll);
+    window.addEventListener('resize', this.scheduleResizeSync, { passive: true });
+    window.visualViewport?.addEventListener('resize', this.scheduleResizeSync, { passive: true });
 
     if (this.shouldBlockPullToRefresh) {
       document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
@@ -54,12 +61,18 @@ export class ManifoldAppScroll {
 
   destroy(): void {
     window.removeEventListener('scroll', this.handleNativeScroll);
+    window.removeEventListener('resize', this.scheduleResizeSync);
+    window.visualViewport?.removeEventListener('resize', this.scheduleResizeSync);
     if (this.shouldBlockPullToRefresh) {
       document.removeEventListener('touchstart', this.handleTouchStart);
       document.removeEventListener('touchmove', this.handleTouchMove);
     }
     if (this.lenisRebaseUnlockRaf) {
       window.cancelAnimationFrame(this.lenisRebaseUnlockRaf);
+    }
+    if (this.resizeSyncRaf) {
+      window.cancelAnimationFrame(this.resizeSyncRaf);
+      this.resizeSyncRaf = 0;
     }
   }
 
@@ -74,19 +87,18 @@ export class ManifoldAppScroll {
   }
 
   initialize(initialLogicalScroll: number): void {
-    const centeredPhysicalScroll = this.useSimpleNativeScroll
-      ? Math.max(0, initialLogicalScroll)
-      : this.loopScrollLength > 0
-        ? this.loopScrollLength * MANIFOLD_LOOP_MULTIPLIER * 0.5
-        : Math.max(0, initialLogicalScroll);
+    // iOS Safari must start away from the native scroll edges; otherwise a normal swipe can become pull-to-refresh.
+    const initialPhysicalScroll = this.loopScrollLength > 0
+      ? this.getLoopPhysicalSpan() * 0.5
+      : Math.max(0, initialLogicalScroll);
 
-    this.logicalOffset = this.useSimpleNativeScroll ? 0 : initialLogicalScroll - centeredPhysicalScroll;
-    this.targetScroll = centeredPhysicalScroll;
-    this.smoothScroll = centeredPhysicalScroll;
-    this.activeScroll = centeredPhysicalScroll;
+    this.logicalOffset = initialLogicalScroll - initialPhysicalScroll;
+    this.targetScroll = initialPhysicalScroll;
+    this.smoothScroll = initialPhysicalScroll;
+    this.activeScroll = initialPhysicalScroll;
     this.targetVelocity = 0;
-    this.setPhysicalDocumentScroll(centeredPhysicalScroll);
-    this.telemetry.logicalScroll = this.toLogicalScroll(centeredPhysicalScroll);
+    this.setPhysicalDocumentScroll(initialPhysicalScroll);
+    this.telemetry.logicalScroll = this.toLogicalScroll(initialPhysicalScroll);
     this.getController()?.setScroll(initialLogicalScroll, 0);
   }
 
@@ -198,7 +210,7 @@ export class ManifoldAppScroll {
    */
   private handleNativeScroll = () => {
     if (this.getLenis()) return;
-    this.targetScroll = window.scrollY;
+    this.targetScroll = this.getNativeScrollTop();
   };
 
   private handleTouchStart = (event: TouchEvent) => {
@@ -211,6 +223,10 @@ export class ManifoldAppScroll {
     this.touchStartX = touch?.clientX ?? 0;
     this.touchStartY = touch?.clientY ?? 0;
     this.touchRefreshGuardArmed = this.shouldBlockTouchRefreshForTarget(event.target);
+
+    if (this.touchRefreshGuardArmed && this.isAtTopBoundary()) {
+      this.recoverFromNativeScrollEdge();
+    }
   };
 
   private handleTouchMove = (event: TouchEvent) => {
@@ -232,8 +248,21 @@ export class ManifoldAppScroll {
     }
 
     if (this.isAtTopBoundary()) {
+      this.recoverFromNativeScrollEdge();
       event.preventDefault();
     }
+  };
+
+  private scheduleResizeSync = () => {
+    if (this.resizeSyncRaf) {
+      return;
+    }
+
+    this.resizeSyncRaf = window.requestAnimationFrame(() => {
+      this.resizeSyncRaf = 0;
+      this.updateScrollProxyHeight();
+      this.recoverFromNativeScrollEdge();
+    });
   };
 
   private toLogicalScroll(physicalScroll: number): number {
@@ -251,8 +280,11 @@ export class ManifoldAppScroll {
   }
 
   private isAtTopBoundary(): boolean {
-    const nativeScrollTop = document.scrollingElement?.scrollTop ?? window.scrollY ?? 0;
-    return nativeScrollTop <= 4;
+    return this.getNativeScrollTop() <= 4;
+  }
+
+  private getNativeScrollTop(): number {
+    return document.scrollingElement?.scrollTop ?? window.scrollY ?? 0;
   }
 
   private setPhysicalDocumentScroll(scroll: number): void {
@@ -263,8 +295,15 @@ export class ManifoldAppScroll {
       return;
     }
 
-    if (Math.abs((window.scrollY ?? 0) - scroll) < 1) {
+    if (Math.abs(this.getNativeScrollTop() - scroll) < 1) {
       return;
+    }
+
+    if (IS_IOS && document.scrollingElement) {
+      document.scrollingElement.scrollTop = scroll;
+      if (Math.abs(this.getNativeScrollTop() - scroll) < 2) {
+        return;
+      }
     }
 
     window.scrollTo(0, scroll);
@@ -275,19 +314,10 @@ export class ManifoldAppScroll {
       return;
     }
 
-    const viewportHeight = window.innerHeight;
-    const proxyHeight =
-      this.useSimpleNativeScroll
-        ? (
-          this.loopScrollLength > 0
-            ? Math.max(viewportHeight + this.loopScrollLength + viewportHeight * 2, viewportHeight * 4)
-            : viewportHeight * 4
-        )
-        : (
-          this.loopScrollLength > 0
-            ? Math.max(viewportHeight + this.loopScrollLength * MANIFOLD_LOOP_MULTIPLIER, viewportHeight * 3)
-            : viewportHeight * 3
-        );
+    const viewportHeight = this.getViewportHeight();
+    const proxyHeight = this.loopScrollLength > 0
+      ? Math.max(viewportHeight + this.getLoopPhysicalSpan(), viewportHeight * 3)
+      : viewportHeight * 3;
 
     const roundedProxyHeight = Math.round(proxyHeight);
     if (roundedProxyHeight !== this.lastProxyHeightPx) {
@@ -348,22 +378,20 @@ export class ManifoldAppScroll {
     physicalScroll: number,
     velocityMagnitude = 0
   ): { scroll: number; delta: number } {
-    if (this.useSimpleNativeScroll) {
-      return {
-        scroll: clampNumber(physicalScroll, 0, this.getSimpleNativeScrollMax()),
-        delta: 0
-      };
-    }
-
     if (this.loopScrollLength <= 0) {
       return { scroll: physicalScroll, delta: 0 };
     }
 
-    const totalSpan = this.loopScrollLength * MANIFOLD_LOOP_MULTIPLIER;
+    const totalSpan = this.getLoopPhysicalSpan();
     const center = totalSpan * 0.5;
-    const edgeMargin = Math.min(this.loopScrollLength * MANIFOLD_LOOP_REBASE_MARGIN_LOOPS, totalSpan * 0.4);
+    const edgeMarginLoops = IS_IOS ? IOS_LOOP_REBASE_MARGIN_LOOPS : MANIFOLD_LOOP_REBASE_MARGIN_LOOPS;
+    const emergencyMarginLoops = IS_IOS
+      ? IOS_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS
+      : MANIFOLD_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS;
+    const deferVelocity = IS_IOS ? IOS_LOOP_REBASE_DEFER_VELOCITY : MANIFOLD_LOOP_REBASE_DEFER_VELOCITY;
+    const edgeMargin = Math.min(this.loopScrollLength * edgeMarginLoops, totalSpan * 0.4);
     const emergencyEdgeMargin = Math.min(
-      this.loopScrollLength * MANIFOLD_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS,
+      this.loopScrollLength * emergencyMarginLoops,
       edgeMargin * 0.6
     );
     const min = edgeMargin;
@@ -372,7 +400,7 @@ export class ManifoldAppScroll {
     const emergencyMax = totalSpan - emergencyEdgeMargin;
 
     if (
-      velocityMagnitude > MANIFOLD_LOOP_REBASE_DEFER_VELOCITY &&
+      velocityMagnitude > deferVelocity &&
       physicalScroll >= emergencyMin &&
       physicalScroll <= emergencyMax
     ) {
@@ -389,16 +417,25 @@ export class ManifoldAppScroll {
     return { scroll: physicalScroll, delta: 0 };
   }
 
-  private getSimpleNativeScrollMax(): number {
-    const viewportHeight = window.innerHeight;
-    return this.loopScrollLength > 0
-      ? Math.max(this.loopScrollLength + viewportHeight * 2, viewportHeight * 3)
-      : viewportHeight * 3;
-  }
-}
+  private recoverFromNativeScrollEdge(): void {
+    if (this.getLenis() || this.loopScrollLength <= 0) {
+      return;
+    }
 
-function clampNumber(value: number, min: number, max: number): number {
-  if (value < min) return min;
-  if (value > max) return max;
-  return value;
+    const physicalScroll = this.getNativeScrollTop();
+    const rebased = this.maybeRebasePhysicalScroll(physicalScroll, Number.POSITIVE_INFINITY);
+    if (rebased.delta !== 0) {
+      this.applyRebase(rebased.scroll, rebased.delta);
+    }
+  }
+
+  private getLoopPhysicalSpan(): number {
+    // Keep iOS' physical document shorter than desktop Lenis while preserving enough room for rebasing.
+    const multiplier = IS_IOS ? IOS_NATIVE_LOOP_MULTIPLIER : MANIFOLD_LOOP_MULTIPLIER;
+    return this.loopScrollLength * multiplier;
+  }
+
+  private getViewportHeight(): number {
+    return Math.max(1, Math.round(window.visualViewport?.height ?? window.innerHeight));
+  }
 }

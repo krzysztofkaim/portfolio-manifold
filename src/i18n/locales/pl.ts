@@ -25,7 +25,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     facts: [
       { label: 'Rola', value: 'Lead / Architekt' },
-      { label: 'Telefon', value: '(+48) 666 550 888' },
+      { label: 'Kontakt', value: 'Email / LinkedIn' },
       { label: 'Email', value: 'krzysztof@kaim.dev' },
       { label: 'Rdzeń', value: '.NET 8 / React 18' }
     ],

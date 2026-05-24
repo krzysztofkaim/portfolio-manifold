@@ -228,6 +228,9 @@ export class ManifoldAppLocale {
     if (el.topbarRole) el.topbarRole.textContent = ui.topbarRole;
     if (el.downloadCv) if (el.downloadCv) el.downloadCv.href = documentStrings.cvDownloadHref;
     if (el.downloadCv) if (el.downloadCv) el.downloadCv.download = documentStrings.cvDownloadFileName;
+    el.downloadCv?.setAttribute('rel', 'nofollow');
+    el.downloadCv?.setAttribute('data-noindex', 'true');
+    el.downloadCv?.setAttribute('data-nosnippet', '');
     el.downloadCv?.setAttribute('aria-label', ui.cvDownloadAria);
     if (el.downloadCvLabel) el.downloadCvLabel.textContent = ui.cvLabel;
     if (el.downloadCvLabel) el.downloadCvLabel.dataset.text = ui.cvLabel;

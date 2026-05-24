@@ -39,6 +39,15 @@ const cloudflareHeaderRules = [
     headers: {
       'Cache-Control': 'public, max-age=31536000, immutable'
     }
+  },
+  {
+    route: '/files/*',
+    headers: {
+      ...securityHeaders,
+      'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+      'Content-Disposition': 'attachment',
+      'Cache-Control': 'no-store'
+    }
   }
 ];
 

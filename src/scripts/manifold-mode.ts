@@ -1734,8 +1734,8 @@ class ManifoldApp {
           scrollVelocity > 0.0035 ||
           time - this.lastInteractionBurstAt < 1400;
         const audioActive = this.audio.getAudioActiveState();
-        const iosInteractiveInterval = 1000 / (audioActive ? 18 : 16);
-        const iosIdleInterval = 1000 / 8;
+        const iosInteractiveInterval = 1000 / 24;
+        const iosIdleInterval = 1000 / 10;
         const effectiveFrameInterval = IS_IOS
           ? Math.max(
             perf.frameInterval || 0,
@@ -1785,7 +1785,7 @@ class ManifoldApp {
       const isInteracting = scrollVelocity > 0.0035 || time - this.lastInteractionBurstAt < 1400;
       const isMotionActive = perf.transitionActive || isInteracting;
       const audioActive = this.audio.getAudioActiveState();
-      const iosUiInterval = isMotionActive || audioActive ? 1000 / 12 : 1000 / 4;
+      const iosUiInterval = isMotionActive || audioActive ? 1000 / 16 : 1000 / 5;
       const shouldRunIosUiPass = !IS_IOS || time - this.lastIosUiTickAt >= iosUiInterval;
 
       // On iOS, skip HUD refresh when both controller pass AND UI pass were skipped

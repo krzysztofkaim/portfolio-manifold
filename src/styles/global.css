@@ -384,6 +384,12 @@ html.is-safari body {
   overscroll-behavior-y: contain;
 }
 
+html.is-ios,
+html.is-ios body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+}
+
 html.lenis,
 html.lenis body {
   height: auto;
@@ -511,6 +517,14 @@ html.is-ios .bg-gradient-soft {
   opacity: 0.62;
 }
 
+html.is-ios .scanlines {
+  display: none !important;
+}
+
+html.is-ios .vignette {
+  opacity: 0.42;
+}
+
 html.is-ios .viewport {
   perspective: none !important;
 }
@@ -520,6 +534,23 @@ html.is-ios .item,
 html.is-ios .card {
   transform-style: flat !important;
   will-change: auto !important;
+}
+
+html.is-ios .card-preview-layer,
+html.is-ios .card-expanded-panel,
+html.is-ios .card-core,
+html.is-ios .card-core::before,
+html.is-ios .card-core::after,
+html.is-ios .card-core-icon,
+html.is-ios .card-core-chip,
+html.is-ios .card-core-glow {
+  will-change: auto !important;
+  backface-visibility: visible !important;
+}
+
+html.is-ios .card-core-chip,
+html.is-ios .card-transition-snapshot {
+  box-shadow: none !important;
 }
 
 /* iOS: Disable all backdrop-filter to prevent compositor memory exhaustion */
@@ -1090,6 +1121,25 @@ html.locale-transition-active body:not(.boot-complete) .vignette,
 html.locale-transition-active body:not(.boot-complete) .noise {
   opacity: 0;
   filter: blur(8px);
+}
+
+html.is-ios.locale-transition-active body:not(.boot-complete) .liquid-gradient,
+html.is-ios.locale-transition-active body:not(.boot-complete) .viewport,
+html.is-ios.locale-transition-active body:not(.boot-complete) .hud,
+html.is-ios.locale-transition-active body:not(.boot-complete) .intro-hint,
+html.is-ios.locale-transition-active body:not(.boot-complete) .context-hint,
+html.is-ios.locale-transition-active body:not(.boot-complete) .scanlines,
+html.is-ios.locale-transition-active body:not(.boot-complete) .vignette,
+html.is-ios.locale-transition-active body:not(.boot-complete) .noise,
+html.is-ios body:not(.boot-complete) .liquid-gradient,
+html.is-ios body:not(.boot-complete) .viewport,
+html.is-ios body:not(.boot-complete) .hud,
+html.is-ios body:not(.boot-complete) .intro-hint,
+html.is-ios body:not(.boot-complete) .context-hint,
+html.is-ios body:not(.boot-complete) .scanlines,
+html.is-ios body:not(.boot-complete) .vignette,
+html.is-ios body:not(.boot-complete) .noise {
+  filter: none !important;
 }
 
 .liquid-gradient,
