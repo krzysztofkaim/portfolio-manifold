@@ -8143,27 +8143,50 @@ body.boot-complete .topbar-actions > .topbar-chip:focus-visible {
   }
 
   body.boot-complete .topbar-actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.28rem;
+    width: 100%;
   }
 
   body.boot-complete .topbar-actions > .topbar-chip {
-    min-height: 2.58rem;
-    width: 95% !important;
-    justify-self: start;
-    padding: 0.5rem 0.64rem 0.62rem;
+    justify-content: center;
+    justify-self: stretch;
+    width: auto !important;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.42rem 0.32rem 0.5rem;
+    text-align: center;
     transition:
-      width 110ms linear,
       color 180ms ease,
       background-color 180ms ease;
   }
 
   body.boot-complete .topbar-actions > .topbar-chip:is(:hover, :focus-visible) {
-    width: 100% !important;
+    width: auto !important;
   }
 
-  body.boot-complete .topbar-actions > .topbar-chip .topbar-chip-label,
+  body.boot-complete .topbar-actions > .topbar-chip .topbar-chip-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+    letter-spacing: 0;
+  }
+
+  body.boot-complete .topbar-actions > .topbar-chip .topbar-chip-label > * {
+    display: none;
+  }
+
+  body.boot-complete .topbar-actions > .topbar-chip .topbar-chip-label::before {
+    content: attr(data-mobile-text);
+    font-size: clamp(0.62rem, 3.2vw, 0.78rem);
+    font-weight: 800;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+
   body.boot-complete .topbar-actions > .topbar-chip::after {
-    font-size: 0.64rem;
+    display: none;
   }
 }
 

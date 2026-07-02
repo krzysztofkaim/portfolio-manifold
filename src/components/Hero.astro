@@ -72,6 +72,7 @@ const nextLocale = getNextManifoldLocale(locale);
         data-nosnippet
         data-noindex="true"
         data-menu-text={bundle.ui.cvLabel}
+        data-mobile-text="CV"
         aria-label={bundle.ui.cvDownloadAria}
       >
         <span class="topbar-chip-icon" aria-hidden="true">
@@ -91,7 +92,8 @@ const nextLocale = getNextManifoldLocale(locale);
         <span
           class="topbar-chip-label"
           id="download-cv-label"
-          data-text={bundle.ui.cvLabel}>{bundle.ui.cvLabel}</span
+          data-text={bundle.ui.cvLabel}
+          data-mobile-text="CV">{bundle.ui.cvLabel}</span
         >
       </a>
 
@@ -102,6 +104,7 @@ const nextLocale = getNextManifoldLocale(locale);
         aria-label={bundle.ui.contactAria}
         data-d="kaim.dev"
         data-menu-text={bundle.ui.contactLabel}
+        data-mobile-text="Mail"
       >
         <span class="topbar-chip-icon" aria-hidden="true">
           <svg
@@ -116,7 +119,11 @@ const nextLocale = getNextManifoldLocale(locale);
             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
           </svg>
         </span>
-        <span class="topbar-chip-label" id="contact-me-label">
+        <span
+          class="topbar-chip-label"
+          id="contact-me-label"
+          data-mobile-text="Mail"
+        >
           <span class="contact-u scramble-target"></span><span
             class="contact-d scramble-target">@kaim.dev</span
           >
@@ -132,8 +139,12 @@ const nextLocale = getNextManifoldLocale(locale);
           : bundle.ui.localeSwitchToEnglish}
         aria-pressed={locale === 'pl' ? 'true' : 'false'}
         data-menu-text={bundle.ui.localeLabel}
+        data-mobile-text={bundle.ui.localeLabel}
       >
-        <span class="topbar-chip-label" id="toggle-locale-label"
+        <span
+          class="topbar-chip-label"
+          id="toggle-locale-label"
+          data-mobile-text={bundle.ui.localeLabel}
           >{bundle.ui.localeLabel}</span
         >
       </button>
