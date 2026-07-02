@@ -1,5 +1,5 @@
 import type { Camera, ColorRepresentation, Scene } from 'three';
-import { IS_SAFARI } from '../utils/browserDetection';
+import { IS_ANDROID, IS_IOS, IS_SAFARI } from '../utils/browserDetection';
 
 type RendererInfo = {
   autoReset?: boolean;
@@ -130,10 +130,9 @@ export class RenderPipeline {
       return false;
     }
 
-    // Force WebGL2 for Safari/WebKit even if navigator.gpu exists.
-    // Safari's WebGPU implementation is currently experimental and often less stable/performant
-    // than its highly optimized WebGL2 engine on M-series chips.
-    if (IS_SAFARI) {
+    // Force WebGL2 for Safari/WebKit and mobile browsers even if navigator.gpu exists.
+    // Their WebGPU implementations are still less predictable for this effect stack.
+    if (IS_SAFARI || IS_IOS || IS_ANDROID) {
       return false;
     }
 

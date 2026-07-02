@@ -3198,7 +3198,8 @@ export class ManifoldModeController {
       return;
     }
 
-    const nextDpr = clamp(window.devicePixelRatio || 1, 1, 1.4);
+    const maxDpr = IS_ANDROID ? 1.0 : 1.4;
+    const nextDpr = clamp(window.devicePixelRatio || 1, 1, maxDpr);
     const nextWidth = Math.max(1, Math.round(this.viewportWidth * nextDpr));
     const nextHeight = Math.max(1, Math.round(this.viewportHeight * nextDpr));
 
