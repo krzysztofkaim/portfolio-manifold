@@ -24,9 +24,7 @@ export class ManifoldPhysicsRuntime {
   private nextFrameId = 1;
   private latestResults = new Map<number, PhysicsWorkerItemResult>();
 
-  constructor(
-    private readonly orchestrator: ManifoldPhysicsOrchestrator = new ManifoldPhysicsOrchestrator()
-  ) {}
+  constructor(private readonly orchestrator: ManifoldPhysicsOrchestrator = new ManifoldPhysicsOrchestrator()) {}
 
   prepareFrame(items: readonly ItemState[], context: PhysicsContext): void {
     const worker = this.ensureWorker();
@@ -67,22 +65,16 @@ export class ManifoldPhysicsRuntime {
     return this.orchestrator.updateItemPhysics(item, context);
   }
 
-  computeCardOpacity(
-    ...args: Parameters<ManifoldPhysicsOrchestrator['computeCardOpacity']>
-  ): number {
+  computeCardOpacity(...args: Parameters<ManifoldPhysicsOrchestrator['computeCardOpacity']>): number {
     return this.orchestrator.computeCardOpacity(...args);
   }
 
-  blendCardPose(
-    ...args: Parameters<ManifoldPhysicsOrchestrator['blendCardPose']>
-  ) {
+  blendCardPose(...args: Parameters<ManifoldPhysicsOrchestrator['blendCardPose']>) {
     return this.orchestrator.blendCardPose(...args);
   }
 
   destroy(): void {
-    this.worker?.postMessage({
-      type: 'destroy'
-    } satisfies PhysicsWorkerRequest);
+    this.worker?.postMessage({ type: 'destroy' } satisfies PhysicsWorkerRequest);
     this.worker?.terminate();
     this.worker = null;
     this.workerBusy = false;
@@ -99,12 +91,9 @@ export class ManifoldPhysicsRuntime {
     }
 
     try {
-      const worker = new Worker(
-        new URL('./ManifoldPhysics.worker.ts', import.meta.url),
-        {
-          type: 'module'
-        }
-      );
+      const worker = new Worker(new URL('./ManifoldPhysics.worker.ts', import.meta.url), {
+        type: 'module'
+      });
       worker.onmessage = (event: MessageEvent<PhysicsWorkerResponse>) => {
         const message = event.data;
         this.latestResults.clear();
@@ -120,10 +109,7 @@ export class ManifoldPhysicsRuntime {
       this.worker = worker;
       return worker;
     } catch (error) {
-      console.warn(
-        'Manifold physics worker unavailable. Falling back to main thread.',
-        error
-      );
+      console.warn('Manifold physics worker unavailable. Falling back to main thread.', error);
       return null;
     }
   }

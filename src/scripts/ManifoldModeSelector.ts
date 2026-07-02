@@ -31,8 +31,7 @@ export class ManifoldModeSelector {
   private elements: ModeToggleElements | null = null;
   private optionElements: readonly HTMLButtonElement[] = [];
   private readonly supportsHoverMenuInteractions =
-    window.matchMedia('(hover: hover)').matches &&
-    window.matchMedia('(pointer: fine)').matches;
+    window.matchMedia('(hover: hover)').matches && window.matchMedia('(pointer: fine)').matches;
   private localeStrings: ManifoldModeSelectorLocaleStrings = {
     currentModeAriaPrefix: 'Current manifold mode',
     menuAriaLabel: 'Mode selection',
@@ -50,12 +49,9 @@ export class ManifoldModeSelector {
     }
 
     this.elements.menu.setAttribute('aria-label', strings.menuAriaLabel);
-    const option2DLabel =
-      this.elements.option2D.querySelector('span:last-child');
-    const option3DLabel =
-      this.elements.option3D.querySelector('span:last-child');
-    const option4DLabel =
-      this.elements.option4D.querySelector('span:last-child');
+    const option2DLabel = this.elements.option2D.querySelector('span:last-child');
+    const option3DLabel = this.elements.option3D.querySelector('span:last-child');
+    const option4DLabel = this.elements.option4D.querySelector('span:last-child');
     if (option2DLabel) option2DLabel.textContent = strings.mode2D;
     if (option3DLabel) option3DLabel.textContent = strings.mode3D;
     if (option4DLabel) option4DLabel.textContent = strings.mode4D;
@@ -64,20 +60,11 @@ export class ManifoldModeSelector {
 
   setup(elements: ModeToggleElements): () => void {
     this.elements = elements;
-    this.optionElements = [
-      elements.option2D,
-      elements.option3D,
-      elements.option4D
-    ];
-    elements.button.setAttribute('aria-controls', elements.menu.id);
-    elements.menu.setAttribute('aria-label', this.localeStrings.menuAriaLabel);
+    this.optionElements = [elements.option2D, elements.option3D, elements.option4D];
 
     const setModeMenuExpanded = (expanded: boolean) => {
       elements.picker.dataset.expanded = expanded ? 'true' : 'false';
-      elements.button.setAttribute(
-        'aria-expanded',
-        expanded ? 'true' : 'false'
-      );
+      elements.button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
       elements.menu.setAttribute('aria-hidden', expanded ? 'false' : 'true');
 
       const menuWithInert = elements.menu as HTMLElement & { inert?: boolean };
@@ -161,17 +148,11 @@ export class ManifoldModeSelector {
     const handleModePickerPointerLeave = (event: PointerEvent) => {
       const relatedTarget = event.relatedTarget;
 
-      if (
-        relatedTarget instanceof Node &&
-        elements.picker.contains(relatedTarget)
-      ) {
+      if (relatedTarget instanceof Node && elements.picker.contains(relatedTarget)) {
         return;
       }
 
-      closeModeMenu(
-        document.activeElement instanceof HTMLElement &&
-          elements.picker.contains(document.activeElement)
-      );
+      closeModeMenu(document.activeElement instanceof HTMLElement && elements.picker.contains(document.activeElement));
     };
 
     const handleModePickerPointerMove = (event: PointerEvent) => {
@@ -201,16 +182,10 @@ export class ManifoldModeSelector {
     const handleModePickerFocusOut = () => {
       window.setTimeout(() => {
         const activeElement = document.activeElement;
-        if (
-          activeElement instanceof Node &&
-          elements.picker.contains(activeElement)
-        ) {
+        if (activeElement instanceof Node && elements.picker.contains(activeElement)) {
           return;
         }
-        closeModeMenu(
-          activeElement instanceof HTMLElement &&
-            elements.picker.contains(activeElement)
-        );
+        closeModeMenu(activeElement instanceof HTMLElement && elements.picker.contains(activeElement));
       }, 0);
     };
 
@@ -220,23 +195,15 @@ export class ManifoldModeSelector {
         return;
       }
 
-      if (
-        !elements.picker.contains(target) &&
-        !elements.menu.contains(target)
-      ) {
-        const restoreFocus =
-          document.activeElement instanceof HTMLElement &&
-          elements.picker.contains(document.activeElement);
+      if (!elements.picker.contains(target) && !elements.menu.contains(target)) {
+        const restoreFocus = document.activeElement instanceof HTMLElement && elements.picker.contains(document.activeElement);
         closeModeMenu(restoreFocus);
       }
     };
 
-    const handleModeOption2DClick = (event: MouseEvent) =>
-      handleModeOptionClick(event, '2d');
-    const handleModeOption3DClick = (event: MouseEvent) =>
-      handleModeOptionClick(event, '3d');
-    const handleModeOption4DClick = (event: MouseEvent) =>
-      handleModeOptionClick(event, '4d');
+    const handleModeOption2DClick = (event: MouseEvent) => handleModeOptionClick(event, '2d');
+    const handleModeOption3DClick = (event: MouseEvent) => handleModeOptionClick(event, '3d');
+    const handleModeOption4DClick = (event: MouseEvent) => handleModeOptionClick(event, '4d');
 
     elements.button.addEventListener('click', handleModeToggleClick);
     elements.option2D.addEventListener('click', handleModeOption2DClick);
@@ -247,27 +214,13 @@ export class ManifoldModeSelector {
     elements.menu.style.paddingBottom = '0.6rem';
 
     if (this.supportsHoverMenuInteractions) {
-      elements.button.addEventListener(
-        'pointerenter',
-        handleModeTogglePointerEnter
-      );
-      elements.picker.addEventListener(
-        'pointerenter',
-        handleModePickerPointerEnter
-      );
-      elements.picker.addEventListener(
-        'pointerleave',
-        handleModePickerPointerLeave
-      );
-      elements.picker.addEventListener(
-        'pointermove',
-        handleModePickerPointerMove
-      );
+      elements.button.addEventListener('pointerenter', handleModeTogglePointerEnter);
+      elements.picker.addEventListener('pointerenter', handleModePickerPointerEnter);
+      elements.picker.addEventListener('pointerleave', handleModePickerPointerLeave);
+      elements.picker.addEventListener('pointermove', handleModePickerPointerMove);
     }
 
-    window.addEventListener('pointerdown', handleWindowPointerDown, {
-      passive: true
-    });
+    window.addEventListener('pointerdown', handleWindowPointerDown, { passive: true });
     this.syncModeToggleState();
     this.resetModeMenuDockEffect();
     setModeMenuHoverLocked(false);
@@ -282,22 +235,10 @@ export class ManifoldModeSelector {
       elements.picker.removeEventListener('focusout', handleModePickerFocusOut);
 
       if (this.supportsHoverMenuInteractions) {
-        elements.button.removeEventListener(
-          'pointerenter',
-          handleModeTogglePointerEnter
-        );
-        elements.picker.removeEventListener(
-          'pointerenter',
-          handleModePickerPointerEnter
-        );
-        elements.picker.removeEventListener(
-          'pointerleave',
-          handleModePickerPointerLeave
-        );
-        elements.picker.removeEventListener(
-          'pointermove',
-          handleModePickerPointerMove
-        );
+        elements.button.removeEventListener('pointerenter', handleModeTogglePointerEnter);
+        elements.picker.removeEventListener('pointerenter', handleModePickerPointerEnter);
+        elements.picker.removeEventListener('pointerleave', handleModePickerPointerLeave);
+        elements.picker.removeEventListener('pointermove', handleModePickerPointerMove);
       }
 
       window.removeEventListener('pointerdown', handleWindowPointerDown);
@@ -314,9 +255,7 @@ export class ManifoldModeSelector {
       return;
     }
 
-    const activeMode =
-      this.context.getController()?.getViewMode() ??
-      this.context.getActiveMode();
+    const activeMode = this.context.getController()?.getViewMode() ?? this.context.getActiveMode();
     this.context.setActiveMode(activeMode);
     const label =
       activeMode === '2d'
@@ -324,56 +263,13 @@ export class ManifoldModeSelector {
         : activeMode === '4d'
           ? this.localeStrings.mode4D
           : this.localeStrings.mode3D;
-    this.elements.button.setAttribute(
-      'aria-label',
-      `${this.localeStrings.currentModeAriaPrefix}: ${label.toLowerCase()}`
-    );
+    this.elements.button.setAttribute('aria-label', `${this.localeStrings.currentModeAriaPrefix}: ${label.toLowerCase()}`);
     this.elements.button.dataset.manifoldMode = activeMode;
     this.elements.label.dataset.text = label;
     this.elements.label.textContent = label;
-    this.syncModeOptionAccessibility(activeMode);
-  }
-
-  private syncModeOptionAccessibility(activeMode: ViewMode): void {
-    if (!this.elements) {
-      return;
-    }
-
-    const options: Array<{
-      element: HTMLButtonElement;
-      label: string;
-      mode: ViewMode;
-    }> = [
-      {
-        element: this.elements.option2D,
-        label: this.localeStrings.mode2D,
-        mode: '2d'
-      },
-      {
-        element: this.elements.option3D,
-        label: this.localeStrings.mode3D,
-        mode: '3d'
-      },
-      {
-        element: this.elements.option4D,
-        label: this.localeStrings.mode4D,
-        mode: '4d'
-      }
-    ];
-
-    for (const option of options) {
-      const selected = option.mode === activeMode;
-      option.element.setAttribute('aria-selected', selected ? 'true' : 'false');
-      option.element.setAttribute('aria-label', option.label);
-      option.element.removeAttribute('aria-pressed');
-
-      if (selected) {
-        this.elements.menu.setAttribute(
-          'aria-activedescendant',
-          option.element.id
-        );
-      }
-    }
+    this.elements.option2D.setAttribute('aria-pressed', activeMode === '2d' ? 'true' : 'false');
+    this.elements.option3D.setAttribute('aria-pressed', activeMode === '3d' ? 'true' : 'false');
+    this.elements.option4D.setAttribute('aria-pressed', activeMode === '4d' ? 'true' : 'false');
   }
 
   // Cache for menu option bounding rects to prevent layout thrashing
@@ -382,7 +278,7 @@ export class ManifoldModeSelector {
 
   private cacheOptionRects(): void {
     if (!this.elements || this.optionRectsCache) return;
-    this.optionRectsCache = this.optionElements.map((opt) => {
+    this.optionRectsCache = this.optionElements.map(opt => {
       const rect = opt.getBoundingClientRect();
       return { left: rect.left, width: rect.width };
     });
@@ -414,14 +310,8 @@ export class ManifoldModeSelector {
         const scale = 1 + normalized * 0.095;
         const lift = normalized * 0.05;
 
-        this.optionElements[i]?.style.setProperty(
-          '--mode-dock-scale',
-          scale.toFixed(3)
-        );
-        this.optionElements[i]?.style.setProperty(
-          '--mode-dock-lift',
-          `${lift.toFixed(3)}rem`
-        );
+        this.optionElements[i]?.style.setProperty('--mode-dock-scale', scale.toFixed(3));
+        this.optionElements[i]?.style.setProperty('--mode-dock-lift', `${lift.toFixed(3)}rem`);
       }
       this.lastUpdateFrame = 0;
     });
@@ -429,7 +319,7 @@ export class ManifoldModeSelector {
 
   private resetModeMenuDockEffect(): void {
     this.optionRectsCache = null;
-
+    
     if (!this.elements) {
       return;
     }

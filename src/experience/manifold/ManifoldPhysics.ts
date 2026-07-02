@@ -40,73 +40,32 @@ export function computeCardMotionState(
 ): CardMotionState {
   const motion = MANIFOLD_CONSTANTS.CARD_MOTION;
   const timeSeconds = context.time * 0.001;
-  const ambientLift =
-    Math.sin(
-      timeSeconds *
-        (motion.ambientLiftFrequencyBase +
-          snapshot.variance * motion.ambientLiftFrequencyVariance) +
-        snapshot.variance * motion.ambientLiftPhaseVariance
-    ) * motion.ambientLiftAmplitude;
+  const ambientLift = Math.sin(
+    timeSeconds * (motion.ambientLiftFrequencyBase + snapshot.variance * motion.ambientLiftFrequencyVariance) +
+      snapshot.variance * motion.ambientLiftPhaseVariance
+  ) * motion.ambientLiftAmplitude;
   const targetInertiaZ = clamp(
-    context.velocity *
-      (motion.inertiaVelocityBase +
-        snapshot.variance * motion.inertiaVelocityVariance),
+    context.velocity * (motion.inertiaVelocityBase + snapshot.variance * motion.inertiaVelocityVariance),
     -motion.inertiaVelocityClamp,
     motion.inertiaVelocityClamp
   );
   const targetRotX =
-    clamp(
-      context.velocity * motion.rotXVelocityScalar,
-      -motion.rotXClamp,
-      motion.rotXClamp
-    ) +
-    Math.sin(
-      timeSeconds * motion.rotXWaveFrequency +
-        snapshot.variance * motion.rotXWavePhaseVariance
-    ) *
+    clamp(context.velocity * motion.rotXVelocityScalar, -motion.rotXClamp, motion.rotXClamp) +
+    Math.sin(timeSeconds * motion.rotXWaveFrequency + snapshot.variance * motion.rotXWavePhaseVariance) *
       motion.rotXWaveAmplitude;
   const targetRotY =
-    Math.sin(
-      timeSeconds * motion.rotYWaveFrequency +
-        snapshot.variance * motion.rotYWavePhaseVariance
-    ) *
+    Math.sin(timeSeconds * motion.rotYWaveFrequency + snapshot.variance * motion.rotYWavePhaseVariance) *
       motion.rotYWaveAmplitude +
-    context.mouseX *
-      (motion.rotYMouseBase + snapshot.variance * motion.rotYMouseVariance);
+    context.mouseX * (motion.rotYMouseBase + snapshot.variance * motion.rotYMouseVariance);
   const targetRotZ =
-    snapshot.rot +
-    Math.sin(
-      timeSeconds * motion.rotZWaveFrequency +
-        snapshot.variance * motion.rotZWavePhaseVariance
-    ) *
-      motion.rotZWaveAmplitude;
+    snapshot.rot + Math.sin(timeSeconds * motion.rotZWaveFrequency + snapshot.variance * motion.rotZWavePhaseVariance) * motion.rotZWaveAmplitude;
 
   return {
-    inertiaZ: lerp(
-      snapshot.inertiaZ,
-      targetInertiaZ,
-      snapshot.response * motion.inertiaZResponse
-    ),
-    inertiaY: lerp(
-      snapshot.inertiaY,
-      ambientLift,
-      snapshot.response * motion.inertiaYResponse
-    ),
-    inertiaRotZ: lerp(
-      snapshot.inertiaRotZ,
-      targetRotZ,
-      snapshot.response * motion.inertiaRotZResponse
-    ),
-    inertiaRotY: lerp(
-      snapshot.inertiaRotY,
-      targetRotY,
-      snapshot.response * motion.inertiaRotYResponse
-    ),
-    inertiaRotX: lerp(
-      snapshot.inertiaRotX,
-      targetRotX,
-      snapshot.response * motion.inertiaRotXResponse
-    )
+    inertiaZ: lerp(snapshot.inertiaZ, targetInertiaZ, snapshot.response * motion.inertiaZResponse),
+    inertiaY: lerp(snapshot.inertiaY, ambientLift, snapshot.response * motion.inertiaYResponse),
+    inertiaRotZ: lerp(snapshot.inertiaRotZ, targetRotZ, snapshot.response * motion.inertiaRotZResponse),
+    inertiaRotY: lerp(snapshot.inertiaRotY, targetRotY, snapshot.response * motion.inertiaRotYResponse),
+    inertiaRotX: lerp(snapshot.inertiaRotX, targetRotX, snapshot.response * motion.inertiaRotXResponse)
   };
 }
 
@@ -119,10 +78,7 @@ export function applyCardMotion(item: ItemState, context: MotionContext): void {
   item.inertiaRotX = next.inertiaRotX;
 }
 
-export function computeFeaturedCardPose(
-  featured: ItemState,
-  input: FeaturedPoseInput
-): FeaturedPose {
+export function computeFeaturedCardPose(featured: ItemState, input: FeaturedPoseInput): FeaturedPose {
   const topology = MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY;
   let normalZ = featured.baseZ + input.cameraZ;
 

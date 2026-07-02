@@ -30,9 +30,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Rdzeń', value: '.NET 8 / React 18' }
     ],
     surfaceKicker: 'Executive Fit',
-    surfaceValue: 'Full-stack',
-    surfaceText:
-      'Architektura, implementacja, integracje i utrzymanie systemów, które muszą działać w realnym środowisku biznesowym.'
+    surfaceValue: 'FULL-STACK',
+    surfaceText: 'Architektura, implementacja, integracje i utrzymanie systemów, które muszą działać w realnym środowisku biznesowym.'
   },
   {
     title: '#DLACZEGO',
@@ -40,8 +39,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     signal: 'PROFIL 02',
     mode: 'PRIORYTET',
     handoff: 'UX / BACKEND / ENTERPRISE',
-    expandedHandoff:
-      'ZAKRES TECHNICZNY // UX, BACKEND I OGRANICZENIA ENTERPRISE',
+    expandedHandoff: 'ZAKRES TECHNICZNY // UX, BACKEND I OGRANICZENIA ENTERPRISE',
     chip: 'Fokus',
     id: 'ID-SYS2',
     previewLeftLabel: 'TRYB',
@@ -63,9 +61,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Rdzeń', value: 'React / .NET / integracje' }
     ],
     surfaceKicker: 'Obecny Tor',
-    surfaceValue: 'Produkt',
-    surfaceText:
-      'Najmocniejsze dopasowanie: produkt, backend, integracje i odpowiedzialność za działanie w produkcji.'
+    surfaceValue: 'PRODUKT',
+    surfaceText: 'Najmocniejsze dopasowanie: produkt, backend, integracje i odpowiedzialność za działanie w produkcji.'
   },
   {
     title: '#JAK',
@@ -95,9 +92,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Zakres', value: 'Od produktu do produkcji' }
     ],
     surfaceKicker: 'Model Operacyjny',
-    surfaceValue: 'Systemy',
-    surfaceText:
-      'Budowanie kompletnych rozwiązań, które mają sens techniczny, biznesowy i operacyjny.'
+    surfaceValue: 'SYSTEMY',
+    surfaceText: 'Budowanie kompletnych rozwiązań, które mają sens techniczny, biznesowy i operacyjny.'
   },
   {
     title: '#NDA',
@@ -128,8 +124,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Klasa Wdrozenia',
     surfaceValue: 'MES',
-    surfaceText:
-      'System produkcyjny, integracja ERP, panele planistyczne i logika domenowa podporządkowana realnym procesom na hali.'
+    surfaceText: 'System produkcyjny, integracja ERP, panele planistyczne i logika domenowa podporządkowana realnym procesom na hali.'
   },
   {
     title: '#NTA',
@@ -159,9 +154,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Dane', value: 'PostgreSQL' }
     ],
     surfaceKicker: 'Tryb Odzyskiwania',
-    surfaceValue: 'Stabilizacja',
-    surfaceText:
-      'Stabilizacja infrastruktury, modernizacja frontendu i odzyskanie kontroli nad logiką krytyczną dla biznesu.'
+    surfaceValue: 'STABILIZACJA',
+    surfaceText: 'Stabilizacja infrastruktury, modernizacja frontendu i odzyskanie kontroli nad logiką krytyczną dla biznesu.'
   },
   {
     title: '#VPT',
@@ -192,8 +186,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Tor systemowy',
     surfaceValue: 'B2B',
-    surfaceText:
-      'Systemy dla branży travel i medical prowadzone od decyzji architektonicznych po utrzymanie produkcyjne.'
+    surfaceText: 'Systemy dla branży travel i medical prowadzone od decyzji architektonicznych po utrzymanie produkcyjne.'
   },
   {
     title: '#WSEI',
@@ -223,9 +216,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Rola', value: 'Developer / project lead' }
     ],
     surfaceKicker: 'Warstwa Operacyjna',
-    surfaceValue: 'Cloud',
-    surfaceText:
-      'Aplikacje wewnętrzne, odpowiedzialność za chmurę i infrastruktura przygotowana na intensywne wydarzenia.'
+    surfaceValue: 'CLOUD',
+    surfaceText: 'Aplikacje wewnętrzne, odpowiedzialność za chmurę i infrastruktura przygotowana na intensywne wydarzenia.'
   },
   {
     title: '#ARCH',
@@ -255,9 +247,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Zakres', value: 'ECM security consulting' }
     ],
     surfaceKicker: 'Perspektywa bezpieczeństwa',
-    surfaceValue: 'Audyt',
-    surfaceText:
-      'Testy, raportowanie, rekomendacje naprawcze i praktyczny feedback dla bezpiecznego wytwarzania oprogramowania.'
+    surfaceValue: 'AUDYT',
+    surfaceText: 'Testy, raportowanie, rekomendacje naprawcze i praktyczny feedback dla bezpiecznego wytwarzania oprogramowania.'
   },
   {
     title: '#WLCK',
@@ -287,9 +278,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Tryb', value: 'On-site operations' }
     ],
     surfaceKicker: 'Warstwa Fundamentów',
-    surfaceValue: 'Ops',
-    surfaceText:
-      'Bazy danych, migracje i topologie sieci jako fundament późniejszej pracy nad systemami aplikacyjnymi.'
+    surfaceValue: 'OPS',
+    surfaceText: 'Bazy danych, migracje i topologie sieci jako fundament późniejszej pracy nad systemami aplikacyjnymi.'
   },
   {
     title: '#FE',
@@ -319,9 +309,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Cel', value: 'Czytelność i utrzymanie' }
     ],
     surfaceKicker: 'Warstwa Kompetencji',
-    surfaceValue: 'Frontend',
-    surfaceText:
-      'Typowane interfejsy, skalowalne systemy UI i architektura klienta przygotowana na rozwój produktu.'
+    surfaceValue: 'FRONTEND',
+    surfaceText: 'Typowane interfejsy, skalowalne systemy UI i architektura klienta przygotowana na rozwój produktu.'
   },
   {
     title: '#BE',
@@ -351,9 +340,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Zakres', value: 'API, silniki, warstwy danych' }
     ],
     surfaceKicker: 'Warstwa Kompetencji',
-    surfaceValue: 'Backend',
-    surfaceText:
-      'API, logika domenowa, silniki i warstwy danych budowane z myślą o poprawności oraz odporności.'
+    surfaceValue: 'BACKEND',
+    surfaceText: 'API, logika domenowa, silniki i warstwy danych budowane z myślą o poprawności oraz odporności.'
   },
   {
     title: '#INF',
@@ -383,9 +371,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Tryb', value: 'Operacje gotowe na produkt' }
     ],
     surfaceKicker: 'Warstwa wdrożeniowa',
-    surfaceValue: 'Infra',
-    surfaceText:
-      'Infrastruktura, bezpieczeństwo i tooling domykające odpowiedzialność za cały produkt.'
+    surfaceValue: 'INFRA',
+    surfaceText: 'Infrastruktura, bezpieczeństwo i tooling domykające odpowiedzialność za cały produkt.'
   },
   {
     title: '#EDU',
@@ -415,9 +402,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Profil', value: 'Podstawa inżynierska' }
     ],
     surfaceKicker: 'Podstawa Formalna',
-    surfaceValue: 'Edukacja',
-    surfaceText:
-      'Wykształcenie techniczne wsparte praktyką produktową, bezpieczeństwem i ciągłym rozwojem zawodowym.'
+    surfaceValue: 'EDU',
+    surfaceText: 'Wykształcenie techniczne wsparte praktyką produktową, bezpieczeństwem i ciągłym rozwojem zawodowym.'
   },
   {
     title: '#COM',
@@ -447,9 +433,8 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Wątek', value: 'Leadership i mentoring' }
     ],
     surfaceKicker: 'Warstwa Leadershipu',
-    surfaceValue: 'Liderstwo',
-    surfaceText:
-      'Mentoring, organizacja wydarzeń, reprezentacja i odpowiedzialne prowadzenie zespołów.'
+    surfaceValue: 'LEAD',
+    surfaceText: 'Mentoring, organizacja wydarzeń, reprezentacja i odpowiedzialne prowadzenie zespołów.'
   },
   {
     title: '#GDPR',
@@ -480,8 +465,7 @@ export const PL_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Warstwa Formalna',
     surfaceValue: 'GDPR',
-    surfaceText:
-      'Zgoda GDPR, referencje i formalna gotowość do procesu rekrutacyjnego lub współpracy B2B.'
+    surfaceText: 'Zgoda GDPR, referencje i formalna gotowość do procesu rekrutacyjnego lub współpracy B2B.'
   }
 ];
 
@@ -513,9 +497,8 @@ export const PL_FEATURED_INTRO_CARD: CvCardContent = {
     { label: 'Efekt', value: 'Wejście do manifold' }
   ],
   surfaceKicker: 'Powierzchnia startu',
-  surfaceValue: 'Wejście',
-  surfaceText:
-    'Dedykowany próg wejścia, który po aktywacji przechodzi w główną prezentację portfolio.'
+  surfaceValue: 'WEJŚCIE',
+  surfaceText: 'Dedykowany próg wejścia, który po aktywacji przechodzi w główną prezentację portfolio.'
 };
 
 export const PL_BUNDLE: ManifoldLocaleBundle = {
@@ -526,7 +509,7 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
     pauseAria: 'Wstrzymaj muzykę w tle',
     pauseLabel: 'Pauza',
     playAria: 'Odtwórz muzykę w tle',
-    playLabel: 'Odtwórz',
+    playLabel: 'GRAJ',
     zenLabel: 'Zen'
   },
   document: {
@@ -547,13 +530,11 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
   ui: {
     additionalOptions: 'Opcje dodatkowe',
     additionalOptionsHint: '[ BLOKADA ]',
-    aboutLabel: 'System',
-    aboutCloseLabel: 'Zamknij',
+    aboutLabel: 'SYSTEM',
+    aboutCloseLabel: 'ZAMKNIJ',
     aboutContent: {
-      stack:
-        'Silnik Manifold (DOM/WebGL2/WebGPU), TypeScript, Three.js (Renderowanie Scen), Matematyka macierzowa Tesseraktu 4D, WebWorker Physics, Object Pooling, CSS Typed OM.',
-      trivia:
-        'Hybrydowy renderer WebGL/WebGPU i DOM wykorzystujący projekcję Tesserakt 4D oraz homografię CSS matrix3d. Pętla renderująca zoptymalizowana pod niski narzut GC (integer hashing, object pooling). Symulacje płynów, fizyka i analiza FFT izolowane w WebWorkers. System integruje adaptacyjny frame-pacing oraz dynamiczne skalowanie DPR.',
+      stack: 'Silnik Manifold (DOM/WebGL2/WebGPU), TypeScript, Three.js (Renderowanie Scen), Matematyka macierzowa Tesseraktu 4D, WebWorker Physics, Object Pooling, CSS Typed OM.',
+      trivia: 'Hybrydowy renderer WebGL/WebGPU i DOM wykorzystujący projekcję Tesserakt 4D oraz homografię CSS matrix3d. Pętla renderująca zoptymalizowana pod niski narzut GC (integer hashing, object pooling). Symulacje płynów, fizyka i analiza FFT izolowane w WebWorkers. System integruje adaptacyjny frame-pacing oraz dynamiczne skalowanie DPR.',
       build: 'SYGNATURA KOMPILACJI',
       runtime: 'STATUS OPERACYJNY',
       authorTime: 'STATUS AUTORA',
@@ -569,7 +550,7 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
     },
     cardHighlights: 'Najważniejsze',
     cardSnapshot: 'Podsumowanie',
-    clickCardForDetails: 'Otwórz szczegóły karty',
+    clickCardForDetails: 'Kliknij kartę po szczegóły',
     closeNavigationAria: 'Zamknij nawigację',
     coord: 'WSPÓŁ',
     cvDownloadAria: 'Pobierz CV',
@@ -581,9 +562,9 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
     entryPoint: 'Punkt wejścia',
     fps: 'FPS',
     focusLock: 'TRYB FOKUS',
-    hudHintLineOne: 'Otwórz kliknięciem',
-    hudHintLineTwo: 'Menu sceny',
-    hudTravelLineOne: 'Przejście do',
+    hudHintLineOne: 'JESTEM KLIKALNY',
+    hudHintLineTwo: 'MENU SCENY',
+    hudTravelLineOne: 'PRZEJŚCIE DO',
     fullRate: 'PEŁNA WYDAJNOŚĆ',
     fullRateBoost: 'PEŁNA WYDAJNOŚĆ+',
     jumpAcrossCards: 'Przeskocz między kartami',
@@ -599,7 +580,7 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
     nextCardAria: 'Następna karta',
     nextCardSectionAria: 'Pokaż następną sekcję karty',
     nextPageAria: 'Następna strona',
-    orbitToggle: 'Orbity',
+    orbitToggle: 'ORBITY',
     orbitToggleActive: 'Orbity: wł.',
     orbitToggleInactive: 'Orbity: wył.',
     orbitToggleAria: 'Przełącz orbity',
@@ -607,46 +588,46 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
     previousCardAria: 'Poprzednia karta',
     powerSave: 'OSZCZĘDZANIE',
     perf: 'TRYB',
-    policyLabel: 'Polityka prywatności',
-    policyCloseLabel: 'Zamknij politykę',
+    policyLabel: 'POLITYKA PRYWATNOŚCI',
+    policyCloseLabel: 'ZAMKNIJ POLITYKĘ',
     policyContent: {
       intro:
-        'Polityka prywatności\n\nOstatnia aktualizacja: 29 kwietnia 2026 r.\n\nTa strona jest osobistym doświadczeniem webowym działającym w domenie kaim.dev. Została zaprojektowana tak, aby działać głównie w przeglądarce użytkownika i zbierać możliwie mało informacji.',
-      processingTitle: 'Przetwarzanie lokalne',
+        'POLITYKA PRYWATNOŚCI\n\nOstatnia aktualizacja: 29 kwietnia 2026 r.\n\nTa strona jest osobistym doświadczeniem webowym działającym w domenie kaim.dev. Została zaprojektowana tak, aby działać głównie w przeglądarce użytkownika i zbierać możliwie mało informacji.',
+      processingTitle: 'PRZETWARZANIE LOKALNE',
       processingBody:
         'Renderowanie, stan interakcji, diagnostyka, sprawdzanie możliwości GPU/przeglądarki oraz efekty wizualne działają lokalnie w przeglądarce. Informacje debugowe o urządzeniu lub przeglądarce pozostają na urządzeniu użytkownika, chyba że telemetria zostanie wyraźnie włączona.',
-      storageTitle: 'Pamięć przeglądarki',
+      storageTitle: 'PAMIĘĆ PRZEGLĄDARKI',
       storageBody:
         'Strona używa localStorage do zapamiętania wybranego języka i widoczności przewodnika orbitalnego oraz sessionStorage dla krótkotrwałej flagi przejścia językowego. Te wartości służą wyłącznie zachowaniu spójności interfejsu. Strona nie używa plików cookies.',
-      audioTitle: 'Odtwarzanie audio',
+      audioTitle: 'ODTWARZANIE AUDIO',
       audioBody:
         'Dźwięk tła jest ładowany dopiero po użyciu przełącznika audio. Strona nie żąda dostępu do mikrofonu ani kamery.',
-      telemetryTitle: 'Opcjonalna telemetria',
+      telemetryTitle: 'OPCJONALNA TELEMETRIA',
       telemetryBody:
         'Jeżeli dla tej wersji wdrożenia skonfigurowano endpoint telemetryczny, aplikacja może wysyłać ograniczone zdarzenia techniczne, takie jak nazwa zdarzenia, znacznik czasu, aktualna ścieżka oraz niewielkie dane interakcji, np. zmiana trybu lub uruchomienie audio. Dane te służą wyłącznie zrozumieniu i poprawie działania strony.',
-      performanceTitle: 'Analityka wydajności',
+      performanceTitle: 'ANALITYKA WYDAJNOŚCI',
       performanceBody:
         'Strona może używać Cloudflare Web Analytics / Real User Measurements (RUM) do pomiaru rzeczywistej szybkości ładowania i niezawodności. Po włączeniu tej funkcji Cloudflare może załadować lub automatycznie dodać niewielki skrypt JavaScript, który zbiera pomiary wydajności przeglądarki, takie jak czas ładowania strony, navigation timing, resource timing, paint timing i Core Web Vitals, wraz z ograniczonym kontekstem strony, takim jak aktualna ścieżka lub referrer. Ten pomiar wydajności służy diagnozowaniu i poprawie szybkości, renderowania oraz odczuwalnej jakości działania strony. Strona nie wykorzystuje tych danych do reklam, profilowania między stronami ani identyfikowania użytkowników. Podstawą prawną, tam gdzie jest wymagana, jest prawnie uzasadniony interes operatora polegający na utrzymaniu i poprawie jakości technicznej strony.',
-      contactTitle: 'Kontakt',
+      contactTitle: 'KONTAKT',
       contactBody:
         'Link kontaktowy dopasowuje się do aktywnego języka ("contact" albo "kontakt"). Aby ograniczyć automatyczne zbieranie adresu przez scrapery i boty, adres nie jest przechowywany jako statyczny widoczny tekst i jest wstawiany do protokołu mailto dopiero po interakcji użytkownika.',
-      rightsTitle: 'Twoje prawa',
+      rightsTitle: 'TWOJE PRAWA',
       rightsBody:
         'Tam, gdzie zastosowanie ma RODO, możesz żądać dostępu, sprostowania, usunięcia, ograniczenia przetwarzania lub sprzeciwu wobec przetwarzania danych osobowych związanych z tą stroną. Kontakt jest możliwy przez akcję kontaktową dostępną na stronie.'
     },
-    privacyLabel: 'Panel debug',
-    privacyCloseLabel: 'Ukryj debug',
+    privacyLabel: 'DEBUG OVERLAY',
+    privacyCloseLabel: 'UKRYJ DEBUG',
     privacyContent: '',
-    return: 'Powrót do startu',
-    sceneNavigation: 'Nawigacja sceny',
+    return: 'POWRÓT DO STARTU',
+    sceneNavigation: 'Nawigacja Sceny',
     returnToEntryAria: 'Wyjdź i wróć do ekranu startowego',
-    scrollArrowsToExit: 'Przewijaj / strzałki, aby wyjść',
-    scrollArrowsWsToMove: 'Przewijaj / strzałki / W S, aby się poruszać',
+    scrollArrowsToExit: 'Przewijaj / Strzałki, aby wyjść',
+    scrollArrowsWsToMove: 'Przewijaj / Strzałki / W S, aby się poruszać',
     scrollToExit: 'Przewijaj, aby wyjść',
     scrollVelocity: 'PRĘDKOŚĆ SCROLLU',
     scrollToBrowse: 'Przewijaj, aby przeglądać',
     scrollToExitCard: 'Przewiń, aby wyjść z karty',
-    scrollPrompt: 'Scroll',
+    scrollPrompt: 'SCROLL',
     sectionKicker: 'Sekcja',
     systemLoader: 'System Loader',
     topbarRole: 'inżynier oprogramowania full-stack / lead architect',
@@ -654,8 +635,8 @@ export const PL_BUNDLE: ManifoldLocaleBundle = {
     systemOverlayToggleAria: 'Przełącz overlay systemowy',
     systemOverlayToggleActive: 'Overlay systemowy: włączony',
     systemOverlayToggleInactive: 'Overlay systemowy: wyłączony',
-    systemOverlayOn: 'Overlay: włączony',
-    systemOverlayOff: 'Overlay: wyłączony',
-    zenLock: 'Tryb zen'
+    systemOverlayOn: 'OVERLAY: WŁĄCZONY',
+    systemOverlayOff: 'OVERLAY: WYŁĄCZONY',
+    zenLock: 'TRYB ZEN'
   }
 };

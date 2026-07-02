@@ -47,9 +47,7 @@ const PRETEXT_FONT_FAMILY = "'JetBrains Mono', monospace";
 const PRETEXT_SINGLE_LINE_SPAN_PX = 4096;
 const PRETEXT_FALLBACK_ROOT_FONT_PX = 16;
 
-const HINT_LAYOUT_METRICS: Readonly<
-  Record<HintVariant, Readonly<Record<HintViewport, HintViewportMetrics>>>
-> = {
+const HINT_LAYOUT_METRICS: Readonly<Record<HintVariant, Readonly<Record<HintViewport, HintViewportMetrics>>>> = {
   intro: {
     desktop: {
       minWidthPx: 238,
@@ -132,13 +130,9 @@ class PretextLayoutService {
       return;
     }
 
-    const nextFontPx = Number.parseFloat(
-      window.getComputedStyle(document.documentElement).fontSize
-    );
+    const nextFontPx = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
     const resolvedFontPx =
-      Number.isFinite(nextFontPx) && nextFontPx > 0
-        ? nextFontPx
-        : PRETEXT_FALLBACK_ROOT_FONT_PX;
+      Number.isFinite(nextFontPx) && nextFontPx > 0 ? nextFontPx : PRETEXT_FALLBACK_ROOT_FONT_PX;
     // Tolerance of 0.5px avoids cache-busting on micro browser-zoom changes.
     if (Math.abs(resolvedFontPx - this.rootFontPx) >= 0.5) {
       this.rootFontPx = resolvedFontPx;
@@ -176,9 +170,7 @@ class PretextLayoutService {
       700,
       viewportMetrics.title.letterSpacingEm
     );
-    const measuredWidth = Math.ceil(
-      Math.max(kickerWidth, titleWidth) + paddingX
-    );
+    const measuredWidth = Math.ceil(Math.max(kickerWidth, titleWidth) + paddingX);
 
     const measurement = {
       width: Math.max(viewportMetrics.minWidthPx, measuredWidth),
@@ -206,14 +198,8 @@ class PretextLayoutService {
       AUDIO_BUTTON_METRICS.desktop.letterSpacingEm
     );
     const chromeWidth =
-      this.toPx(
-        AUDIO_BUTTON_METRICS.desktop.paddingLeftRem +
-          AUDIO_BUTTON_METRICS.desktop.paddingRightRem
-      ) +
-      this.toPx(
-        AUDIO_BUTTON_METRICS.desktop.iconWidthRem +
-          AUDIO_BUTTON_METRICS.desktop.gapRem
-      ) +
+      this.toPx(AUDIO_BUTTON_METRICS.desktop.paddingLeftRem + AUDIO_BUTTON_METRICS.desktop.paddingRightRem) +
+      this.toPx(AUDIO_BUTTON_METRICS.desktop.iconWidthRem + AUDIO_BUTTON_METRICS.desktop.gapRem) +
       AUDIO_BUTTON_METRICS.desktop.borderPx;
 
     const measurement = {
@@ -235,10 +221,7 @@ class PretextLayoutService {
     }
 
     const fontPx = this.toPx(fontRem);
-    const prepared = this.getPreparedEntry(
-      text,
-      this.createFontShorthand(fontPx, fontWeight)
-    );
+    const prepared = this.getPreparedEntry(text, this.createFontShorthand(fontPx, fontWeight));
     let naturalWidth = 0;
 
     walkLineRanges(prepared.prepared, PRETEXT_SINGLE_LINE_SPAN_PX, (line) => {

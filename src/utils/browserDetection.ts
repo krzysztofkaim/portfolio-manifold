@@ -14,7 +14,7 @@ function isSafari(): boolean {
   const ua = window.navigator.userAgent.toLowerCase();
   const isChrome = ua.indexOf('chrome') > -1 || ua.indexOf('crios') > -1;
   const isSafari = ua.indexOf('safari') > -1 && !isChrome;
-
+  
   return isSafari;
 }
 
@@ -22,10 +22,7 @@ function isIOS(): boolean {
   if (typeof window === 'undefined') return false;
 
   const ua = window.navigator.userAgent;
-  return (
-    /iPad|iPhone|iPod/.test(ua) ||
-    (ua.includes('Mac') && window.navigator.maxTouchPoints > 1)
-  );
+  return /iPad|iPhone|iPod/.test(ua) || (ua.includes('Mac') && window.navigator.maxTouchPoints > 1);
 }
 
 function isAndroid(): boolean {

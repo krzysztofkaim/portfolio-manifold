@@ -26,10 +26,7 @@ export class ManifoldAppCursor {
   setup(): void {
     // Safari: Disable custom cursor entirely — the per-pointermove transforms
     // and per-frame ring lerp add unnecessary compositor overhead.
-    this.enabled =
-      !IS_SAFARI &&
-      window.matchMedia('(pointer: fine)').matches &&
-      !window.matchMedia('(hover: none)').matches;
+    this.enabled = !IS_SAFARI && window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(hover: none)').matches;
 
     if (!this.enabled) {
       if (this.elements.root) this.elements.root.hidden = true;
@@ -47,24 +44,15 @@ export class ManifoldAppCursor {
       this.ringY = Number.isFinite(this.ringY) ? this.ringY : this.targetY;
       this.setIdle(false);
 
-      if (this.elements.core)
-        this.elements.core.style.transform = `translate3d(${this.targetX.toFixed(2)}px, ${this.targetY.toFixed(2)}px, 0) translate(-50%, -50%)`;
+      if (this.elements.core) this.elements.core.style.transform = `translate3d(${this.targetX.toFixed(2)}px, ${this.targetY.toFixed(2)}px, 0) translate(-50%, -50%)`;
 
       const target = event.target;
       if (target instanceof Element) {
         this.setOverUiControl(
-          Boolean(
-            target.closest(
-              '.topbar-chip, .hud-nav-return, .hud-mode-toggle, .hud-mode-option'
-            )
-          )
+          Boolean(target.closest('.topbar-chip, .hud-nav-return, .hud-mode-toggle, .hud-mode-option'))
         );
         this.setInteractive(
-          Boolean(
-            target.closest(
-              'button, a, [role="button"], .card, [data-entry-card="true"], .topbar-chip'
-            )
-          )
+          Boolean(target.closest('button, a, [role="button"], .card, [data-entry-card="true"], .topbar-chip'))
         );
       } else {
         this.setOverUiControl(false);
@@ -97,12 +85,7 @@ export class ManifoldAppCursor {
       window.removeEventListener('pointerdown', handleDown);
       window.removeEventListener('pointerup', handleUp);
       document.body.classList.remove('has-custom-cursor');
-      this.elements.root?.classList.remove(
-        'is-interactive',
-        'is-over-ui-control',
-        'is-pressed',
-        'is-idle'
-      );
+      this.elements.root?.classList.remove('is-interactive', 'is-over-ui-control', 'is-pressed', 'is-idle');
     };
   }
 
@@ -114,12 +97,10 @@ export class ManifoldAppCursor {
     const ringLerp = this.interactive ? 0.18 : 0.14;
     this.ringX += (this.targetX - this.ringX) * ringLerp;
     this.ringY += (this.targetY - this.ringY) * ringLerp;
-    this.intent =
-      Math.abs(this.targetX - this.ringX) + Math.abs(this.targetY - this.ringY);
+    this.intent = Math.abs(this.targetX - this.ringX) + Math.abs(this.targetY - this.ringY);
 
     if (this.intent > 0.04) {
-      if (this.elements.ring)
-        this.elements.ring.style.transform = `translate3d(${this.ringX.toFixed(2)}px, ${this.ringY.toFixed(2)}px, 0) translate(-50%, -50%)`;
+      if (this.elements.ring) this.elements.ring.style.transform = `translate3d(${this.ringX.toFixed(2)}px, ${this.ringY.toFixed(2)}px, 0) translate(-50%, -50%)`;
     }
   }
 

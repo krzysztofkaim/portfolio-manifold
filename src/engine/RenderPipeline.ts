@@ -1,5 +1,5 @@
 import type { Camera, ColorRepresentation, Scene } from 'three';
-import { IS_SAFARI, IS_IOS, IS_ANDROID } from '../utils/browserDetection';
+import { IS_SAFARI } from '../utils/browserDetection';
 
 type RendererInfo = {
   autoReset?: boolean;
@@ -39,10 +39,8 @@ export class RenderPipeline {
 
     if (RenderPipeline.supportsWebGPU()) {
       try {
-        const webgpuModule: typeof import('three/webgpu') =
-          await import('three/webgpu');
-        const WebGPURendererCtor =
-          webgpuModule.WebGPURenderer ?? webgpuModule.default;
+        const webgpuModule: typeof import('three/webgpu') = await import('three/webgpu');
+        const WebGPURendererCtor = webgpuModule.WebGPURenderer ?? webgpuModule.default;
         const webgpuRenderer = new WebGPURendererCtor({
           canvas: this.canvas,
           alpha: true,
@@ -52,20 +50,14 @@ export class RenderPipeline {
           stencil: false
         });
 
-        if (
-          'init' in webgpuRenderer &&
-          typeof webgpuRenderer.init === 'function'
-        ) {
+        if ('init' in webgpuRenderer && typeof webgpuRenderer.init === 'function') {
           await webgpuRenderer.init();
         }
 
         this.renderer = webgpuRenderer as unknown as RendererLike;
         this.backend = 'WebGPU';
       } catch (error) {
-        console.warn(
-          'WebGPU initialization failed, falling back to WebGL2.',
-          error
-        );
+        console.warn('WebGPU initialization failed, falling back to WebGL2.', error);
       }
     }
 
@@ -134,17 +126,14 @@ export class RenderPipeline {
   }
 
   private static supportsWebGPU(): boolean {
-    if (
-      typeof navigator === 'undefined' ||
-      !('gpu' in navigator) ||
-      navigator.gpu == null
-    ) {
+    if (typeof navigator === 'undefined' || !('gpu' in navigator) || navigator.gpu == null) {
       return false;
     }
 
-    // Force WebGL2 for Safari/WebKit and mobile platforms even if navigator.gpu exists.
-    // Mobile browsers and WebKit's experimental WebGPU implementation are unstable.
-    if (IS_SAFARI || IS_IOS || IS_ANDROID) {
+    // Force WebGL2 for Safari/WebKit even if navigator.gpu exists.
+    // Safari's WebGPU implementation is currently experimental and often less stable/performant
+    // than its highly optimized WebGL2 engine on M-series chips.
+    if (IS_SAFARI) {
       return false;
     }
 

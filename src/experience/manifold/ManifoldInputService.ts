@@ -19,11 +19,7 @@ export interface ManifoldInputServiceContext {
   isHudNavigationOpen(): boolean;
   markInteractionActivity(): void;
   pan2DBy(deltaX: number): void;
-  resolveCardTarget(
-    target: EventTarget | null,
-    x: number,
-    y: number
-  ): ItemState | null;
+  resolveCardTarget(target: EventTarget | null, x: number, y: number): ItemState | null;
   setCardMobilePage(item: ItemState, page: number): void;
   setHoveredCard(item: ItemState | null): void;
   triggerIntroEnter(): void;
@@ -78,8 +74,7 @@ export class ManifoldInputService {
     );
     this.pointerX = event.clientX;
     this.pointerY = event.clientY;
-    this.pointerTarget =
-      event.target instanceof HTMLElement ? event.target : null;
+    this.pointerTarget = event.target instanceof HTMLElement ? event.target : null;
     this.pointerActive = true;
     this.pointerDirty = true;
     this.context.markInteractionActivity();
@@ -102,31 +97,17 @@ export class ManifoldInputService {
     this.pointerDownX = event.clientX;
     this.pointerDownY = event.clientY;
 
-    if (
-      !this.context.getIntroCompleted() ||
-      this.context.getIntroTarget() < 1
-    ) {
-      this.pressedEntry = this.context.isEntryTarget(
-        event.target,
-        event.clientX,
-        event.clientY
-      );
+    if (!this.context.getIntroCompleted() || this.context.getIntroTarget() < 1) {
+      this.pressedEntry = this.context.isEntryTarget(event.target, event.clientX, event.clientY);
       return;
     }
 
-    if (
-      event.target instanceof HTMLElement &&
-      event.target.closest('[data-card-page-nav]')
-    ) {
+    if (event.target instanceof HTMLElement && event.target.closest('[data-card-page-nav]')) {
       this.pressedCard = null;
       return;
     }
 
-    this.pressedCard = this.context.resolveCardTarget(
-      event.target,
-      event.clientX,
-      event.clientY
-    );
+    this.pressedCard = this.context.resolveCardTarget(event.target, event.clientX, event.clientY);
   }
 
   handleViewportPointerUp(event: PointerEvent): void {
@@ -134,10 +115,7 @@ export class ManifoldInputService {
       return;
     }
 
-    const moved = Math.hypot(
-      event.clientX - this.pointerDownX,
-      event.clientY - this.pointerDownY
-    );
+    const moved = Math.hypot(event.clientX - this.pointerDownX, event.clientY - this.pointerDownY);
     if (moved > 14) {
       this.pressedCard = null;
       return;
@@ -149,21 +127,13 @@ export class ManifoldInputService {
       return;
     }
 
-    if (
-      target instanceof HTMLElement &&
-      target.closest('[data-card-page-nav]')
-    ) {
+    if (target instanceof HTMLElement && target.closest('[data-card-page-nav]')) {
       this.pressedCard = null;
       return;
     }
 
-    if (
-      !this.context.getIntroCompleted() ||
-      this.context.getIntroTarget() < 1
-    ) {
-      const shouldEnter =
-        this.pressedEntry ||
-        this.context.isEntryTarget(target, event.clientX, event.clientY);
+    if (!this.context.getIntroCompleted() || this.context.getIntroTarget() < 1) {
+      const shouldEnter = this.pressedEntry || this.context.isEntryTarget(target, event.clientX, event.clientY);
       this.pressedEntry = false;
 
       if (shouldEnter) {
@@ -174,9 +144,7 @@ export class ManifoldInputService {
       return;
     }
 
-    const releasedCard =
-      this.pressedCard ??
-      this.context.resolveCardTarget(target, event.clientX, event.clientY);
+    const releasedCard = this.pressedCard ?? this.context.resolveCardTarget(target, event.clientX, event.clientY);
 
     if (!releasedCard) {
       this.pressedCard = null;
@@ -215,8 +183,7 @@ export class ManifoldInputService {
         const item = this.context.findCardState(card);
 
         if (item) {
-          const direction =
-            pageNavButton.dataset.cardPageNav === 'prev' ? -1 : 1;
+          const direction = pageNavButton.dataset.cardPageNav === 'prev' ? -1 : 1;
           this.context.setCardMobilePage(item, item.mobilePage + direction);
         }
       }
@@ -225,10 +192,7 @@ export class ManifoldInputService {
       return;
     }
 
-    if (
-      !this.context.getIntroCompleted() ||
-      this.context.getIntroTarget() < 1
-    ) {
+    if (!this.context.getIntroCompleted() || this.context.getIntroTarget() < 1) {
       if (this.context.isEntryTarget(target, event.clientX, event.clientY)) {
         this.context.triggerIntroEnter();
       }
@@ -237,9 +201,7 @@ export class ManifoldInputService {
       return;
     }
 
-    const clickedCard =
-      this.pressedCard ??
-      this.context.resolveCardTarget(target, event.clientX, event.clientY);
+    const clickedCard = this.pressedCard ?? this.context.resolveCardTarget(target, event.clientX, event.clientY);
     this.pressedCard = null;
 
     if (clickedCard) {
@@ -257,10 +219,7 @@ export class ManifoldInputService {
   }
 
   handleFeaturedKeydown(event: KeyboardEvent): void {
-    if (
-      (event.key === 'Enter' || event.key === ' ') &&
-      this.context.getIntroTarget() < 1
-    ) {
+    if ((event.key === 'Enter' || event.key === ' ') && this.context.getIntroTarget() < 1) {
       event.preventDefault();
       this.context.triggerIntroEnter();
     }
@@ -281,56 +240,24 @@ export class ManifoldInputService {
       introCompleted &&
       is2DMode &&
       !hudNavigationOpen &&
-      [
-        'a',
-        'd',
-        'w',
-        's',
-        'ArrowRight',
-        'ArrowLeft',
-        'ArrowUp',
-        'ArrowDown'
-      ].includes(event.key)
+      ['a', 'd', 'w', 's', 'ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(event.key)
     ) {
       event.preventDefault();
       return;
     }
 
-    if (
-      is2DMode &&
-      expandedCard &&
-      expandedTarget > 0 &&
-      SCROLL_CLOSE_KEYS.has(event.key)
-    ) {
+    if (is2DMode && expandedCard && expandedTarget > 0 && SCROLL_CLOSE_KEYS.has(event.key)) {
       event.preventDefault();
       return;
     }
 
-    if (
-      introCompleted &&
-      is2DMode &&
-      !hudNavigationOpen &&
-      !expandedCard &&
-      (event.key === 'ArrowUp' ||
-        event.key.toLowerCase() === 'w' ||
-        event.key === 'ArrowLeft' ||
-        event.key.toLowerCase() === 'a')
-    ) {
+    if (introCompleted && is2DMode && !hudNavigationOpen && !expandedCard && (event.key === 'ArrowUp' || event.key.toLowerCase() === 'w' || event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a')) {
       event.preventDefault();
       this.context.advancePrev();
       return;
     }
 
-    if (
-      introCompleted &&
-      is2DMode &&
-      !hudNavigationOpen &&
-      !expandedCard &&
-      (event.key === 'ArrowDown' ||
-        event.key.toLowerCase() === 's' ||
-        event.key === 'ArrowRight' ||
-        event.key.toLowerCase() === 'd')
-    ) {
+    if (introCompleted && is2DMode && !hudNavigationOpen && !expandedCard && (event.key === 'ArrowDown' || event.key.toLowerCase() === 's' || event.key === 'ArrowRight' || event.key.toLowerCase() === 'd')) {
       event.preventDefault();
       this.context.advanceNext();
       return;
@@ -341,10 +268,7 @@ export class ManifoldInputService {
       !hudNavigationOpen &&
       !is2DMode &&
       !expandedCard &&
-      (event.key === 'ArrowUp' ||
-        event.key.toLowerCase() === 'w' ||
-        event.key === 'ArrowLeft' ||
-        event.key.toLowerCase() === 'a')
+      (event.key === 'ArrowUp' || event.key.toLowerCase() === 'w' || event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a')
     ) {
       event.preventDefault();
       this.context.advancePrev();
@@ -356,10 +280,7 @@ export class ManifoldInputService {
       !hudNavigationOpen &&
       !is2DMode &&
       !expandedCard &&
-      (event.key === 'ArrowDown' ||
-        event.key.toLowerCase() === 's' ||
-        event.key === 'ArrowRight' ||
-        event.key.toLowerCase() === 'd')
+      (event.key === 'ArrowDown' || event.key.toLowerCase() === 's' || event.key === 'ArrowRight' || event.key.toLowerCase() === 'd')
     ) {
       event.preventDefault();
       this.context.advanceNext();
@@ -371,28 +292,7 @@ export class ManifoldInputService {
       return;
     }
 
-    if (
-      introCompleted &&
-      !hudNavigationOpen &&
-      (event.key === 'Enter' || event.key === ' ') &&
-      document.activeElement instanceof HTMLElement &&
-      document.activeElement.classList.contains('card')
-    ) {
-      const focusedCard = this.context.findCardState(document.activeElement);
-
-      if (focusedCard) {
-        event.preventDefault();
-        this.context.toggleExpandedCard(focusedCard);
-        return;
-      }
-    }
-
-    if (
-      !this.context.is2DMode() &&
-      expandedCard &&
-      expandedTarget > 0 &&
-      SCROLL_CLOSE_KEYS.has(event.key)
-    ) {
+    if (!this.context.is2DMode() && expandedCard && expandedTarget > 0 && SCROLL_CLOSE_KEYS.has(event.key)) {
       this.context.closeExpandedCard();
     }
   }
@@ -406,19 +306,14 @@ export class ManifoldInputService {
     ) {
       const metrics = this.context.get2DGridMetrics();
       const horizontalDelta =
-        Math.abs(event.deltaX) > 0.01
-          ? event.deltaX
-          : event.shiftKey && Math.abs(event.deltaY) > 0.01
-            ? event.deltaY
-            : 0;
+        Math.abs(event.deltaX) > 0.01 ? event.deltaX : event.shiftKey && Math.abs(event.deltaY) > 0.01 ? event.deltaY : 0;
 
       if (metrics.stackedMobile && Math.abs(horizontalDelta) > 10) {
         return;
       }
 
       const horizontalIntent =
-        Math.abs(horizontalDelta) > 10 &&
-        Math.abs(horizontalDelta) > Math.abs(event.deltaY) * 0.55;
+        Math.abs(horizontalDelta) > 10 && Math.abs(horizontalDelta) > Math.abs(event.deltaY) * 0.55;
 
       if (horizontalIntent) {
         this.context.pan2DBy(horizontalDelta);
@@ -426,10 +321,7 @@ export class ManifoldInputService {
       }
     }
 
-    if (
-      this.context.getExpandedCard() &&
-      this.context.getExpandedTarget() > 0
-    ) {
+    if (this.context.getExpandedCard() && this.context.getExpandedTarget() > 0) {
       this.context.closeExpandedCard();
     }
   }

@@ -1,8 +1,5 @@
 import { BufferGeometry, Mesh, Object3D } from 'three';
-import {
-  GLTFLoader,
-  type GLTF
-} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
@@ -80,9 +77,7 @@ export class AssetLoader {
 
   private cloneGltf(source: GLTF): GLTF {
     const scene = clone(source.scene) as GLTF['scene'];
-    const scenes = source.scenes.map(
-      (item: GLTF['scene']) => clone(item) as GLTF['scene']
-    );
+    const scenes = source.scenes.map((item: GLTF['scene']) => clone(item) as GLTF['scene']);
 
     return {
       ...source,

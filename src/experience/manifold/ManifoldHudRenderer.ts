@@ -48,10 +48,7 @@ export class ManifoldHudRenderer {
     performanceMode: (modeLabel) => modeLabel,
     scrollPrompt: INITIAL_SECTION_PROMPT
   };
-  private readonly hudCoordNodes: Record<
-    (typeof HUD_COORD_AXES)[number],
-    { label: HTMLElement; value: HTMLElement }
-  >;
+  private readonly hudCoordNodes: Record<(typeof HUD_COORD_AXES)[number], { label: HTMLElement; value: HTMLElement }>;
 
   constructor(private readonly elements: HudElements) {
     this.hudCoordNodes = this.initializeCoordinateReadout();
@@ -79,13 +76,8 @@ export class ManifoldHudRenderer {
   }
 
   render(snapshot: ManifoldHudSnapshot): void {
-    const nextPerf = this.resolvePerformanceModeLabel(
-      this.localeConfig.performanceMode(snapshot.perfModeLabel),
-      snapshot.now
-    );
-    const nextCoordKey = this.serializeHudCoordinateSamples(
-      snapshot.coordinates
-    );
+    const nextPerf = this.resolvePerformanceModeLabel(this.localeConfig.performanceMode(snapshot.perfModeLabel), snapshot.now);
+    const nextCoordKey = this.serializeHudCoordinateSamples(snapshot.coordinates);
 
     if (snapshot.fps !== this.lastFps) {
       this.elements.fps.textContent = snapshot.fps;
@@ -145,11 +137,7 @@ export class ManifoldHudRenderer {
   }
 
   noteInitialScrollGesture(): void {
-    if (
-      !this.initialSectionPromptActive ||
-      this.sectionRevealTimeout ||
-      this.sectionScrambleRaf
-    ) {
+    if (!this.initialSectionPromptActive || this.sectionRevealTimeout || this.sectionScrambleRaf) {
       return;
     }
 
@@ -171,21 +159,13 @@ export class ManifoldHudRenderer {
     }
   }
 
-  private initializeCoordinateReadout(): Record<
-    (typeof HUD_COORD_AXES)[number],
-    { label: HTMLElement; value: HTMLElement }
-  > {
-    const nodes: Partial<
-      Record<
-        (typeof HUD_COORD_AXES)[number],
-        { label: HTMLElement; value: HTMLElement }
-      >
-    > = {};
+  private initializeCoordinateReadout(): Record<(typeof HUD_COORD_AXES)[number], { label: HTMLElement; value: HTMLElement }> {
+    const nodes: Partial<Record<(typeof HUD_COORD_AXES)[number], { label: HTMLElement; value: HTMLElement }>> = {};
     const coordRoot = this.elements.coord;
     const fragment = document.createDocumentFragment();
-
+ 
     coordRoot.replaceChildren();
-
+ 
     const prefix = document.createElement('span');
     prefix.className = 'hud-coord-prefix';
     prefix.textContent = 'COORD';
@@ -208,28 +188,17 @@ export class ManifoldHudRenderer {
       nodes[axis] = { label: pair, value: valueNode };
       fragment.append(pair);
     }
-
+ 
     coordRoot.append(fragment);
-    return nodes as Record<
-      (typeof HUD_COORD_AXES)[number],
-      { label: HTMLElement; value: HTMLElement }
-    >;
+    return nodes as Record<(typeof HUD_COORD_AXES)[number], { label: HTMLElement; value: HTMLElement }>;
   }
 
-  private serializeHudCoordinateSamples(
-    samples: readonly HudCoordinateSample[]
-  ): string {
-    return samples
-      .map((sample) => `${sample.axis}:${Math.round(sample.value)}`)
-      .join('|');
+  private serializeHudCoordinateSamples(samples: readonly HudCoordinateSample[]): string {
+    return samples.map((sample) => `${sample.axis}:${Math.round(sample.value)}`).join('|');
   }
 
-  private updateCoordinateReadout(
-    samples: readonly HudCoordinateSample[]
-  ): void {
-    const sampleMap = new Map(
-      samples.map((sample) => [sample.axis, Math.round(sample.value)])
-    );
+  private updateCoordinateReadout(samples: readonly HudCoordinateSample[]): void {
+    const sampleMap = new Map(samples.map((sample) => [sample.axis, Math.round(sample.value)]));
 
     for (const axis of HUD_COORD_AXES) {
       const { label, value } = this.hudCoordNodes[axis];
@@ -240,7 +209,7 @@ export class ManifoldHudRenderer {
       if (label.style.display !== nextDisplay) {
         label.style.display = nextDisplay;
       }
-
+      
       if (isVisible) {
         const text = String(nextValue);
         if (value.textContent !== text) {
@@ -261,10 +230,7 @@ export class ManifoldHudRenderer {
         return;
       }
 
-      const progress = Math.min(
-        1,
-        (now - startedAt) / SECTION_SCRAMBLE_DURATION_MS
-      );
+      const progress = Math.min(1, (now - startedAt) / SECTION_SCRAMBLE_DURATION_MS);
       const revealCount = Math.floor(progress * normalizedTarget.length);
       let nextText = '';
 
@@ -279,15 +245,11 @@ export class ManifoldHudRenderer {
           continue;
         }
 
-        const charIndex =
-          (token + index + Math.floor(now / 34)) %
-          SECTION_SCRAMBLE_CHARS.length;
-        nextText +=
-          SECTION_SCRAMBLE_CHARS[charIndex] ?? SECTION_SCRAMBLE_CHARS[0];
+        const charIndex = (token + index + Math.floor(now / 34)) % SECTION_SCRAMBLE_CHARS.length;
+        nextText += SECTION_SCRAMBLE_CHARS[charIndex] ?? SECTION_SCRAMBLE_CHARS[0];
       }
 
-      this.elements.section.textContent =
-        progress >= 1 ? normalizedTarget : nextText;
+      this.elements.section.textContent = progress >= 1 ? normalizedTarget : nextText;
 
       if (progress < 1) {
         this.sectionScrambleRaf = window.requestAnimationFrame(tick);
@@ -326,10 +288,7 @@ export class ManifoldHudRenderer {
       return this.performanceModeLabel;
     }
 
-    if (
-      now - this.pendingPerformanceModeSince <
-      MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.performanceModeDebounceMs
-    ) {
+    if (now - this.pendingPerformanceModeSince < MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.performanceModeDebounceMs) {
       return this.performanceModeLabel;
     }
 

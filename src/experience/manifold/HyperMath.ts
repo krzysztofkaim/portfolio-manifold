@@ -3,9 +3,7 @@ import { MANIFOLD_CONSTANTS } from './ManifoldConstants';
 export type ScreenQuadPoint = readonly [number, number];
 
 export function easeInOutCubic(value: number): number {
-  return value < 0.5
-    ? 4 * value * value * value
-    : 1 - Math.pow(-2 * value + 2, 3) / 2;
+  return value < 0.5 ? 4 * value * value * value : 1 - Math.pow(-2 * value + 2, 3) / 2;
 }
 
 export function computeDampedLerp(deltaMs: number, envelope: number): number {
@@ -45,10 +43,7 @@ export function computeCardProjectionMatrix(
   // A near-zero determinant means the quad is degenerate or numerically unstable:
   // corners are collapsing toward a line, overlapping, or otherwise cannot produce
   // a reliable homography. Returning null lets callers fade/cull that face instead.
-  if (
-    Math.abs(determinant) <
-    MANIFOLD_CONSTANTS.TESSERACT_PHYSICS.determinantEpsilon
-  ) {
+  if (Math.abs(determinant) < MANIFOLD_CONSTANTS.TESSERACT_PHYSICS.determinantEpsilon) {
     return null;
   }
 
@@ -62,39 +57,16 @@ export function computeCardProjectionMatrix(
   const d = (y1 - y0 + g * y1) / width;
   const e = (y3 - y0 + h * y3) / height;
   const f = y0;
-  const matrix = [
-    a,
-    d,
-    0,
-    g / width,
-    b,
-    e,
-    0,
-    h / height,
-    0,
-    0,
-    1,
-    0,
-    c,
-    f,
-    0,
-    1
-  ];
+  const matrix = [a, d, 0, g / width, b, e, 0, h / height, 0, 0, 1, 0, c, f, 0, 1];
 
   return `matrix3d(${matrix.map((value) => (Number.isFinite(value) ? value.toFixed(8) : '0')).join(',')})`;
 }
 
 export function parseMatrix3d(matrix: string): Float32Array {
-  return new Float32Array(
-    matrix.replace('matrix3d(', '').replace(')', '').split(',').map(Number)
-  );
+  return new Float32Array(matrix.replace('matrix3d(', '').replace(')', '').split(',').map(Number));
 }
 
-export function projectMatrix3dPoint(
-  matrix: Float32Array,
-  px: number,
-  py: number
-): ScreenQuadPoint {
+export function projectMatrix3dPoint(matrix: Float32Array, px: number, py: number): ScreenQuadPoint {
   const a = matrix[0]!;
   const b = matrix[4]!;
   const c = matrix[12]!;

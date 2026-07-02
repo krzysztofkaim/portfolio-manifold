@@ -52,11 +52,7 @@ export default function createContactScene(): SceneModule {
         thickness: 0.5,
         vertexColors: true
       });
-      spheres = new InstancedMesh(
-        sphereGeometry,
-        sphereMaterial,
-        basePositions.length
-      );
+      spheres = new InstancedMesh(sphereGeometry, sphereMaterial, basePositions.length);
       spheres.instanceMatrix.setUsage(DynamicDrawUsage);
 
       for (let index = 0; index < basePositions.length; index += 1) {
@@ -66,8 +62,7 @@ export default function createContactScene(): SceneModule {
         sphereAnchor.updateMatrix();
         spheres.setMatrixAt(index, sphereAnchor.matrix);
 
-        const intensity =
-          basePositions.length <= 1 ? 0 : index / (basePositions.length - 1);
+        const intensity = basePositions.length <= 1 ? 0 : index / (basePositions.length - 1);
         const tint = baseColor.clone().lerp(highlightColor, intensity * 0.32);
         spheres.setColorAt(index, tint);
       }

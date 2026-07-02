@@ -56,10 +56,7 @@ export class PixelCanvas extends HTMLElement {
   private static transitionMode = false;
   private static worker: Worker | null | undefined;
   private static workerRequestId = 0;
-  private static readonly workerRequests = new Map<
-    number,
-    PendingPixelWorkerRequest
-  >();
+  private static readonly workerRequests = new Map<number, PendingPixelWorkerRequest>();
   private canvas: HTMLCanvasElement | null = null;
   private context: CanvasRenderingContext2D | null = null;
   private hostCard: HTMLElement | null = null;
@@ -101,10 +98,7 @@ export class PixelCanvas extends HTMLElement {
   }
 
   private static supportsSharedMemory(): boolean {
-    return (
-      typeof SharedArrayBuffer !== 'undefined' &&
-      window.crossOriginIsolated === true
-    );
+    return typeof SharedArrayBuffer !== 'undefined' && window.crossOriginIsolated === true;
   }
 
   private static ensureWorker(): Worker | null {
@@ -113,10 +107,7 @@ export class PixelCanvas extends HTMLElement {
     }
 
     try {
-      const worker = new Worker(
-        new URL('./PixelCanvas.worker.ts', import.meta.url),
-        { type: 'module' }
-      );
+      const worker = new Worker(new URL('./PixelCanvas.worker.ts', import.meta.url), { type: 'module' });
       worker.onmessage = (event: MessageEvent<PixelWorkerResponse>) => {
         const request = PixelCanvas.consumeWorkerRequest(event.data.id);
         if (!request) {
@@ -126,30 +117,21 @@ export class PixelCanvas extends HTMLElement {
         request.resolve(event.data);
       };
       worker.onerror = (event) => {
-        PixelCanvas.failWorker(
-          event.error ?? new Error('PixelCanvas worker crashed.')
-        );
+        PixelCanvas.failWorker(event.error ?? new Error('PixelCanvas worker crashed.'));
       };
       worker.onmessageerror = () => {
-        PixelCanvas.failWorker(
-          new Error('PixelCanvas worker failed to deserialize a response.')
-        );
+        PixelCanvas.failWorker(new Error('PixelCanvas worker failed to deserialize a response.'));
       };
       PixelCanvas.worker = worker;
     } catch (error) {
-      console.warn(
-        'PixelCanvas worker unavailable. Falling back to main-thread generation.',
-        error
-      );
+      console.warn('PixelCanvas worker unavailable. Falling back to main-thread generation.', error);
       PixelCanvas.worker = null;
     }
 
     return PixelCanvas.worker;
   }
 
-  private static consumeWorkerRequest(
-    requestId: number
-  ): PendingPixelWorkerRequest | null {
+  private static consumeWorkerRequest(requestId: number): PendingPixelWorkerRequest | null {
     const request = PixelCanvas.workerRequests.get(requestId) ?? null;
     if (!request) {
       return null;
@@ -161,10 +143,7 @@ export class PixelCanvas extends HTMLElement {
   }
 
   private static failWorker(reason: unknown): void {
-    const error =
-      reason instanceof Error
-        ? reason
-        : new Error('PixelCanvas worker failed.');
+    const error = reason instanceof Error ? reason : new Error('PixelCanvas worker failed.');
     const pendingRequests = [...PixelCanvas.workerRequests.values()];
 
     for (const request of pendingRequests) {
@@ -175,19 +154,15 @@ export class PixelCanvas extends HTMLElement {
     PixelCanvas.workerRequests.clear();
     PixelCanvas.worker?.terminate();
     PixelCanvas.worker = null;
-    console.warn(
-      'PixelCanvas worker failed. Falling back to main-thread generation.',
-      error
-    );
+    console.warn('PixelCanvas worker failed. Falling back to main-thread generation.', error);
   }
 
   private get colors(): string[] {
-    return (
-      this.dataset.colors
-        ?.split(',')
-        .map((value) => value.trim())
-        .filter(Boolean) ?? ['#f8fafc', '#f1f5f9', '#cbd5e1']
-    );
+    return this.dataset.colors?.split(',').map((value) => value.trim()).filter(Boolean) ?? [
+      '#f8fafc',
+      '#f1f5f9',
+      '#cbd5e1'
+    ];
   }
 
   private get gap(): number {
@@ -210,9 +185,7 @@ export class PixelCanvas extends HTMLElement {
       return;
     }
 
-    this.reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches;
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.hostCard = this.closest('.card');
 
     const shadowRoot = this.attachShadow({ mode: 'open' });
@@ -273,10 +246,7 @@ export class PixelCanvas extends HTMLElement {
 
     if (event.type === 'focusin') {
       const focusEvent = event as FocusEvent;
-      if (
-        focusEvent.currentTarget instanceof HTMLElement &&
-        focusEvent.currentTarget.contains(focusEvent.relatedTarget as Node)
-      ) {
+      if (focusEvent.currentTarget instanceof HTMLElement && focusEvent.currentTarget.contains(focusEvent.relatedTarget as Node)) {
         return;
       }
       this.startAnimation('appear');
@@ -285,10 +255,7 @@ export class PixelCanvas extends HTMLElement {
 
     if (event.type === 'focusout') {
       const focusEvent = event as FocusEvent;
-      if (
-        focusEvent.currentTarget instanceof HTMLElement &&
-        focusEvent.currentTarget.contains(focusEvent.relatedTarget as Node)
-      ) {
+      if (focusEvent.currentTarget instanceof HTMLElement && focusEvent.currentTarget.contains(focusEvent.relatedTarget as Node)) {
         return;
       }
       this.startAnimation('disappear');
@@ -301,10 +268,7 @@ export class PixelCanvas extends HTMLElement {
     }
 
     const width = Math.max(1, Math.floor(this.clientWidth || this.offsetWidth));
-    const height = Math.max(
-      1,
-      Math.floor(this.clientHeight || this.offsetHeight)
-    );
+    const height = Math.max(1, Math.floor(this.clientHeight || this.offsetHeight));
 
     if (!force && width === this.lastWidth && height === this.lastHeight) {
       return;
@@ -327,10 +291,7 @@ export class PixelCanvas extends HTMLElement {
     this.isInitialized = true;
   }
 
-  private async buildPixels(
-    width: number,
-    height: number
-  ): Promise<PixelState[]> {
+  private async buildPixels(width: number, height: number): Promise<PixelState[]> {
     const worker = PixelCanvas.ensureWorker();
     if (!worker) {
       return this.createPixelsSync(width, height);
@@ -338,44 +299,33 @@ export class PixelCanvas extends HTMLElement {
 
     const requestId = ++PixelCanvas.workerRequestId;
     try {
-      const response = await new Promise<PixelWorkerResponse>(
-        (resolve, reject) => {
-          const timeoutId = window.setTimeout(() => {
-            const pendingRequest = PixelCanvas.consumeWorkerRequest(requestId);
-            if (!pendingRequest) {
-              return;
-            }
+      const response = await new Promise<PixelWorkerResponse>((resolve, reject) => {
+        const timeoutId = window.setTimeout(() => {
+          const pendingRequest = PixelCanvas.consumeWorkerRequest(requestId);
+          if (!pendingRequest) {
+            return;
+          }
 
-            pendingRequest.reject(
-              new Error(
-                `PixelCanvas worker request ${requestId} timed out after ${PixelCanvas.workerRequestTimeoutMs}ms.`
-              )
-            );
-          }, PixelCanvas.workerRequestTimeoutMs);
+          pendingRequest.reject(
+            new Error(`PixelCanvas worker request ${requestId} timed out after ${PixelCanvas.workerRequestTimeoutMs}ms.`)
+          );
+        }, PixelCanvas.workerRequestTimeoutMs);
 
-          PixelCanvas.workerRequests.set(requestId, {
-            resolve,
-            reject,
-            timeoutId
-          });
-          worker.postMessage({
-            id: requestId,
-            width,
-            height,
-            gap: this.gap,
-            colors: this.colors,
-            preferSharedMemory: PixelCanvas.supportsSharedMemory(),
-            reducedMotion: this.reducedMotion
-          });
-        }
-      );
+        PixelCanvas.workerRequests.set(requestId, { resolve, reject, timeoutId });
+        worker.postMessage({
+          id: requestId,
+          width,
+          height,
+          gap: this.gap,
+          colors: this.colors,
+          preferSharedMemory: PixelCanvas.supportsSharedMemory(),
+          reducedMotion: this.reducedMotion
+        });
+      });
 
       return this.hydratePixels(response);
     } catch (error) {
-      console.warn(
-        'PixelCanvas worker request failed. Falling back to main-thread generation.',
-        error
-      );
+      console.warn('PixelCanvas worker request failed. Falling back to main-thread generation.', error);
       return this.createPixelsSync(width, height);
     }
   }
@@ -390,9 +340,7 @@ export class PixelCanvas extends HTMLElement {
       for (let y = 0; y < height; y += gap) {
         const colorIndex = Math.floor(Math.random() * palette.length);
         const color = palette[colorIndex] ?? palette[0] ?? '#ffffff';
-        const delay = this.reducedMotion
-          ? 0
-          : distanceToCenter(x, y, width, height);
+        const delay = this.reducedMotion ? 0 : distanceToCenter(x, y, width, height);
 
         pixels.push({
           x,
@@ -465,11 +413,7 @@ export class PixelCanvas extends HTMLElement {
     cancelAnimationFrame(this.animationFrame);
     this.animationFrame = 0;
 
-    if (
-      IS_SAFARI &&
-      PixelCanvas.activeAnimationsCount >= PixelCanvas.MAX_SAFARI_CONCURRENCY &&
-      mode === 'appear'
-    ) {
+    if (IS_SAFARI && PixelCanvas.activeAnimationsCount >= PixelCanvas.MAX_SAFARI_CONCURRENCY && mode === 'appear') {
       return;
     }
 
@@ -478,18 +422,14 @@ export class PixelCanvas extends HTMLElement {
     }
 
     this.activeMode = mode;
-
+    
     if (IS_SAFARI && mode === 'appear') {
       window.clearTimeout(this.staggerTimeout);
       this.staggerTimeout = window.setTimeout(() => {
-        this.animationFrame = window.requestAnimationFrame((time) =>
-          this.stepAnimation(mode, time)
-        );
+        this.animationFrame = window.requestAnimationFrame((time) => this.stepAnimation(mode, time));
       }, Math.random() * 800);
     } else {
-      this.animationFrame = window.requestAnimationFrame((time) =>
-        this.stepAnimation(mode, time)
-      );
+      this.animationFrame = window.requestAnimationFrame((time) => this.stepAnimation(mode, time));
     }
   }
 
@@ -501,9 +441,7 @@ export class PixelCanvas extends HTMLElement {
       return;
     }
 
-    this.animationFrame = window.requestAnimationFrame((nextTime) =>
-      this.stepAnimation(mode, nextTime)
-    );
+    this.animationFrame = window.requestAnimationFrame((nextTime) => this.stepAnimation(mode, nextTime));
 
     if (!this.context || !this.canvas) {
       cancelAnimationFrame(this.animationFrame);
@@ -512,17 +450,12 @@ export class PixelCanvas extends HTMLElement {
       return;
     }
 
-    if (
-      !PixelCanvas.isTransitionMode() &&
-      Math.abs(PixelCanvas.getGlobalQuality() - this.lastQualityScale) > 0.02
-    ) {
+    if (!PixelCanvas.isTransitionMode() && Math.abs(PixelCanvas.getGlobalQuality() - this.lastQualityScale) > 0.02) {
       this.init(true);
     }
 
     const timePassed = time - this.timePrevious;
-    const frameInterval = PixelCanvas.isTransitionMode()
-      ? this.frameInterval * 1.75
-      : this.frameInterval;
+    const frameInterval = PixelCanvas.isTransitionMode() ? this.frameInterval * 1.75 : this.frameInterval;
     if (timePassed < frameInterval) {
       return;
     }
@@ -564,10 +497,7 @@ export class PixelCanvas extends HTMLElement {
       this.animationFrame = 0;
       this.staggerTimeout = 0;
       this.activeMode = null;
-      PixelCanvas.activeAnimationsCount = Math.max(
-        0,
-        PixelCanvas.activeAnimationsCount - 1
-      );
+      PixelCanvas.activeAnimationsCount = Math.max(0, PixelCanvas.activeAnimationsCount - 1);
     }
   }
 
@@ -580,10 +510,7 @@ export class PixelCanvas extends HTMLElement {
       cancelAnimationFrame(this.animationFrame);
       this.animationFrame = 0;
       this.activeMode = null;
-      PixelCanvas.activeAnimationsCount = Math.max(
-        0,
-        PixelCanvas.activeAnimationsCount - 1
-      );
+      PixelCanvas.activeAnimationsCount = Math.max(0, PixelCanvas.activeAnimationsCount - 1);
     }
   }
 }
@@ -619,24 +546,14 @@ function animateDisappear(pixel: PixelState): void {
 
 function drawPixel(context: CanvasRenderingContext2D, pixel: PixelState): void {
   const centerOffset = 1 - pixel.size * 0.5;
-  context.fillRect(
-    pixel.x + centerOffset,
-    pixel.y + centerOffset,
-    pixel.size,
-    pixel.size
-  );
+  context.fillRect(pixel.x + centerOffset, pixel.y + centerOffset, pixel.size, pixel.size);
 }
 
 function sortPixelsByColor(pixels: PixelState[]): void {
   pixels.sort((left, right) => left.colorIndex - right.colorIndex);
 }
 
-function distanceToCenter(
-  x: number,
-  y: number,
-  width: number,
-  height: number
-): number {
+function distanceToCenter(x: number, y: number, width: number, height: number): number {
   const dx = x - width / 2;
   const dy = y - height / 2;
   return Math.sqrt(dx * dx + dy * dy);

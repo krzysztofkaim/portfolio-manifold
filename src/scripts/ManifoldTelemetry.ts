@@ -31,10 +31,7 @@ const DEFAULT_ENDPOINT = '/api/telemetry/manifold';
 export class ManifoldTelemetry {
   constructor(private readonly endpoint: string | null) {}
 
-  track(
-    event: ManifoldAnalyticsEventName,
-    payload?: ManifoldAnalyticsPayload
-  ): void {
+  track(event: ManifoldAnalyticsEventName, payload?: ManifoldAnalyticsPayload): void {
     const body: ManifoldAnalyticsEvent = {
       event,
       timestamp: new Date().toISOString(),
@@ -49,9 +46,7 @@ export class ManifoldTelemetry {
     }
 
     try {
-      const blob = new Blob([JSON.stringify(body)], {
-        type: 'application/json'
-      });
+      const blob = new Blob([JSON.stringify(body)], { type: 'application/json' });
       navigator.sendBeacon(this.endpoint, blob);
     } catch {
       // Ignore beacon failures
@@ -87,10 +82,7 @@ export class ManifoldTelemetry {
 
     return () => {
       window.removeEventListener('error', handleError);
-      window.removeEventListener(
-        'unhandledrejection',
-        handleUnhandledRejection
-      );
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
   }
 }

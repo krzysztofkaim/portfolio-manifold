@@ -58,9 +58,7 @@ export class ManifoldAudioController {
 
   setupAudioPlayback(elements: AudioElements): () => void {
     this.elements = elements;
-    this.soundtrack = document.getElementById(
-      'background-audio'
-    ) as HTMLAudioElement | null;
+    this.soundtrack = document.getElementById('background-audio') as HTMLAudioElement | null;
 
     if (elements.audioButton && elements.audioLabel) {
       this.syncAudioButtonWidths(true);
@@ -206,10 +204,7 @@ export class ManifoldAudioController {
       text: this.elements.audioLabel.textContent?.trim() || 'Play',
       mobile: isMobile
     });
-    const currentWidth =
-      this.lastAudioButtonWidthPx > 0
-        ? this.lastAudioButtonWidthPx
-        : targetWidth;
+    const currentWidth = this.lastAudioButtonWidthPx > 0 ? this.lastAudioButtonWidthPx : targetWidth;
 
     if (this.lastAudioButtonWidthPx === targetWidth) {
       return;
@@ -232,20 +227,10 @@ export class ManifoldAudioController {
   updateAudioReactiveState(time: number): void {
     const scrollLoad = Math.abs(this.context.getTargetVelocity());
 
-    if (
-      this.soundtrack &&
-      this.audioAnalyser &&
-      this.audioAnalyserData &&
-      this.audioIsPlaying &&
-      !this.soundtrack.paused
-    ) {
-      const analysisInterval =
-        scrollLoad > 1.35 ? 1000 / 8 : scrollLoad > 0.8 ? 1000 / 12 : 1000 / 18;
+    if (this.soundtrack && this.audioAnalyser && this.audioAnalyserData && this.audioIsPlaying && !this.soundtrack.paused) {
+      const analysisInterval = scrollLoad > 1.35 ? 1000 / 8 : scrollLoad > 0.8 ? 1000 / 12 : 1000 / 18;
 
-      if (
-        this.lastAudioAnalysisTime === 0 ||
-        time - this.lastAudioAnalysisTime >= analysisInterval
-      ) {
+      if (this.lastAudioAnalysisTime === 0 || time - this.lastAudioAnalysisTime >= analysisInterval) {
         this.lastAudioAnalysisTime = time;
         this.audioAnalyser.getByteFrequencyData(this.audioAnalyserData);
 
@@ -274,19 +259,11 @@ export class ManifoldAudioController {
         const nextEnergy = clamp((weightedEnergy - 28) / 96, 0, 1);
         const normalizedLow = lowAverage / 255;
         this.audioBeatBaseline +=
-          (normalizedLow - this.audioBeatBaseline) *
-          (normalizedLow > this.audioBeatBaseline ? 0.05 : 0.18);
-        const attack = Math.max(
-          0,
-          normalizedLow - this.audioBeatBaseline - 0.035
-        );
+          (normalizedLow - this.audioBeatBaseline) * (normalizedLow > this.audioBeatBaseline ? 0.05 : 0.18);
+        const attack = Math.max(0, normalizedLow - this.audioBeatBaseline - 0.035);
         const deltaLow = Math.max(0, normalizedLow - this.audioPreviousLowBand);
         const peakFactor = Math.max(0, peak / 255 - 0.22);
-        const nextPulse = clamp(
-          attack * 3.8 + deltaLow * 4.2 + peakFactor * 0.35,
-          0,
-          1
-        );
+        const nextPulse = clamp(attack * 3.8 + deltaLow * 4.2 + peakFactor * 0.35, 0, 1);
         this.audioPreviousLowBand = normalizedLow;
         this.audioReactiveTargetEnergy = nextEnergy;
         this.audioReactiveTargetPulse = nextPulse;
@@ -295,30 +272,20 @@ export class ManifoldAudioController {
       this.audioReactiveEnergy +=
         (this.audioReactiveTargetEnergy - this.audioReactiveEnergy) *
         (this.audioReactiveTargetEnergy > this.audioReactiveEnergy ? 0.2 : 0.1);
-      this.audioReactivePulse = Math.max(
-        this.audioReactiveTargetPulse,
-        this.audioReactivePulse * 0.86
-      );
+      this.audioReactivePulse = Math.max(this.audioReactiveTargetPulse, this.audioReactivePulse * 0.86);
     } else {
       this.audioReactiveEnergy += (0 - this.audioReactiveEnergy) * 0.12;
       this.audioReactivePulse += (0 - this.audioReactivePulse) * 0.18;
       this.audioBeatBaseline += (0 - this.audioBeatBaseline) * 0.08;
       this.audioPreviousLowBand += (0 - this.audioPreviousLowBand) * 0.12;
-      this.audioReactiveTargetEnergy +=
-        (0 - this.audioReactiveTargetEnergy) * 0.12;
-      this.audioReactiveTargetPulse +=
-        (0 - this.audioReactiveTargetPulse) * 0.18;
+      this.audioReactiveTargetEnergy += (0 - this.audioReactiveTargetEnergy) * 0.12;
+      this.audioReactiveTargetPulse += (0 - this.audioReactiveTargetPulse) * 0.18;
       this.lastAudioAnalysisTime = 0;
     }
 
-    const energyDelta = Math.abs(
-      this.audioReactiveEnergy - this.lastSentAudioEnergy
-    );
-    const pulseDelta = Math.abs(
-      this.audioReactivePulse - this.lastSentAudioPulse
-    );
-    const controllerSyncInterval =
-      scrollLoad > 1.35 ? 1000 / 10 : scrollLoad > 0.8 ? 1000 / 16 : 1000 / 24;
+    const energyDelta = Math.abs(this.audioReactiveEnergy - this.lastSentAudioEnergy);
+    const pulseDelta = Math.abs(this.audioReactivePulse - this.lastSentAudioPulse);
+    const controllerSyncInterval = scrollLoad > 1.35 ? 1000 / 10 : scrollLoad > 0.8 ? 1000 / 16 : 1000 / 24;
     const shouldSyncController =
       energyDelta > 0.012 ||
       pulseDelta > 0.018 ||
@@ -326,13 +293,11 @@ export class ManifoldAudioController {
       this.lastAudioControllerSyncTime === 0 ||
       time - this.lastAudioControllerSyncTime >= controllerSyncInterval;
     if (shouldSyncController) {
-      this.context
-        .getController()
-        ?.setAudioReactiveState(
-          this.audioReactiveEnergy,
-          this.audioReactivePulse,
-          this.audioIsPlaying
-        );
+      this.context.getController()?.setAudioReactiveState(
+        this.audioReactiveEnergy,
+        this.audioReactivePulse,
+        this.audioIsPlaying
+      );
       this.lastAudioControllerSyncTime = time;
       this.lastSentAudioEnergy = this.audioReactiveEnergy;
       this.lastSentAudioPulse = this.audioReactivePulse;
@@ -341,11 +306,7 @@ export class ManifoldAudioController {
   }
 
   getFrequencyData(): Uint8Array | null {
-    if (
-      !this.audioIsPlaying ||
-      !this.audioAnalyser ||
-      !this.audioAnalyserData
-    ) {
+    if (!this.audioIsPlaying || !this.audioAnalyser || !this.audioAnalyserData) {
       return null;
     }
     this.audioAnalyser.getByteFrequencyData(this.audioAnalyserData);
@@ -387,41 +348,24 @@ export class ManifoldAudioController {
       return;
     }
 
-    if (
-      !this.audioIsPlaying &&
-      this.audioPlaybackGain < 0.005 &&
-      this.audioPlaybackTarget < 0.005
-    ) {
+    if (!this.audioIsPlaying && this.audioPlaybackGain < 0.005 && this.audioPlaybackTarget < 0.005) {
       return;
     }
 
-    const motionTarget = clamp(
-      Math.abs(this.context.getTargetVelocity()) / 1.8,
-      0,
-      1
-    );
+    const motionTarget = clamp(Math.abs(this.context.getTargetVelocity()) / 1.8, 0, 1);
     const targetScrollGain = 0.84 + motionTarget * 0.16;
     this.audioScrollGain +=
-      (targetScrollGain - this.audioScrollGain) *
-      (targetScrollGain > this.audioScrollGain ? 0.065 : 0.025);
+      (targetScrollGain - this.audioScrollGain) * (targetScrollGain > this.audioScrollGain ? 0.065 : 0.025);
     this.audioPlaybackGain +=
-      (this.audioPlaybackTarget - this.audioPlaybackGain) *
-      (this.audioPlaybackTarget > this.audioPlaybackGain ? 0.08 : 0.06);
-    const nextVolume =
-      MANIFOLD_AUDIO_TARGET_VOLUME *
-      this.audioPlaybackGain *
-      this.audioScrollGain;
+      (this.audioPlaybackTarget - this.audioPlaybackGain) * (this.audioPlaybackTarget > this.audioPlaybackGain ? 0.08 : 0.06);
+    const nextVolume = MANIFOLD_AUDIO_TARGET_VOLUME * this.audioPlaybackGain * this.audioScrollGain;
 
     if (Math.abs(nextVolume - this.lastAudioVolume) > 0.0025) {
       this.soundtrack.volume = nextVolume;
       this.lastAudioVolume = nextVolume;
     }
 
-    if (
-      this.audioPlaybackTarget <= 0.001 &&
-      this.audioPlaybackGain <= 0.01 &&
-      !this.soundtrack.paused
-    ) {
+    if (this.audioPlaybackTarget <= 0.001 && this.audioPlaybackGain <= 0.01 && !this.soundtrack.paused) {
       this.soundtrack.pause();
     }
   }
@@ -433,10 +377,7 @@ export class ManifoldAudioController {
 
     const AudioContextCtor =
       window.AudioContext ||
-      (
-        window as Window &
-          typeof globalThis & { webkitAudioContext?: typeof AudioContext }
-      ).webkitAudioContext;
+      (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
 
     if (!AudioContextCtor) {
       return;
@@ -447,24 +388,18 @@ export class ManifoldAudioController {
       mozCaptureStream?: () => MediaStream;
     };
 
-    const streamFactory =
-      captureAudio.captureStream ?? captureAudio.mozCaptureStream;
+    const streamFactory = captureAudio.captureStream ?? captureAudio.mozCaptureStream;
     if (!streamFactory) {
       return;
     }
 
     this.audioContext = this.audioContext ?? new AudioContextCtor();
     const stream = streamFactory.call(captureAudio);
-    this.audioStreamSourceNode =
-      this.audioStreamSourceNode ??
-      this.audioContext.createMediaStreamSource(stream);
-    this.audioAnalyser =
-      this.audioAnalyser ?? this.audioContext.createAnalyser();
+    this.audioStreamSourceNode = this.audioStreamSourceNode ?? this.audioContext.createMediaStreamSource(stream);
+    this.audioAnalyser = this.audioAnalyser ?? this.audioContext.createAnalyser();
     this.audioAnalyser.fftSize = 64;
     this.audioAnalyser.smoothingTimeConstant = 0.8;
-    this.audioAnalyserData =
-      this.audioAnalyserData ??
-      new Uint8Array(this.audioAnalyser.frequencyBinCount);
+    this.audioAnalyserData = this.audioAnalyserData ?? new Uint8Array(this.audioAnalyser.frequencyBinCount);
     this.audioStreamSourceNode.connect(this.audioAnalyser);
   }
 
@@ -511,21 +446,12 @@ export class ManifoldAudioController {
       return;
     }
 
-    this.elements.audioButton.classList.toggle(
-      'is-playing',
-      this.audioIsPlaying
-    );
+    this.elements.audioButton.classList.toggle('is-playing', this.audioIsPlaying);
     this.elements.audioButton.setAttribute(
       'aria-label',
-      this.audioIsPlaying
-        ? this.localeStrings.pauseAria
-        : this.localeStrings.playAria
+      this.audioIsPlaying ? this.localeStrings.pauseAria : this.localeStrings.playAria
     );
-    this.setAudioButtonLabel(
-      this.audioIsPlaying
-        ? this.localeStrings.pauseLabel
-        : this.localeStrings.playLabel
-    );
+    this.setAudioButtonLabel(this.audioIsPlaying ? this.localeStrings.pauseLabel : this.localeStrings.playLabel);
   }
 
   private setAudioButtonState(playing: boolean): void {

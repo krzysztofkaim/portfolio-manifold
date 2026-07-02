@@ -1,9 +1,4 @@
 import { clamp } from '../utils/math';
-import {
-  IS_IOS,
-  IS_ANDROID,
-  IS_ANDROID_LOW_END
-} from '../utils/browserDetection';
 
 interface NavigatorWithDeviceMemory extends Navigator {
   deviceMemory?: number;
@@ -18,25 +13,15 @@ export class AdaptiveQuality {
   private sampleIndex = 0;
   private sampleCount = 0;
   private bootstrapChecked = false;
-  private readonly maxDpr: number;
+  private readonly maxDpr = Math.min(window.devicePixelRatio || 1, 2);
   currentDpr: number;
 
   constructor() {
     const mem = (navigator as NavigatorWithDeviceMemory).deviceMemory || 8;
     const cpu = navigator.hardwareConcurrency || 8;
-
-    const isMobile = IS_IOS || IS_ANDROID;
-    this.maxDpr = isMobile
-      ? IS_ANDROID_LOW_END
-        ? 1.2
-        : 1.5
-      : Math.min(window.devicePixelRatio || 1, 2);
-
+    
     // Heuristic: Start at lower quality on low-end hardware to ensure smooth initial experience
-    this.currentDpr =
-      mem <= 4 || cpu <= 4 || IS_ANDROID_LOW_END
-        ? Math.max(0.75, this.maxDpr * 0.8)
-        : this.maxDpr;
+    this.currentDpr = (mem <= 4 || cpu <= 4) ? Math.max(0.75, this.maxDpr * 0.8) : this.maxDpr;
   }
 
   /**

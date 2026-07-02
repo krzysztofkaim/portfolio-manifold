@@ -8,9 +8,7 @@ declare global {
   }
 
   interface WindowEventMap {
-    'manifold:record-profile': CustomEvent<
-      import('./config/manifold/ManifoldEvents').RecordProfileDetail
-    >;
+    'manifold:record-profile': CustomEvent<import('./config/manifold/ManifoldEvents').RecordProfileDetail>;
   }
 
   interface Performance {

@@ -35,16 +35,10 @@ const nextLocale = getNextManifoldLocale(locale);
 <div class="top-ui">
   <div class="topbar">
     <div class="topbar-brand">
-      <div class="topbar-screen-info" aria-hidden="true">
-        <span class="topbar-screen-block"></span>
-        <p>{locale === 'pl' ? 'portfolio system' : 'portfolio system'}</p>
-      </div>
-      <div class="topbar-brand-title">
-        <div class="topbar-mark" id="topbar-mark">KK</div>
-        <div class="topbar-copy" id="topbar-copy">
-          <strong id="topbar-name">krzysztof kaim</strong>
-          <span id="topbar-role">{bundle.ui.topbarRole}</span>
-        </div>
+      <div class="topbar-mark" id="topbar-mark">KK</div>
+      <div class="topbar-copy" id="topbar-copy">
+        <strong id="topbar-name">krzysztof kaim</strong>
+        <span id="topbar-role">{bundle.ui.topbarRole}</span>
       </div>
     </div>
 
@@ -71,8 +65,6 @@ const nextLocale = getNextManifoldLocale(locale);
         rel="nofollow"
         data-nosnippet
         data-noindex="true"
-        data-menu-text={bundle.ui.cvLabel}
-        data-mobile-text="CV"
         aria-label={bundle.ui.cvDownloadAria}
       >
         <span class="topbar-chip-icon" aria-hidden="true">
@@ -92,8 +84,7 @@ const nextLocale = getNextManifoldLocale(locale);
         <span
           class="topbar-chip-label"
           id="download-cv-label"
-          data-text={bundle.ui.cvLabel}
-          data-mobile-text="CV">{bundle.ui.cvLabel}</span
+          data-text={bundle.ui.cvLabel}>{bundle.ui.cvLabel}</span
         >
       </a>
 
@@ -103,8 +94,6 @@ const nextLocale = getNextManifoldLocale(locale);
         id="contact-me"
         aria-label={bundle.ui.contactAria}
         data-d="kaim.dev"
-        data-menu-text={bundle.ui.contactLabel}
-        data-mobile-text="Mail"
       >
         <span class="topbar-chip-icon" aria-hidden="true">
           <svg
@@ -119,14 +108,8 @@ const nextLocale = getNextManifoldLocale(locale);
             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
           </svg>
         </span>
-        <span
-          class="topbar-chip-label"
-          id="contact-me-label"
-          data-mobile-text="Mail"
-        >
-          <span class="contact-u scramble-target"></span><span
-            class="contact-d scramble-target">@kaim.dev</span
-          >
+        <span class="topbar-chip-label" id="contact-me-label">
+          <span class="contact-u scramble-target"></span><span class="contact-d scramble-target">@kaim.dev</span>
         </span>
       </button>
 
@@ -138,13 +121,8 @@ const nextLocale = getNextManifoldLocale(locale);
           ? bundle.ui.localeSwitchToPolish
           : bundle.ui.localeSwitchToEnglish}
         aria-pressed={locale === 'pl' ? 'true' : 'false'}
-        data-menu-text={bundle.ui.localeLabel}
-        data-mobile-text={bundle.ui.localeLabel}
       >
-        <span
-          class="topbar-chip-label"
-          id="toggle-locale-label"
-          data-mobile-text={bundle.ui.localeLabel}
+        <span class="topbar-chip-label" id="toggle-locale-label"
           >{bundle.ui.localeLabel}</span
         >
       </button>
@@ -152,12 +130,7 @@ const nextLocale = getNextManifoldLocale(locale);
   </div>
 </div>
 
-<div
-  class="hud-nav-overlay"
-  id="hud-nav-overlay"
-  aria-hidden="true"
-  style="display: none;"
->
+<div class="hud-nav-overlay" id="hud-nav-overlay" aria-hidden="true" style="display: none;">
   <button
     type="button"
     class="hud-nav-backdrop"
@@ -541,7 +514,6 @@ const nextLocale = getNextManifoldLocale(locale);
             id="hud-mode-toggle"
             aria-haspopup="listbox"
             aria-expanded="false"
-            aria-controls="hud-mode-menu"
             aria-label={bundle.ui.menuAriaLabel}
           >
             <span class="hud-mode-glyph hud-mode-glyph--left" aria-hidden="true"
@@ -558,7 +530,6 @@ const nextLocale = getNextManifoldLocale(locale);
             id="hud-mode-menu"
             role="listbox"
             aria-hidden="true"
-            aria-label={bundle.ui.menuAriaLabel}
           >
             <button
               type="button"

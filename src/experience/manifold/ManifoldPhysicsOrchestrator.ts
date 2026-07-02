@@ -1,8 +1,5 @@
 import { clamp, lerp } from '../../utils/math';
-import {
-  computeCardMotionState,
-  type CardMotionState
-} from './ManifoldPhysics';
+import { computeCardMotionState, type CardMotionState } from './ManifoldPhysics';
 import type { ItemState, ItemType, ViewMode } from './ManifoldTypes';
 
 export interface PhysicsContext {
@@ -117,11 +114,8 @@ export class ManifoldPhysicsOrchestrator {
       alpha *= contextRevealByType[snapshot.type];
     }
 
-    const isExpandedMorphing =
-      expandedCard !== null &&
-      (expandedTarget > 0.01 || expandedProgress > 0.01);
-    const isExpandedItem =
-      expandedCardKey !== null && expandedCardKey === snapshot.itemKey;
+    const isExpandedMorphing = expandedCard !== null && (expandedTarget > 0.01 || expandedProgress > 0.01);
+    const isExpandedItem = expandedCardKey !== null && expandedCardKey === snapshot.itemKey;
 
     if (expandedCard && !isExpandedItem) {
       if (snapshot.type === 'card') {
@@ -152,11 +146,8 @@ export class ManifoldPhysicsOrchestrator {
       velocity: velocityMagnitude
     });
 
-    const skipAlphaCheck =
-      activeFourDProgress > 0.001 && snapshot.type === 'card';
-    const isCardNearCamera =
-      vizZ > -4200 &&
-      (vizZ < 0 || (reverseScrollActivationMode && vizZ < 1500));
+    const skipAlphaCheck = activeFourDProgress > 0.001 && snapshot.type === 'card';
+    const isCardNearCamera = vizZ > -4200 && (vizZ < 0 || (reverseScrollActivationMode && vizZ < 1500));
 
     return {
       alpha,
@@ -168,32 +159,26 @@ export class ManifoldPhysicsOrchestrator {
     };
   }
 
-  updateItemPhysics(
-    item: ItemState,
-    context: PhysicsContext
-  ): ItemPhysicsResult {
-    const result = this.computeItemState(
-      {
-        itemKey: item.cardIndex,
-        baseZ: item.baseZ,
-        currentAlpha: item.currentAlpha,
-        gridOrder: item.gridOrder,
-        inertiaRotX: item.inertiaRotX,
-        inertiaRotY: item.inertiaRotY,
-        inertiaRotZ: item.inertiaRotZ,
-        inertiaY: item.inertiaY,
-        inertiaZ: item.inertiaZ,
-        isFeatured: item.isFeatured,
-        response: item.response,
-        rot: item.rot,
-        sectionTitle: item.sectionTitle,
-        type: item.type,
-        variance: item.variance,
-        x: item.x,
-        y: item.y
-      },
-      context
-    );
+  updateItemPhysics(item: ItemState, context: PhysicsContext): ItemPhysicsResult {
+    const result = this.computeItemState({
+      itemKey: item.cardIndex,
+      baseZ: item.baseZ,
+      currentAlpha: item.currentAlpha,
+      gridOrder: item.gridOrder,
+      inertiaRotX: item.inertiaRotX,
+      inertiaRotY: item.inertiaRotY,
+      inertiaRotZ: item.inertiaRotZ,
+      inertiaY: item.inertiaY,
+      inertiaZ: item.inertiaZ,
+      isFeatured: item.isFeatured,
+      response: item.response,
+      rot: item.rot,
+      sectionTitle: item.sectionTitle,
+      type: item.type,
+      variance: item.variance,
+      x: item.x,
+      y: item.y
+    }, context);
 
     item.inertiaZ = result.motion.inertiaZ;
     item.inertiaY = result.motion.inertiaY;
@@ -226,11 +211,7 @@ export class ManifoldPhysicsOrchestrator {
     fourDAlpha: number,
     isExpandedCard: boolean
   ): number {
-    let finalOpacity = clamp(
-      lerp(item.currentAlpha, twoDAlpha, viewModeProgress),
-      0,
-      1
-    );
+    let finalOpacity = clamp(lerp(item.currentAlpha, twoDAlpha, viewModeProgress), 0, 1);
     finalOpacity = clamp(lerp(finalOpacity, fourDAlpha, fourDProgress), 0, 1);
 
     if (active2DSectionTitle.length > 0 && viewModeProgress > 0.01) {
@@ -248,45 +229,12 @@ export class ManifoldPhysicsOrchestrator {
   }
 
   blendCardPose(
-    threeDPose: {
-      shiftZ: number;
-      tiltX: number;
-      tiltY: number;
-      tiltZ: number;
-      tx: number;
-      ty: number;
-      tz: number;
-    },
-    twoDPose: {
-      scale: number;
-      shiftZ: number;
-      tiltX: number;
-      tiltY: number;
-      tiltZ: number;
-      x: number;
-      y: number;
-      z: number;
-    },
-    fourDPose: {
-      shiftZ: number;
-      tiltX: number;
-      tiltY: number;
-      tiltZ: number;
-      x: number;
-      y: number;
-      z: number;
-    },
+    threeDPose: { shiftZ: number; tiltX: number; tiltY: number; tiltZ: number; tx: number; ty: number; tz: number },
+    twoDPose: { scale: number; shiftZ: number; tiltX: number; tiltY: number; tiltZ: number; x: number; y: number; z: number },
+    fourDPose: { shiftZ: number; tiltX: number; tiltY: number; tiltZ: number; x: number; y: number; z: number },
     viewModeProgress: number,
     fourDProgress: number
-  ): {
-    shiftZ: number;
-    tiltX: number;
-    tiltY: number;
-    tiltZ: number;
-    tx: number;
-    ty: number;
-    tz: number;
-  } {
+  ): { shiftZ: number; tiltX: number; tiltY: number; tiltZ: number; tx: number; ty: number; tz: number } {
     const mixedTwoD = {
       shiftZ: lerp(threeDPose.shiftZ, twoDPose.shiftZ, viewModeProgress),
       tiltX: lerp(threeDPose.tiltX, twoDPose.tiltX, viewModeProgress),
@@ -333,12 +281,10 @@ export class ManifoldPhysicsOrchestrator {
     z: number;
     textScale: number;
   } {
-    const column =
-      ((item.gridOrder % metrics.columns) + metrics.columns) % metrics.columns;
+    const column = ((item.gridOrder % metrics.columns) + metrics.columns) % metrics.columns;
     const row = Math.floor(item.gridOrder / metrics.columns);
 
-    const scrollWorldY =
-      (sceneScroll - metrics.introScrollAnchor) * metrics.scrollScale;
+    const scrollWorldY = (sceneScroll - metrics.introScrollAnchor) * metrics.scrollScale;
     const targetX = column * metrics.spacingX - metrics.twoDOffsetX;
     const targetY = row * metrics.spacingY - scrollWorldY;
 

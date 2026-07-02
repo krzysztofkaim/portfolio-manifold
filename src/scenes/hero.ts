@@ -64,10 +64,7 @@ export default function createHeroScene(): SceneModule {
       }
 
       particleGeometry = new BufferGeometry();
-      particleGeometry.setAttribute(
-        'position',
-        new BufferAttribute(positions, 3)
-      );
+      particleGeometry.setAttribute('position', new BufferAttribute(positions, 3));
       particleGeometry.setAttribute('aScale', new BufferAttribute(scales, 1));
       particleGeometry.setAttribute('aPhase', new BufferAttribute(phases, 1));
 
@@ -137,7 +134,7 @@ export default function createHeroScene(): SceneModule {
         transmission: 0.06
       });
       shell = new Mesh(shellGeometry, shellMaterial);
-
+      
       wireframeGeometry = new WireframeGeometry(shellGeometry);
       wireframeMaterial = new LineBasicMaterial({
         color: 0x8efdf1,
@@ -160,8 +157,7 @@ export default function createHeroScene(): SceneModule {
     },
 
     update(ctx) {
-      if (!root || !shell || !wireframe || !shellMaterial || !particleMaterial)
-        return;
+      if (!root || !shell || !wireframe || !shellMaterial || !particleMaterial) return;
 
       const fade = 1 - smoothstep(0.04, 0.86, ctx.sectionScroll);
 
@@ -190,7 +186,7 @@ export default function createHeroScene(): SceneModule {
         ctx.scene.remove(root);
         disposeObject(root);
       }
-
+      
       particleGeometry?.dispose();
       particleMaterial?.dispose();
       shellGeometry?.dispose();

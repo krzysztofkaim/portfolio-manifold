@@ -26,10 +26,7 @@ export function createManifoldPhaseState(): ManifoldPhaseState {
   };
 }
 
-export function createManifoldAtlasState(
-  now: number,
-  viewport: { height: number; width: number }
-): ManifoldAtlasState {
+export function createManifoldAtlasState(now: number, viewport: { height: number; width: number }): ManifoldAtlasState {
   return {
     viewportWidth: viewport.width,
     viewportHeight: viewport.height,

@@ -16,7 +16,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'REACH',
     previewRight: 'krzysztof@kaim.dev',
     eyebrow: 'Executive Summary // Identity and range',
-    lead: 'Full-stack software engineer with security consulting experience and a lead-level track record in complex manufacturing, enterprise and recovery-oriented projects.',
+    lead:
+      'Full-stack software engineer with security consulting experience and a lead-level track record in complex manufacturing, enterprise and recovery-oriented projects.',
     highlights: [
       'Connects product-facing UI, backend architecture, integrations and operational responsibility into one coherent delivery model.',
       'Strong fit for MES, ERP-connected platforms, internal enterprise systems and projects that need technical stabilization.',
@@ -30,9 +31,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Core', value: '.NET 8 / React 18' }
     ],
     surfaceKicker: 'Executive Fit',
-    surfaceValue: 'Full-stack',
-    surfaceText:
-      'Architecture, implementation, integrations and maintenance for systems that need to perform in real operating environments.'
+    surfaceValue: 'FULL-STACK',
+    surfaceText: 'Architecture, implementation, integrations and maintenance for systems that need to perform in real operating environments.'
   },
   {
     title: '#WHY',
@@ -40,8 +40,7 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     signal: 'PROFILE 02',
     mode: 'PRIORITY',
     handoff: 'UX / BACKEND / ENTERPRISE',
-    expandedHandoff:
-      'TECHNICAL RANGE // UX, BACKEND AND ENTERPRISE CONSTRAINTS',
+    expandedHandoff: 'TECHNICAL RANGE // UX, BACKEND AND ENTERPRISE CONSTRAINTS',
     chip: 'Focus',
     id: 'ID-SYS2',
     previewLeftLabel: 'MODE',
@@ -49,7 +48,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'RANGE',
     previewRight: 'UX to backend',
     eyebrow: 'Technical Range // Product, backend and domain constraints',
-    lead: 'The strongest contribution comes where product experience, backend correctness and domain constraints have to be designed together.',
+    lead:
+      'The strongest contribution comes where product experience, backend correctness and domain constraints have to be designed together.',
     highlights: [
       'Works across the full path from requirements and architecture to deployment, monitoring and ongoing maintenance.',
       'Builds modern React interfaces with disciplined state management, data flow and performance awareness.',
@@ -63,9 +63,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Core', value: 'React / .NET / integrations' }
     ],
     surfaceKicker: 'Current Lane',
-    surfaceValue: 'Product',
-    surfaceText:
-      'A strong fit for product, backend, integrations and production ownership in one technical role.'
+    surfaceValue: 'PRODUCT',
+    surfaceText: 'A strong fit for product, backend, integrations and production ownership in one technical role.'
   },
   {
     title: '#HOW',
@@ -81,7 +80,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'STYLE',
     previewRight: 'Pragmatic Delivery',
     eyebrow: 'Delivery Model // From decision to stable release',
-    lead: 'Built around pragmatic product engineering: clarifying the goal, managing risk and choosing architecture that can survive production.',
+    lead:
+      'Built around pragmatic product engineering: clarifying the goal, managing risk and choosing architecture that can survive production.',
     highlights: [
       'Focuses on solving the business problem rather than simply completing implementation tasks.',
       'Covers the operational perimeter: deployment, documentation, support, release flow and future maintainability.',
@@ -95,9 +95,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Scope', value: 'Product to production' }
     ],
     surfaceKicker: 'Operating Model',
-    surfaceValue: 'Systems',
-    surfaceText:
-      'Complete solutions designed to make sense technically, operationally and commercially.'
+    surfaceValue: 'SYSTEMS',
+    surfaceText: 'Complete solutions designed to make sense technically, operationally and commercially.'
   },
   {
     title: '#NDA',
@@ -113,7 +112,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'ROLE',
     previewRight: 'Lead / Architect',
     eyebrow: 'Textile MES // Manufacturing platform modernization',
-    lead: 'Assumed responsibility for a critical textile MES platform and led architectural cleanup, major rewrite work and platform modernization.',
+    lead:
+      'Assumed responsibility for a critical textile MES platform and led architectural cleanup, major rewrite work and platform modernization.',
     highlights: [
       'The system supports 58 machines across 5 production halls, over 205 virtual stock records and 180 ERP-to-MES integrations.',
       'Reduced server resource usage by roughly 80% by removing major N+1 hotspots and profiling flows with OpenTelemetry.',
@@ -128,8 +128,7 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Deployment Class',
     surfaceValue: 'MES',
-    surfaceText:
-      'Manufacturing workflows, ERP integration, planning dashboards and domain logic aligned with real factory operations.'
+    surfaceText: 'Manufacturing workflows, ERP integration, planning dashboards and domain logic aligned with real factory operations.'
   },
   {
     title: '#NTA',
@@ -145,7 +144,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'ROLE',
     previewRight: 'Contract',
     eyebrow: 'NATA Automation // Automation project stabilization',
-    lead: 'Joined as a backend .NET engineer and expanded into broader technical ownership to stabilize an automation project under delivery pressure.',
+    lead:
+      'Joined as a backend .NET engineer and expanded into broader technical ownership to stabilize an automation project under delivery pressure.',
     highlights: [
       'Built a custom drag-and-drop deployment tool that reduced release time by roughly 95%.',
       'Rebuilt the UI with React 18 and Feature-Sliced Design, removing dependency cycles and significant architectural debt.',
@@ -159,9 +159,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Data', value: 'PostgreSQL' }
     ],
     surfaceKicker: 'Recovery Mode',
-    surfaceValue: 'Stabilization',
-    surfaceText:
-      'Infrastructure stabilization, frontend modernization and recovery of business-critical domain behavior.'
+    surfaceValue: 'STABILIZE',
+    surfaceText: 'Infrastructure stabilization, frontend modernization and recovery of business-critical domain behavior.'
   },
   {
     title: '#VPT',
@@ -177,7 +176,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'DOMAIN',
     previewRight: 'Travel / Medical',
     eyebrow: 'Vapture // Travel, medical and internal platforms',
-    lead: 'Operated an independent software consultancy serving five long-term NDA clients across travel, medical and internal business systems.',
+    lead:
+      'Operated an independent software consultancy serving five long-term NDA clients across travel, medical and internal business systems.',
     highlights: [
       'Owned the full SDLC from architecture and requirements discovery through deployment and maintenance.',
       'Engineered a Google Cloud-based SMS gateway for patient appointment reminders.',
@@ -192,8 +192,7 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Enterprise Track',
     surfaceValue: 'B2B',
-    surfaceText:
-      'Travel and medical systems delivered from architectural decisions through production maintenance.'
+    surfaceText: 'Travel and medical systems delivered from architectural decisions through production maintenance.'
   },
   {
     title: '#WSEI',
@@ -209,7 +208,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'PLACE',
     previewRight: 'Krakow',
     eyebrow: 'WSEI // Internal systems and event infrastructure',
-    lead: 'Developed the university internal technology ecosystem while combining application work with cloud ownership, communication tooling and event infrastructure.',
+    lead:
+      'Developed the university internal technology ecosystem while combining application work with cloud ownership, communication tooling and event infrastructure.',
     highlights: [
       'Developed and maintained the university CRM, event websites and hackathon communication platforms.',
       'Led a cross-functional team of 20 people while organizing SheepYourHack and WSEICraft.',
@@ -223,9 +223,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Role', value: 'Developer / project lead' }
     ],
     surfaceKicker: 'Operations Layer',
-    surfaceValue: 'Cloud',
-    surfaceText:
-      'Internal applications, cloud ownership and infrastructure prepared for high-intensity events.'
+    surfaceValue: 'CLOUD',
+    surfaceText: 'Internal applications, cloud ownership and infrastructure prepared for high-intensity events.'
   },
   {
     title: '#ARCH',
@@ -241,7 +240,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'PLACE',
     previewRight: 'Krakow',
     eyebrow: 'Security // ECM platform assessment',
-    lead: 'Conducted black-box penetration testing and security consulting for a proprietary ECM platform, focusing on practical exploitability and remediation.',
+    lead:
+      'Conducted black-box penetration testing and security consulting for a proprietary ECM platform, focusing on practical exploitability and remediation.',
     highlights: [
       'Used Burp Suite, Nmap and OWASP ZAP to identify weaknesses relevant to real attack scenarios.',
       'Performed vulnerability and compliance audits with actionable remediation guidance for engineering teams.',
@@ -255,9 +255,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Scope', value: 'ECM security consulting' }
     ],
     surfaceKicker: 'Security Lens',
-    surfaceValue: 'Audit',
-    surfaceText:
-      'Testing, reporting, remediation guidance and practical feedback loops for secure software engineering.'
+    surfaceValue: 'AUDIT',
+    surfaceText: 'Testing, reporting, remediation guidance and practical feedback loops for secure software engineering.'
   },
   {
     title: '#WLCK',
@@ -273,7 +272,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'PLACE',
     previewRight: 'Wieliczka',
     eyebrow: 'Data & networks // Operational foundations',
-    lead: 'Early operational experience established a practical foundation in data integrity, local infrastructure and technical environment stability.',
+    lead:
+      'Early operational experience established a practical foundation in data integrity, local infrastructure and technical environment stability.',
     highlights: [
       'Executed complex data migrations across Oracle Database environments.',
       'Designed and documented network topology maps for system expansions.',
@@ -287,9 +287,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Mode', value: 'On-site operations' }
     ],
     surfaceKicker: 'Foundational Layer',
-    surfaceValue: 'Ops',
-    surfaceText:
-      'Databases, migrations and network topology as the foundation for later application-system work.'
+    surfaceValue: 'OPS',
+    surfaceText: 'Databases, migrations and network topology as the foundation for later application-system work.'
   },
   {
     title: '#FE',
@@ -305,7 +304,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'BUILD',
     previewRight: 'Vite / FSD / MUI',
     eyebrow: 'Frontend // Interfaces for complex products',
-    lead: 'Designs and builds interfaces that are not only polished, but also clear, fast and maintainable over the full product lifecycle.',
+    lead:
+      'Designs and builds interfaces that are not only polished, but also clear, fast and maintainable over the full product lifecycle.',
     highlights: [
       'Strong React 18, TypeScript and Next.js experience in products with complex states and user scenarios.',
       'Predictable data and state orchestration using Redux Toolkit and RTK Query.',
@@ -319,9 +319,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Goal', value: 'Clarity and maintainability' }
     ],
     surfaceKicker: 'Capability Layer',
-    surfaceValue: 'Frontend',
-    surfaceText:
-      'Typed interfaces, scalable UI systems and client-side architecture ready for product growth.'
+    surfaceValue: 'FRONTEND',
+    surfaceText: 'Typed interfaces, scalable UI systems and client-side architecture ready for product growth.'
   },
   {
     title: '#BE',
@@ -337,7 +336,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'PATTERNS',
     previewRight: 'DDD / CQRS',
     eyebrow: 'Backend // Domain logic and data',
-    lead: 'Builds backend systems that structure business logic, protect data and give products a stable technical foundation.',
+    lead:
+      'Builds backend systems that structure business logic, protect data and give products a stable technical foundation.',
     highlights: [
       'Extensive use of .NET 8 and ASP.NET Core where performance, correctness and security matter.',
       'Data modeling with EF Core, PostgreSQL, MSSQL and MongoDB, emphasizing consistency and clear boundaries.',
@@ -351,9 +351,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Scope', value: 'APIs, engines, data layers' }
     ],
     surfaceKicker: 'Capability Layer',
-    surfaceValue: 'Backend',
-    surfaceText:
-      'Business logic, APIs, engines and data layers built for correctness and resilience.'
+    surfaceValue: 'BACKEND',
+    surfaceText: 'Business logic, APIs, engines and data layers built for correctness and resilience.'
   },
   {
     title: '#INF',
@@ -369,7 +368,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'TOOLS',
     previewRight: 'Docker / AWS / Auth',
     eyebrow: 'DevOps & security // Operational product quality',
-    lead: 'Treats deployment, hosting, security and developer tooling as part of product quality, not as afterthoughts.',
+    lead:
+      'Treats deployment, hosting, security and developer tooling as part of product quality, not as afterthoughts.',
     highlights: [
       'Hands-on experience with Docker, AWS, CI/CD and controlled release processes.',
       'Strong understanding of authentication, API security and operational system boundaries.',
@@ -383,9 +383,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Mode', value: 'Operational product readiness' }
     ],
     surfaceKicker: 'Capability Layer',
-    surfaceValue: 'Infra',
-    surfaceText:
-      'Infrastructure, security and tooling that close the loop on full product ownership.'
+    surfaceValue: 'INFRA',
+    surfaceText: 'Infrastructure, security and tooling that close the loop on full product ownership.'
   },
   {
     title: '#EDU',
@@ -401,7 +400,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'TRACK',
     previewRight: 'Security / Full-stack',
     eyebrow: 'Formal validation // Education and certs',
-    lead: 'Formal engineering education provides the foundation for practical product work, extended by technical and security-focused certifications.',
+    lead:
+      'Formal engineering education provides the foundation for practical product work, extended by technical and security-focused certifications.',
     highlights: [
       'Bachelor of Engineering in Mobile and Web Application Programming, WSEI Krakow, class of 2020.',
       'IT Technician, Technikum Łączności nr 14 in Krakow, class of 2016.',
@@ -415,9 +415,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Track', value: 'Engineering foundation' }
     ],
     surfaceKicker: 'Academic Track',
-    surfaceValue: 'B.Eng',
-    surfaceText:
-      'Technical education supported by product engineering practice, security awareness and continued professional development.'
+    surfaceValue: 'BENG',
+    surfaceText: 'Technical education supported by product engineering practice, security awareness and continued professional development.'
   },
   {
     title: '#COM',
@@ -433,7 +432,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'SCALE',
     previewRight: 'Teams / 100+',
     eyebrow: 'Credentials // Leadership and team responsibility',
-    lead: 'Leadership and coordination experience complements the technical profile with calm team guidance, communication and execution under pressure.',
+    lead:
+      'Leadership and coordination experience complements the technical profile with calm team guidance, communication and execution under pressure.',
     highlights: [
       'Co-organized SheepYourHack and WSEICraft hackathons as a technical lead and mentor.',
       'Managed a 20-person volunteer team and coordinated with external sponsors.',
@@ -447,9 +447,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
       { label: 'Thread', value: 'Leadership & mentoring' }
     ],
     surfaceKicker: 'Leadership Track',
-    surfaceValue: 'Community',
-    surfaceText:
-      'Mentoring, event operations, representation and responsible team leadership.'
+    surfaceValue: 'COMMUNITY',
+    surfaceText: 'Mentoring, event operations, representation and responsible team leadership.'
   },
   {
     title: '#GDPR',
@@ -465,7 +464,8 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     previewRightLabel: 'REFERENCE',
     previewRight: 'Available',
     eyebrow: 'Compliance // Recruitment data processing',
-    lead: 'The formal documentation layer is prepared for recruitment and B2B cooperation, covering consent, references and consistent Polish-English communication.',
+    lead:
+      'The formal documentation layer is prepared for recruitment and B2B cooperation, covering consent, references and consistent Polish-English communication.',
     highlights: [
       'Consent granted for processing personal data for recruitment purposes in accordance with GDPR.',
       'References from rescued-project clients are available upon request.',
@@ -480,8 +480,7 @@ export const EN_CV_CARDS: readonly CvCardContent[] = [
     ],
     surfaceKicker: 'Compliance Layer',
     surfaceValue: 'GDPR',
-    surfaceText:
-      'GDPR consent, references and formal readiness for recruitment or B2B cooperation.'
+    surfaceText: 'GDPR consent, references and formal readiness for recruitment or B2B cooperation.'
   }
 ];
 
@@ -513,9 +512,8 @@ export const EN_FEATURED_INTRO_CARD: CvCardContent = {
     { label: 'Effect', value: 'Enter manifold' }
   ],
   surfaceKicker: 'Boot Surface',
-  surfaceValue: 'Entry',
-  surfaceText:
-    'A dedicated entry threshold that transitions into the main portfolio presentation.'
+  surfaceValue: 'ENTRY',
+  surfaceText: 'A dedicated entry threshold that transitions into the main portfolio presentation.'
 };
 
 export const EN_BUNDLE: ManifoldLocaleBundle = {
@@ -526,7 +524,7 @@ export const EN_BUNDLE: ManifoldLocaleBundle = {
     pauseAria: 'Pause musical background',
     pauseLabel: 'Pause',
     playAria: 'Play musical background',
-    playLabel: 'Play',
+    playLabel: 'PLAY',
     zenLabel: 'Zen'
   },
   document: {
@@ -547,13 +545,11 @@ export const EN_BUNDLE: ManifoldLocaleBundle = {
   ui: {
     additionalOptions: 'Additional options',
     additionalOptionsHint: '[ LOCK ]',
-    aboutLabel: 'System',
-    aboutCloseLabel: 'Close',
+    aboutLabel: 'SYSTEM',
+    aboutCloseLabel: 'CLOSE',
     aboutContent: {
-      stack:
-        'Manifold Engine (DOM/WebGL2/WebGPU), TypeScript, Three.js (Scene Rendering), Tesseract 4D Matrix Math, WebWorker Physics, Object Pooling, CSS Typed OM.',
-      trivia:
-        'Hybrid WebGL/WebGPU/DOM renderer using 4D Tesseract projection and CSS matrix3d homography. Optimized render loop with state hashing and object pooling for low GC overhead. Off-main-thread WebWorkers handle fluid simulations, spatial physics, and FFT audio analysis. Includes adaptive frame-pacing and dynamic DPR scaling.',
+      stack: 'Manifold Engine (DOM/WebGL2/WebGPU), TypeScript, Three.js (Scene Rendering), Tesseract 4D Matrix Math, WebWorker Physics, Object Pooling, CSS Typed OM.',
+      trivia: 'Hybrid WebGL/WebGPU/DOM renderer using 4D Tesseract projection and CSS matrix3d homography. Optimized render loop with state hashing and object pooling for low GC overhead. Off-main-thread WebWorkers handle fluid simulations, spatial physics, and FFT audio analysis. Includes adaptive frame-pacing and dynamic DPR scaling.',
       build: 'BUILD SIGNATURE',
       runtime: 'RUNTIME STATUS',
       authorTime: "AUTHOR'S STATUS",
@@ -569,7 +565,7 @@ export const EN_BUNDLE: ManifoldLocaleBundle = {
     },
     cardHighlights: 'Highlights',
     cardSnapshot: 'Snapshot',
-    clickCardForDetails: 'Open card details',
+    clickCardForDetails: 'Click Card For Details',
     closeNavigationAria: 'Close navigation',
     coord: 'COORD',
     cvDownloadAria: 'Download résumé placeholder',
@@ -581,9 +577,9 @@ export const EN_BUNDLE: ManifoldLocaleBundle = {
     entryPoint: 'Entry Point',
     fps: 'FPS',
     focusLock: 'FOCUS LOCK',
-    hudHintLineOne: 'Click to open',
-    hudHintLineTwo: 'Scene menu',
-    hudTravelLineOne: 'Moving to',
+    hudHintLineOne: 'CLICK TO OPEN',
+    hudHintLineTwo: 'SCENE MENU',
+    hudTravelLineOne: 'MOVING TO',
     fullRate: 'FULL RATE',
     fullRateBoost: 'FULL RATE+',
     jumpAcrossCards: 'Jump Across Cards',
@@ -599,7 +595,7 @@ export const EN_BUNDLE: ManifoldLocaleBundle = {
     nextCardAria: 'Next card',
     nextCardSectionAria: 'Show next card section',
     nextPageAria: 'Next page',
-    orbitToggle: 'Orbital guides',
+    orbitToggle: 'ORBITAL GUIDES',
     orbitToggleActive: 'Orbital guides: on',
     orbitToggleInactive: 'Orbital guides: off',
     orbitToggleAria: 'Toggle orbital navigation guides',
@@ -607,46 +603,46 @@ export const EN_BUNDLE: ManifoldLocaleBundle = {
     previousCardAria: 'Previous card',
     powerSave: 'POWER SAVE',
     perf: 'PERF',
-    policyLabel: 'Privacy policy',
-    policyCloseLabel: 'Close policy',
+    policyLabel: 'PRIVACY POLICY',
+    policyCloseLabel: 'CLOSE POLICY',
     policyContent: {
       intro:
-        'Privacy notice\n\nLast updated: 29 April 2026\n\nThis website is a personal web experience operated under the kaim.dev domain. It is designed to run mostly in your browser and to collect as little information as reasonably possible.',
-      processingTitle: 'Local processing',
+        'PRIVACY NOTICE\n\nLast updated: 29 April 2026\n\nThis website is a personal web experience operated under the kaim.dev domain. It is designed to run mostly in your browser and to collect as little information as reasonably possible.',
+      processingTitle: 'LOCAL PROCESSING',
       processingBody:
         'Rendering, interaction state, diagnostics, GPU/browser capability checks and visual effects run locally in your browser. Debug information about your device or browser remains on your device unless telemetry is explicitly enabled.',
-      storageTitle: 'Browser storage',
+      storageTitle: 'BROWSER STORAGE',
       storageBody:
         'The site uses localStorage to remember selected language and orbital-guide visibility, and sessionStorage for a short-lived locale transition flag. These values are used only to keep the interface consistent. This experience does not use cookies.',
-      audioTitle: 'Audio playback',
+      audioTitle: 'AUDIO PLAYBACK',
       audioBody:
         'Background audio is loaded only after you press the audio toggle. The site does not request microphone or camera access.',
-      telemetryTitle: 'Optional telemetry',
+      telemetryTitle: 'OPTIONAL TELEMETRY',
       telemetryBody:
         'If a telemetry endpoint is configured for this deployment, the app may send limited technical events such as event name, timestamp, current path and small interaction payloads, for example mode switches or audio start. This is used only to understand and improve the experience.',
-      performanceTitle: 'Performance analytics',
+      performanceTitle: 'PERFORMANCE ANALYTICS',
       performanceBody:
         "This site may use Cloudflare Web Analytics / Real User Measurements (RUM) to measure real-world loading performance and reliability. When enabled, Cloudflare may load or inject a small JavaScript beacon that collects browser performance measurements such as page-load timing, navigation timing, resource timing, paint timing and Core Web Vitals, together with limited page context such as the current path or referrer. This performance measurement is used to diagnose and improve speed, rendering behavior and user-perceived performance. It is not used by this site for advertising, cross-site profiling or user identification. The legal basis, where required, is the operator's legitimate interest in maintaining and improving the technical quality of the website.",
-      contactTitle: 'Contact action',
+      contactTitle: 'CONTACT ACTION',
       contactBody:
         'The contact link matches the active locale ("contact" or "kontakt"). To reduce automated harvesting by scrapers and bots, the address is not stored as a static visible string and is injected into the mailto protocol only upon interaction.',
-      rightsTitle: 'Your rights',
+      rightsTitle: 'YOUR RIGHTS',
       rightsBody:
         'Where GDPR applies, you may request access, correction, deletion, restriction or objection regarding personal data processed in connection with this site. Contact may be made through the contact action available on the website.'
     },
-    privacyLabel: 'Debug overlay',
-    privacyCloseLabel: 'Hide debug',
+    privacyLabel: 'DEBUG OVERLAY',
+    privacyCloseLabel: 'HIDE DEBUG',
     privacyContent: '',
-    return: 'Exit to start',
+    return: 'EXIT TO START',
     sceneNavigation: 'Scene Navigation',
     returnToEntryAria: 'Exit and return to start screen',
-    scrollArrowsToExit: 'Scroll / arrows to exit',
-    scrollArrowsWsToMove: 'Scroll / arrows / W S to move',
-    scrollToExit: 'Scroll to exit',
+    scrollArrowsToExit: 'Scroll / Arrows To Exit',
+    scrollArrowsWsToMove: 'Scroll / Arrows / W S To Move',
+    scrollToExit: 'Scroll To Exit',
     scrollVelocity: 'SCROLL VELOCITY',
-    scrollToBrowse: 'Scroll to browse',
-    scrollToExitCard: 'Scroll to exit card',
-    scrollPrompt: 'Scroll',
+    scrollToBrowse: 'Scroll To Browse',
+    scrollToExitCard: 'Scroll To Exit Card',
+    scrollPrompt: 'SCROLL',
     sectionKicker: 'Section',
     systemLoader: 'System Loader',
     topbarRole: 'full-stack software engineer / lead architect',
@@ -654,8 +650,8 @@ export const EN_BUNDLE: ManifoldLocaleBundle = {
     systemOverlayToggleAria: 'Toggle system overlay',
     systemOverlayToggleActive: 'System overlay: on',
     systemOverlayToggleInactive: 'System overlay: off',
-    systemOverlayOn: 'Overlay: on',
-    systemOverlayOff: 'Overlay: off',
-    zenLock: 'Zen lock'
+    systemOverlayOn: 'OVERLAY: ON',
+    systemOverlayOff: 'OVERLAY: OFF',
+    zenLock: 'ZEN LOCK'
   }
 };

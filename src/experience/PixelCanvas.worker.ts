@@ -21,8 +21,7 @@ interface GeneratePixelsResponse {
 }
 
 self.onmessage = (event: MessageEvent<GeneratePixelsMessage>) => {
-  const { colors, gap, height, id, preferSharedMemory, reducedMotion, width } =
-    event.data;
+  const { colors, gap, height, id, preferSharedMemory, reducedMotion, width } = event.data;
   const columns = Math.ceil(width / gap);
   const rows = Math.ceil(height / gap);
   const total = columns * rows;
@@ -41,15 +40,11 @@ self.onmessage = (event: MessageEvent<GeneratePixelsMessage>) => {
     for (let y = 0; y < height; y += gap) {
       xs[cursor] = x;
       ys[cursor] = y;
-      delays[cursor] = reducedMotion
-        ? 0
-        : distanceToCenter(x, y, width, height);
+      delays[cursor] = reducedMotion ? 0 : distanceToCenter(x, y, width, height);
       maxSizes[cursor] = randomBetween(0.5, maxIntegerSize);
       sizeSteps[cursor] = Math.random() * 0.4;
       counterSteps[cursor] = Math.random() * 4 + (width + height) * 0.01;
-      colorIndexes[cursor] = Math.floor(
-        Math.random() * Math.max(colors.length, 1)
-      );
+      colorIndexes[cursor] = Math.floor(Math.random() * Math.max(colors.length, 1));
       cursor += 1;
     }
   }
@@ -73,23 +68,18 @@ self.onmessage = (event: MessageEvent<GeneratePixelsMessage>) => {
 
   self.postMessage(response, {
     transfer: [
-      response.xs as ArrayBuffer,
-      response.ys as ArrayBuffer,
-      response.delays as ArrayBuffer,
-      response.maxSizes as ArrayBuffer,
-      response.sizeSteps as ArrayBuffer,
-      response.counterSteps as ArrayBuffer,
-      response.colorIndexes as ArrayBuffer
+    response.xs as ArrayBuffer,
+    response.ys as ArrayBuffer,
+    response.delays as ArrayBuffer,
+    response.maxSizes as ArrayBuffer,
+    response.sizeSteps as ArrayBuffer,
+    response.counterSteps as ArrayBuffer,
+    response.colorIndexes as ArrayBuffer
     ]
   });
 };
 
-function distanceToCenter(
-  x: number,
-  y: number,
-  width: number,
-  height: number
-): number {
+function distanceToCenter(x: number, y: number, width: number, height: number): number {
   const dx = x - width / 2;
   const dy = y - height / 2;
   return Math.sqrt(dx * dx + dy * dy);
@@ -117,8 +107,5 @@ function createBuffer(byteLength: number, shared: boolean): ArrayBufferLike {
 }
 
 function supportsSharedMemory(): boolean {
-  return (
-    typeof SharedArrayBuffer !== 'undefined' &&
-    self.crossOriginIsolated === true
-  );
+  return typeof SharedArrayBuffer !== 'undefined' && self.crossOriginIsolated === true;
 }

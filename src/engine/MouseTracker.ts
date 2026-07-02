@@ -20,9 +20,7 @@ export class MouseTracker {
   };
 
   constructor() {
-    window.addEventListener('pointermove', this.handlePointerMove, {
-      passive: true
-    });
+    window.addEventListener('pointermove', this.handlePointerMove, { passive: true });
     window.addEventListener('touchstart', this.handleTouch, { passive: true });
     window.addEventListener('touchmove', this.handleTouch, { passive: true });
   }

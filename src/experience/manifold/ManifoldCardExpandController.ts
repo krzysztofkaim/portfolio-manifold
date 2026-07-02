@@ -29,15 +29,13 @@ export interface ManifoldCardExpandControllerContext {
   requestAnimationFrame(callback: FrameRequestCallback): number;
   scheduleTimeout(callback: () => void, delay: number): number;
   setCardMobilePage(item: ItemState, page: number): void;
-  setExpandedState(
-    next: Partial<{
-      card: ItemState | null;
-      quenchUntil: number;
-      schedulerRaf: number;
-      schedulerToken: number;
-      target: number;
-    }>
-  ): void;
+  setExpandedState(next: Partial<{
+    card: ItemState | null;
+    quenchUntil: number;
+    schedulerRaf: number;
+    schedulerToken: number;
+    target: number;
+  }>): void;
   setPhaseVelocityScale(scale: number): void;
   updateActivity(now: number): void;
 }
@@ -46,9 +44,7 @@ export class ManifoldCardExpandController {
   constructor(private readonly context: ManifoldCardExpandControllerContext) {}
 
   private shouldAnimateReveal(element: HTMLElement): boolean {
-    return !element.matches(
-      '.card-expanded-surface > span, .card-expanded-surface > strong, .card-expanded-surface > p'
-    );
+    return !element.matches('.card-expanded-surface > span, .card-expanded-surface > strong, .card-expanded-surface > p');
   }
 
   toggleExpandedCard(item: ItemState): void {
@@ -75,13 +71,13 @@ export class ManifoldCardExpandController {
       expandedState.card.lastZIndex = '';
     }
 
-    const reverseOpen = this.context.getViewMode() === '3d' && false;
+    const reverseOpen =
+      this.context.getViewMode() === '3d' &&
+      false;
     const now = this.context.getRuntimeNow();
     const immediateVelocityScale = reverseOpen
-      ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS
-          .reverseExpandImmediateVelocityScale
-      : MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS
-          .expandedOpenImmediateVelocityScale;
+      ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.reverseExpandImmediateVelocityScale
+      : MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.expandedOpenImmediateVelocityScale;
     const quenchDuration = reverseOpen
       ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.reverseExpandedMotionQuenchMs
       : MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.expandedMotionQuenchMs;
@@ -131,11 +127,7 @@ export class ManifoldCardExpandController {
 
     const tick = () => {
       const current = this.context.getExpandedState();
-      if (
-        current.schedulerToken !== token ||
-        current.card !== item ||
-        current.target <= 0
-      ) {
+      if (current.schedulerToken !== token || current.card !== item || current.target <= 0) {
         this.context.setExpandedState({ schedulerRaf: 0 });
         return;
       }
@@ -163,8 +155,7 @@ export class ManifoldCardExpandController {
 
   primeExpandedContentForReveal(item: ItemState): void {
     this.clearExpandedContentReveal(item);
-    const revealElements =
-      item.fxEl.querySelectorAll<HTMLElement>('[data-reveal-text]');
+    const revealElements = item.fxEl.querySelectorAll<HTMLElement>('[data-reveal-text]');
 
     for (const element of revealElements) {
       const finalText = element.dataset.revealText ?? '';
@@ -178,8 +169,7 @@ export class ManifoldCardExpandController {
 
   resetExpandedContent(item: ItemState): void {
     this.clearExpandedContentReveal(item);
-    const revealElements =
-      item.fxEl.querySelectorAll<HTMLElement>('[data-reveal-text]');
+    const revealElements = item.fxEl.querySelectorAll<HTMLElement>('[data-reveal-text]');
 
     for (const element of revealElements) {
       const finalText = element.dataset.revealText ?? '';
@@ -189,9 +179,7 @@ export class ManifoldCardExpandController {
 
   animateExpandedContent(item: ItemState): void {
     this.clearExpandedContentReveal(item);
-    const revealElements = Array.from(
-      item.fxEl.querySelectorAll<HTMLElement>('[data-reveal-text]')
-    );
+    const revealElements = Array.from(item.fxEl.querySelectorAll<HTMLElement>('[data-reveal-text]'));
 
     if (revealElements.length === 0) {
       return;
@@ -202,11 +190,7 @@ export class ManifoldCardExpandController {
     const scheduleReveal = (element: HTMLElement, delay: number) => {
       const timeoutId = window.setTimeout(() => {
         const expandedState = this.context.getExpandedState();
-        if (
-          item.contentRevealToken !== token ||
-          expandedState.card !== item ||
-          expandedState.target <= 0
-        ) {
+        if (item.contentRevealToken !== token || expandedState.card !== item || expandedState.target <= 0) {
           return;
         }
 
@@ -224,11 +208,7 @@ export class ManifoldCardExpandController {
 
         const tick = () => {
           const current = this.context.getExpandedState();
-          if (
-            item.contentRevealToken !== token ||
-            current.card !== item ||
-            current.target <= 0
-          ) {
+          if (item.contentRevealToken !== token || current.card !== item || current.target <= 0) {
             this.setRevealDisplay(element, finalText, finalText, false);
             return;
           }
@@ -263,10 +243,7 @@ export class ManifoldCardExpandController {
             }
 
             if (scrambled < scrambleWindow) {
-              next +=
-                TITLE_SCRAMBLE_CHARS[
-                  Math.floor(Math.random() * TITLE_SCRAMBLE_CHARS.length)
-                ] ?? char;
+              next += TITLE_SCRAMBLE_CHARS[Math.floor(Math.random() * TITLE_SCRAMBLE_CHARS.length)] ?? char;
               scrambled += 1;
               continue;
             }

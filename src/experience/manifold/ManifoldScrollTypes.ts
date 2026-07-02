@@ -9,9 +9,4 @@ export interface ManifoldPhaseState {
   velocity: number;
 }
 
-export type {
-  ItemState,
-  ManifoldSceneRuntimeConfig,
-  TwoDGridMetrics,
-  ViewMode
-};
+export type { ItemState, ManifoldSceneRuntimeConfig, TwoDGridMetrics, ViewMode };

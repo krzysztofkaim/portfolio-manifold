@@ -1,8 +1,4 @@
-import type {
-  ItemState,
-  SceneNavigationCard,
-  SceneNavigationSection
-} from './ManifoldTypes';
+import type { ItemState, SceneNavigationCard, SceneNavigationSection } from './ManifoldTypes';
 
 export type NavigationAnchorMode = 'nearest' | 'forward' | 'backward' | 'smart';
 
@@ -10,14 +6,10 @@ export function findCardItemByIndex(
   cardItems: readonly ItemState[],
   cardIndex: number
 ): ItemState | null {
-  return (
-    cardItems.find((candidate) => candidate.cardIndex === cardIndex) ?? null
-  );
+  return cardItems.find((candidate) => candidate.cardIndex === cardIndex) ?? null;
 }
 
-export function getCentered2DCard(
-  cardItems: readonly ItemState[]
-): ItemState | null {
+export function getCentered2DCard(cardItems: readonly ItemState[]): ItemState | null {
   let closestCard: ItemState | null = null;
   let closestDistance = Number.POSITIVE_INFINITY;
 
@@ -45,12 +37,7 @@ export function getEffectiveFocusCard(input: {
   lastCentered2DCard: ItemState | null;
 }): ItemState | null {
   if (input.is2DMode) {
-    return (
-      input.lastCentered2DCard ??
-      input.centered2DCard ??
-      input.featuredItem ??
-      null
-    );
+    return input.lastCentered2DCard ?? input.centered2DCard ?? input.featuredItem ?? null;
   }
 
   return input.closestVisibleCard ?? input.featuredItem ?? null;
@@ -64,10 +51,7 @@ export function getHudFocus(input: {
   if (input.expandedCard) {
     return {
       section: input.expandedCard.sectionTitle || 'PROFILE',
-      card:
-        input.expandedCard.expandedCardTitle ||
-        input.expandedCard.cardTitle ||
-        'KAIM'
+      card: input.expandedCard.expandedCardTitle || input.expandedCard.cardTitle || 'KAIM'
     };
   }
 
@@ -97,10 +81,7 @@ export function getCardNavigationAnchor(input: {
     return null;
   }
 
-  return input.normalizeAnchor(
-    input.getAnchorForCard(item),
-    input.mode ?? 'nearest'
-  );
+  return input.normalizeAnchor(input.getAnchorForCard(item), input.mode ?? 'nearest');
 }
 
 export function getAdjacentCardNavigation(input: {
@@ -121,9 +102,7 @@ export function getAdjacentCardNavigation(input: {
     return null;
   }
 
-  const currentIndex = cards.findIndex(
-    (item) => item.cardIndex === current.cardIndex
-  );
+  const currentIndex = cards.findIndex((item) => item.cardIndex === current.cardIndex);
   const safeIndex = currentIndex >= 0 ? currentIndex : 0;
   const nextIndex = (safeIndex + input.direction + cards.length) % cards.length;
   const nextCard = cards[nextIndex] ?? null;
@@ -133,10 +112,7 @@ export function getAdjacentCardNavigation(input: {
   }
 
   return {
-    anchor: input.normalizeAnchor(
-      input.getAnchorForCard(nextCard),
-      input.direction > 0 ? 'forward' : 'backward'
-    ),
+    anchor: input.normalizeAnchor(input.getAnchorForCard(nextCard), input.direction > 0 ? 'forward' : 'backward'),
     cardIndex: nextCard.cardIndex
   };
 }
@@ -162,29 +138,21 @@ export function getSectionNavigationTargets(input: {
     }
   }
 
-  for (
-    let sectionIndex = 0;
-    sectionIndex < input.sectionHeadings.length;
-    sectionIndex += 1
-  ) {
+  for (let sectionIndex = 0; sectionIndex < input.sectionHeadings.length; sectionIndex += 1) {
     const sectionTitle = input.sectionHeadings[sectionIndex] ?? 'PROFILE';
     const sectionItems = itemsBySection.get(sectionTitle) ?? [];
-
+    
     let bestAnchor: number;
-    const firstCard =
-      sectionItems.find((item) => item.type === 'card') || sectionItems[0];
-
+    const firstCard = sectionItems.find(item => item.type === 'card') || sectionItems[0];
+    
     if (firstCard) {
-      bestAnchor = input.normalizeAnchor(
-        input.getAnchorForCard(firstCard),
-        'nearest'
-      );
+      bestAnchor = input.normalizeAnchor(input.getAnchorForCard(firstCard), 'nearest');
     } else {
       const initialAnchor = input.getAnchorForItemIndex(sectionIndex * 4);
       bestAnchor = input.normalizeAnchor(initialAnchor, 'nearest');
     }
 
-    const cards: SceneNavigationCard[] = sectionItems.map((item) => ({
+    const cards: SceneNavigationCard[] = sectionItems.map(item => ({
       anchor: input.getAnchorForCard(item),
       card: item.cardTitle,
       cardIndex: item.cardIndex
