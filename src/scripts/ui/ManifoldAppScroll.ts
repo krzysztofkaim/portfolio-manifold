@@ -14,6 +14,10 @@ const IOS_NATIVE_LOOP_MULTIPLIER = 14;
 const IOS_LOOP_REBASE_MARGIN_LOOPS = 2;
 const IOS_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS = 0.75;
 const IOS_LOOP_REBASE_DEFER_VELOCITY = 1.8;
+const IOS_NATIVE_SETTLE_VELOCITY = 2.4;
+const IOS_TOUCH_END_GRACE_MS = 200;
+const IOS_REBASE_COOLDOWN_MS = 360;
+const IOS_REBASE_SUPPRESS_MS = 64;
 
 export interface ScrollController {
   getInitialScrollAnchor(): number;
@@ -21,7 +25,7 @@ export interface ScrollController {
 }
 
 /**
- * Orchestrates scroll synchronization between the browser's native scroll (or Lenis) 
+ * Orchestrates scroll synchronization between the browser's native scroll (or Lenis)
  * and the internal "logical" scroll state used by the Manifold engine.
  * Handles rebase logic for the infinite loop experience.
  */
@@ -40,7 +44,17 @@ export class ManifoldAppScroll {
   private touchRefreshGuardArmed = false;
   private resizeSyncRaf = 0;
   private readonly shouldBlockPullToRefresh = IS_IOS && IS_SAFARI;
+  private readonly useDirectNativeScroll = IS_IOS;
   private lastProxyHeightPx = -1;
+
+  private isNativeTouchActive = false;
+  private nativeTouchGraceUntil = 0;
+  private lastNativeScrollTop = 0;
+  private lastNativeScrollSampleAt = 0;
+  private nativeScrollVelocity = 0;
+  private pendingRebase: { scroll: number; delta: number } | null = null;
+  private lastRebaseAt = 0;
+  private suppressNativeScrollUntil = 0;
 
   constructor(
     private readonly telemetry: LoopTelemetry,
@@ -49,20 +63,38 @@ export class ManifoldAppScroll {
   ) {}
 
   setup(): void {
-    window.addEventListener('scroll', this.handleNativeScroll);
+    window.addEventListener('scroll', this.handleNativeScroll, { passive: true });
     window.addEventListener('resize', this.scheduleResizeSync, { passive: true });
     window.visualViewport?.addEventListener('resize', this.scheduleResizeSync, { passive: true });
+
+    if (this.useDirectNativeScroll) {
+      document.addEventListener('touchstart', this.handleNativeTouchStart, { passive: true });
+      document.addEventListener('touchend', this.handleNativeTouchEnd, { passive: true });
+      document.addEventListener('touchcancel', this.handleNativeTouchEnd, { passive: true });
+      window.addEventListener('scrollend', this.handleNativeScrollEnd, { passive: true });
+    }
 
     if (this.shouldBlockPullToRefresh) {
       document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
       document.addEventListener('touchmove', this.handleTouchMove, { passive: false });
     }
+
+    this.lastNativeScrollTop = this.getNativeScrollTop();
+    this.lastNativeScrollSampleAt = performance.now();
   }
 
   destroy(): void {
     window.removeEventListener('scroll', this.handleNativeScroll);
     window.removeEventListener('resize', this.scheduleResizeSync);
     window.visualViewport?.removeEventListener('resize', this.scheduleResizeSync);
+
+    if (this.useDirectNativeScroll) {
+      document.removeEventListener('touchstart', this.handleNativeTouchStart);
+      document.removeEventListener('touchend', this.handleNativeTouchEnd);
+      document.removeEventListener('touchcancel', this.handleNativeTouchEnd);
+      window.removeEventListener('scrollend', this.handleNativeScrollEnd);
+    }
+
     if (this.shouldBlockPullToRefresh) {
       document.removeEventListener('touchstart', this.handleTouchStart);
       document.removeEventListener('touchmove', this.handleTouchMove);
@@ -97,15 +129,18 @@ export class ManifoldAppScroll {
     this.smoothScroll = initialPhysicalScroll;
     this.activeScroll = initialPhysicalScroll;
     this.targetVelocity = 0;
+    this.pendingRebase = null;
     this.setPhysicalDocumentScroll(initialPhysicalScroll);
     this.telemetry.logicalScroll = this.toLogicalScroll(initialPhysicalScroll);
     this.getController()?.setScroll(initialLogicalScroll, 0);
+    this.lastNativeScrollTop = initialPhysicalScroll;
+    this.lastNativeScrollSampleAt = performance.now();
+    this.nativeScrollVelocity = 0;
   }
 
   scrollToLogical(logicalScroll: number, options?: { immediate?: boolean }): void {
     const immediate = options?.immediate ?? true;
-    
-    // Always use the full, natural physical distance
+
     const targetPhysicalScroll = logicalScroll - this.logicalOffset;
 
     if (immediate) {
@@ -117,9 +152,11 @@ export class ManifoldAppScroll {
       this.smoothScroll = rebased.scroll;
       this.activeScroll = rebased.scroll;
       this.targetVelocity = 0;
+      this.pendingRebase = null;
       this.setPhysicalDocumentScroll(rebased.scroll);
       this.telemetry.logicalScroll = this.toLogicalScroll(rebased.scroll);
       this.getController()?.setScroll(logicalScroll, 0);
+      this.lastNativeScrollTop = rebased.scroll;
       return;
     }
 
@@ -157,11 +194,10 @@ export class ManifoldAppScroll {
       lenis.raf(time);
       this.telemetry.lenisMs = performance.now() - lenisStartedAt;
 
-      // Ensure 3D engine is synced in the same frame
       if (typeof window !== 'undefined' && window.__sceneManager) {
         window.__sceneManager.syncScroll(lenis.scroll);
       }
-      
+
       this.activeScroll = this.targetScroll;
       this.smoothScroll = this.targetScroll;
       const logicalScroll = this.toLogicalScroll(this.targetScroll);
@@ -171,6 +207,13 @@ export class ManifoldAppScroll {
     }
 
     this.telemetry.lenisMs = 0;
+
+    if (this.useDirectNativeScroll) {
+      this.updateNativeScrollDirect(controller);
+      this.flushPendingRebase(false);
+      return;
+    }
+
     const rebased = this.maybeRebasePhysicalScroll(this.targetScroll, Math.abs(this.targetVelocity));
 
     if (rebased.delta !== 0) {
@@ -204,13 +247,59 @@ export class ManifoldAppScroll {
     return target;
   }
 
-  /**
-   * Fallback listener that synchronizes the target scroll when Lenis is inactive or disabled.
-   * When Lenis is running, it handles synchronization through handleLenisScroll() directly.
-   */
+  private updateNativeScrollDirect(controller: ScrollController | null): void {
+    const nativeScroll = this.getNativeScrollTop();
+    this.targetScroll = nativeScroll;
+
+    const rebased = this.maybeRebasePhysicalScroll(nativeScroll, Math.abs(this.nativeScrollVelocity));
+    if (rebased.delta !== 0) {
+      if (this.shouldDeferNativeRebase()) {
+        this.pendingRebase = rebased;
+      } else {
+        this.applyRebase(rebased.scroll, rebased.delta);
+        this.pendingRebase = null;
+      }
+    }
+
+    this.activeScroll = this.targetScroll;
+    this.smoothScroll = this.targetScroll;
+    this.targetVelocity = this.nativeScrollVelocity;
+
+    const logicalScroll = this.toLogicalScroll(this.activeScroll);
+    controller?.setScroll(logicalScroll, this.targetVelocity);
+    this.telemetry.logicalScroll = logicalScroll;
+  }
+
   private handleNativeScroll = () => {
     if (this.getLenis()) return;
-    this.targetScroll = this.getNativeScrollTop();
+
+    const now = performance.now();
+    if (now < this.suppressNativeScrollUntil) {
+      return;
+    }
+
+    const nextScrollTop = this.getNativeScrollTop();
+    const elapsed = Math.max(now - this.lastNativeScrollSampleAt, 1);
+    const delta = nextScrollTop - this.lastNativeScrollTop;
+    this.nativeScrollVelocity = (delta / elapsed) * 16.67;
+    this.lastNativeScrollTop = nextScrollTop;
+    this.lastNativeScrollSampleAt = now;
+    this.targetScroll = nextScrollTop;
+  };
+
+  private handleNativeTouchStart = () => {
+    this.isNativeTouchActive = true;
+    this.nativeTouchGraceUntil = 0;
+  };
+
+  private handleNativeTouchEnd = () => {
+    this.isNativeTouchActive = false;
+    this.nativeTouchGraceUntil = performance.now() + IOS_TOUCH_END_GRACE_MS;
+  };
+
+  private handleNativeScrollEnd = () => {
+    this.nativeScrollVelocity = 0;
+    this.flushPendingRebase(true);
   };
 
   private handleTouchStart = (event: TouchEvent) => {
@@ -242,7 +331,6 @@ export class ManifoldAppScroll {
     const deltaX = Math.abs(touch.clientX - this.touchStartX);
     const deltaY = touch.clientY - this.touchStartY;
 
-    // Only intercept a downward edge pull on iOS Safari; normal scrolling stays native.
     if (deltaY < 14 || deltaY <= deltaX * 1.1) {
       return;
     }
@@ -287,10 +375,41 @@ export class ManifoldAppScroll {
     return document.scrollingElement?.scrollTop ?? window.scrollY ?? 0;
   }
 
+  private shouldDeferNativeRebase(): boolean {
+    const now = performance.now();
+    if (this.isNativeTouchActive || now < this.nativeTouchGraceUntil) {
+      return true;
+    }
+
+    if (Math.abs(this.nativeScrollVelocity) > IOS_NATIVE_SETTLE_VELOCITY) {
+      return true;
+    }
+
+    if (now - this.lastRebaseAt < IOS_REBASE_COOLDOWN_MS) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private flushPendingRebase(force: boolean): void {
+    if (!this.pendingRebase) {
+      return;
+    }
+
+    if (!force && this.shouldDeferNativeRebase()) {
+      return;
+    }
+
+    const pending = this.pendingRebase;
+    this.pendingRebase = null;
+    this.applyRebase(pending.scroll, pending.delta);
+  }
+
   private setPhysicalDocumentScroll(scroll: number): void {
     const lenis = this.getLenis();
     if (lenis) {
-      lenis.resize(); // Force DOM height recalculation before aggressive scroll
+      lenis.resize();
       lenis.scrollTo(scroll, { immediate: true, force: true });
       return;
     }
@@ -298,6 +417,10 @@ export class ManifoldAppScroll {
     if (Math.abs(this.getNativeScrollTop() - scroll) < 1) {
       return;
     }
+
+    this.suppressNativeScrollUntil = performance.now() + IOS_REBASE_SUPPRESS_MS;
+    this.lastNativeScrollTop = scroll;
+    this.nativeScrollVelocity = 0;
 
     if (IS_IOS && document.scrollingElement) {
       document.scrollingElement.scrollTop = scroll;
@@ -324,7 +447,7 @@ export class ManifoldAppScroll {
       this.scrollProxy.style.height = `${roundedProxyHeight}px`;
       this.lastProxyHeightPx = roundedProxyHeight;
     }
-    this.getLenis()?.resize(); // Force boundary update
+    this.getLenis()?.resize();
   }
 
   private applyRebase(nextScroll: number, delta: number): void {
@@ -336,6 +459,8 @@ export class ManifoldAppScroll {
       this.smoothScroll += delta;
       this.activeScroll += delta;
       this.targetVelocity = 0;
+      this.nativeScrollVelocity = 0;
+      this.lastRebaseAt = startedAt;
     }
 
     this.targetScroll = nextScroll;
@@ -353,7 +478,7 @@ export class ManifoldAppScroll {
     this.logicalOffset -= delta;
     this.telemetry.rebaseCount += 1;
     this.telemetry.rebaseDelta = delta;
-    
+
     const rebaseAdapter = createLenisRebaseAdapter(lenis);
     const nextAnimatedScroll = rebaseAdapter.offsetBy(delta);
 
@@ -399,8 +524,12 @@ export class ManifoldAppScroll {
     const emergencyMin = emergencyEdgeMargin;
     const emergencyMax = totalSpan - emergencyEdgeMargin;
 
+    const effectiveVelocity = this.useDirectNativeScroll
+      ? Math.max(velocityMagnitude, Math.abs(this.nativeScrollVelocity))
+      : velocityMagnitude;
+
     if (
-      velocityMagnitude > deferVelocity &&
+      effectiveVelocity > deferVelocity &&
       physicalScroll >= emergencyMin &&
       physicalScroll <= emergencyMax
     ) {
@@ -425,12 +554,15 @@ export class ManifoldAppScroll {
     const physicalScroll = this.getNativeScrollTop();
     const rebased = this.maybeRebasePhysicalScroll(physicalScroll, Number.POSITIVE_INFINITY);
     if (rebased.delta !== 0) {
+      if (this.useDirectNativeScroll && this.shouldDeferNativeRebase()) {
+        this.pendingRebase = rebased;
+        return;
+      }
       this.applyRebase(rebased.scroll, rebased.delta);
     }
   }
 
   private getLoopPhysicalSpan(): number {
-    // Keep iOS' physical document shorter than desktop Lenis while preserving enough room for rebasing.
     const multiplier = IS_IOS ? IOS_NATIVE_LOOP_MULTIPLIER : MANIFOLD_LOOP_MULTIPLIER;
     return this.loopScrollLength * multiplier;
   }

@@ -1734,8 +1734,8 @@ class ManifoldApp {
           scrollVelocity > 0.0035 ||
           time - this.lastInteractionBurstAt < 1400;
         const audioActive = this.audio.getAudioActiveState();
-        const iosInteractiveInterval = 1000 / 24;
-        const iosIdleInterval = 1000 / 10;
+        const iosInteractiveInterval = scrollVelocity > 0.02 ? 1000 / 20 : 1000 / 24;
+        const iosIdleInterval = 1000 / 8;
         const effectiveFrameInterval = IS_IOS
           ? Math.max(
             perf.frameInterval || 0,

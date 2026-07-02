@@ -1256,14 +1256,15 @@ export class ManifoldModeController {
       0,
       1
     );
+    const iosScrollPressureThreshold = IS_IOS ? 0.34 : 0.55;
     this.transitionPerformanceMode =
       this.introCompleted &&
       !this.expandedCard &&
-      (transitionMorphPressure > 0.045 ||
+      (transitionMorphPressure > (IS_IOS ? 0.035 : 0.045) ||
         (transitionMorphPressure > 0.015 &&
-          (framePressure > 0.18 ||
-            velocityMagnitude > 0.55 ||
-            Math.abs(this.phaseState.targetSpeed) > 0.55)));
+          (framePressure > (IS_IOS ? 0.12 : 0.18) ||
+            velocityMagnitude > iosScrollPressureThreshold ||
+            Math.abs(this.phaseState.targetSpeed) > iosScrollPressureThreshold)));
 
     if (this.expandedTarget === 0 && this.expandedProgress < 0.01 && this.expandedCard) {
       this.collapsedExpandedCard =
@@ -1526,8 +1527,18 @@ export class ManifoldModeController {
       !this.expandedCard &&
       activeViewModeProgress > 0.72 &&
       visualFourDProgress < 0.01 &&
-      this.visualStateManager.getTwoDCardFastness() > 0.68 &&
-      Math.abs(this.rawScrollVelocity) > 20;
+      (
+        IS_IOS
+          ? (
+            this.visualStateManager.getTwoDCardFastness() > 0.42 ||
+            velocityMagnitude > 0.07 ||
+            Math.abs(this.rawScrollVelocity) > 6
+          )
+          : (
+            this.visualStateManager.getTwoDCardFastness() > 0.68 &&
+            Math.abs(this.rawScrollVelocity) > 20
+          )
+      );
     const transitionSnapshotsActive = this.transitionPerformanceMode || fastTwoDScrollSnapshotMode;
     if (transitionSnapshotsActive !== this.lastTransitionSnapshotBodyState) {
       this.dom.toggleBodyClass('is-transition-snapshots', transitionSnapshotsActive);

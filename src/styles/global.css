@@ -858,10 +858,19 @@ html.is-safari body.is-scrolling .card-shell,
 html.is-safari body.is-scrolling .card-chrome,
 html.is-safari body.is-scrolling .topbar,
 html.is-safari body.is-scrolling .hud-nav-panel,
-html.is-safari body.is-scrolling .hud-side-readout {
+html.is-safari body.is-scrolling .hud-side-readout,
+html.is-ios body.is-scrolling .card-shell,
+html.is-ios body.is-scrolling .card-core,
+html.is-ios body.is-scrolling .card-core-glow,
+html.is-ios body.is-scrolling .topbar {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: none !important;
+}
+
+html.is-ios body.is-scrolling .card,
+html.is-ios body.is-scrolling .item {
+  filter: none !important;
 }
 
 /* Android: Disable box-shadows on cards during scrolling to reduce compositing cost */
