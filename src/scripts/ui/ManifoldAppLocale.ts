@@ -5,7 +5,10 @@ import {
   resolveManifoldLocaleFromEnvironment,
   type ManifoldAudioLocaleStrings
 } from '../../i18n/manifoldLocale';
-import { getLocalePath, resolveLocaleFromPathname } from '../../i18n/localeRouting';
+import {
+  getLocalePath,
+  resolveLocaleFromPathname
+} from '../../i18n/localeRouting';
 import type { ManifoldLocale } from '../../i18n/manifoldLocale';
 
 // Import from the ManifoldModeSelector file
@@ -159,15 +162,15 @@ export class ManifoldAppLocale {
     return getManifoldLocaleBundle(this.activeLocale);
   }
 
-  setup(): (() => void) {
+  setup(): () => void {
     this.applyLocale(this.activeLocale);
-    
+
     const handleClick = () => {
       this.navigateToLocale(getNextManifoldLocale(this.activeLocale));
     };
 
     this.elements.localeButton.addEventListener('click', handleClick);
-    
+
     return () => {
       this.elements.localeButton.removeEventListener('click', handleClick);
     };
@@ -178,7 +181,9 @@ export class ManifoldAppLocale {
     this.persistLocale(locale);
     this.applyToUi(locale);
     this.controllerRef?.setLocale(locale);
-    this.audioController.setLocaleStrings(getManifoldLocaleBundle(locale).audio);
+    this.audioController.setLocaleStrings(
+      getManifoldLocaleBundle(locale).audio
+    );
     this.manifoldAppRef?.syncHudNavigationMode();
     this.manifoldAppRef?.syncOrbitToggleLabel();
     this.manifoldAppRef?.syncToggledButtonLabels();
@@ -224,10 +229,14 @@ export class ManifoldAppLocale {
     this.applyToDocument(locale);
 
     const el = this.elements;
-    if (el.topbarLoaderKicker) el.topbarLoaderKicker.textContent = ui.systemLoader;
+    if (el.topbarLoaderKicker)
+      el.topbarLoaderKicker.textContent = ui.systemLoader;
     if (el.topbarRole) el.topbarRole.textContent = ui.topbarRole;
-    if (el.downloadCv) if (el.downloadCv) el.downloadCv.href = documentStrings.cvDownloadHref;
-    if (el.downloadCv) if (el.downloadCv) el.downloadCv.download = documentStrings.cvDownloadFileName;
+    if (el.downloadCv)
+      if (el.downloadCv) el.downloadCv.href = documentStrings.cvDownloadHref;
+    if (el.downloadCv)
+      if (el.downloadCv)
+        el.downloadCv.download = documentStrings.cvDownloadFileName;
     el.downloadCv?.setAttribute('rel', 'nofollow');
     el.downloadCv?.setAttribute('data-noindex', 'true');
     el.downloadCv?.setAttribute('data-nosnippet', '');
@@ -235,7 +244,8 @@ export class ManifoldAppLocale {
     if (el.downloadCvLabel) el.downloadCvLabel.textContent = ui.cvLabel;
     if (el.downloadCvLabel) el.downloadCvLabel.dataset.text = ui.cvLabel;
     el.contactButton?.setAttribute('aria-label', ui.contactAria);
-    if (el.contactButton) el.contactButton.dataset.u = locale === 'pl' ? 'kontakt' : 'contact';
+    if (el.contactButton)
+      el.contactButton.dataset.u = locale === 'pl' ? 'kontakt' : 'contact';
     const contactUserEl = el.contactLabel.querySelector('.contact-u');
     if (contactUserEl) contactUserEl.textContent = ui.contactLabel;
     el.audioButton?.setAttribute('aria-label', audio.playAria);
@@ -245,12 +255,18 @@ export class ManifoldAppLocale {
       'aria-label',
       nextLocale === 'pl' ? ui.localeSwitchToPolish : ui.localeSwitchToEnglish
     );
-    el.localeButton?.setAttribute('aria-pressed', locale === 'pl' ? 'true' : 'false');
+    el.localeButton?.setAttribute(
+      'aria-pressed',
+      locale === 'pl' ? 'true' : 'false'
+    );
     if (el.localeButton) el.localeButton.dataset.locale = locale;
     el.modeToggle.menu?.setAttribute('aria-label', ui.menuAriaLabel);
-    el.modeToggle.option2D.querySelector('span:last-child')!.textContent = ui.mode2D;
-    el.modeToggle.option3D.querySelector('span:last-child')!.textContent = ui.mode3D;
-    el.modeToggle.option4D.querySelector('span:last-child')!.textContent = ui.mode4D;
+    el.modeToggle.option2D.querySelector('span:last-child')!.textContent =
+      ui.mode2D;
+    el.modeToggle.option3D.querySelector('span:last-child')!.textContent =
+      ui.mode3D;
+    el.modeToggle.option4D.querySelector('span:last-child')!.textContent =
+      ui.mode4D;
     el.advanceButtons.prev?.setAttribute('aria-label', ui.previousCardAria);
     el.advanceButtons.next?.setAttribute('aria-label', ui.nextCardAria);
 
@@ -268,45 +284,81 @@ export class ManifoldAppLocale {
     if (el.hud.perfSidebarLabel) el.hud.perfSidebarLabel.textContent = ui.perf;
     if (el.hud.fpsLabel) el.hud.fpsLabel.textContent = ui.fps;
     if (el.hud.coordPrefix) el.hud.coordPrefix.textContent = ui.coord;
-    if (el.hud.velocityLabel) el.hud.velocityLabel.textContent = ui.scrollVelocity;
+    if (el.hud.velocityLabel)
+      el.hud.velocityLabel.textContent = ui.scrollVelocity;
     if (el.hudNav.kicker) el.hudNav.kicker.textContent = ui.sceneNavigation;
     if (el.hudNav.title) el.hudNav.title.textContent = ui.jumpAcrossSections;
     el.hudNav.backdrop?.setAttribute('aria-label', ui.closeNavigationAria);
     el.hudNav.orbitToggleButton?.setAttribute('aria-label', ui.orbitToggleAria);
-    if (el.hudNav.orbitToggleLabel) el.hudNav.orbitToggleLabel.textContent = ui.orbitToggle;
-    if (el.hudNav.additionalLabel) el.hudNav.additionalLabel.textContent = ui.additionalOptions;
+    if (el.hudNav.orbitToggleLabel)
+      el.hudNav.orbitToggleLabel.textContent = ui.orbitToggle;
+    if (el.hudNav.additionalLabel)
+      el.hudNav.additionalLabel.textContent = ui.additionalOptions;
     el.hudNav.privacyTrigger?.setAttribute('aria-label', ui.privacyLabel);
-    if (el.hudNav.privacyLabel) el.hudNav.privacyLabel.textContent = ui.privacyLabel;
+    if (el.hudNav.privacyLabel)
+      el.hudNav.privacyLabel.textContent = ui.privacyLabel;
     el.hudNav.aboutTrigger?.setAttribute('aria-label', ui.aboutLabel);
     if (el.hudNav.aboutLabel) el.hudNav.aboutLabel.textContent = ui.aboutLabel;
     el.hudNav.policyTrigger?.setAttribute('aria-label', ui.policyLabel);
-    if (el.hudNav.policyLabel) el.hudNav.policyLabel.textContent = ui.policyLabel;
-    el.hudNav.debugForceButton?.setAttribute('aria-label', ui.systemOverlayToggleAria);
-    if (el.hudNav.aboutStack) el.hudNav.aboutStack.textContent = ui.aboutContent.stack;
-    if (el.hudNav.aboutTrivia) el.hudNav.aboutTrivia.textContent = ui.aboutContent.trivia;
-    if (el.hudNav.aboutVisitor) el.hudNav.aboutVisitor.textContent = ui.aboutContent.visitor;
-    if (el.hudNav.policyIntro) el.hudNav.policyIntro.textContent = ui.policyContent.intro;
-    if (el.hudNav.policyProcessingTitle) el.hudNav.policyProcessingTitle.textContent = ui.policyContent.processingTitle;
-    if (el.hudNav.policyProcessingBody) el.hudNav.policyProcessingBody.textContent = ui.policyContent.processingBody;
-    if (el.hudNav.policyStorageTitle) el.hudNav.policyStorageTitle.textContent = ui.policyContent.storageTitle;
-    if (el.hudNav.policyStorageBody) el.hudNav.policyStorageBody.textContent = ui.policyContent.storageBody;
-    if (el.hudNav.policyAudioTitle) el.hudNav.policyAudioTitle.textContent = ui.policyContent.audioTitle;
-    if (el.hudNav.policyAudioBody) el.hudNav.policyAudioBody.textContent = ui.policyContent.audioBody;
-    if (el.hudNav.policyTelemetryTitle) el.hudNav.policyTelemetryTitle.textContent = ui.policyContent.telemetryTitle;
-    if (el.hudNav.policyTelemetryBody) el.hudNav.policyTelemetryBody.textContent = ui.policyContent.telemetryBody;
-    if (el.hudNav.policyPerformanceTitle) el.hudNav.policyPerformanceTitle.textContent = ui.policyContent.performanceTitle;
-    if (el.hudNav.policyPerformanceBody) el.hudNav.policyPerformanceBody.textContent = ui.policyContent.performanceBody;
-    if (el.hudNav.policyContactTitle) el.hudNav.policyContactTitle.textContent = ui.policyContent.contactTitle;
-    if (el.hudNav.policyContactBody) el.hudNav.policyContactBody.textContent = ui.policyContent.contactBody;
-    if (el.hudNav.policyRightsTitle) el.hudNav.policyRightsTitle.textContent = ui.policyContent.rightsTitle;
-    if (el.hudNav.policyRightsBody) el.hudNav.policyRightsBody.textContent = ui.policyContent.rightsBody;
+    if (el.hudNav.policyLabel)
+      el.hudNav.policyLabel.textContent = ui.policyLabel;
+    el.hudNav.debugForceButton?.setAttribute(
+      'aria-label',
+      ui.systemOverlayToggleAria
+    );
+    if (el.hudNav.aboutStack)
+      el.hudNav.aboutStack.textContent = ui.aboutContent.stack;
+    if (el.hudNav.aboutTrivia)
+      el.hudNav.aboutTrivia.textContent = ui.aboutContent.trivia;
+    if (el.hudNav.aboutVisitor)
+      el.hudNav.aboutVisitor.textContent = ui.aboutContent.visitor;
+    if (el.hudNav.policyIntro)
+      el.hudNav.policyIntro.textContent = ui.policyContent.intro;
+    if (el.hudNav.policyProcessingTitle)
+      el.hudNav.policyProcessingTitle.textContent =
+        ui.policyContent.processingTitle;
+    if (el.hudNav.policyProcessingBody)
+      el.hudNav.policyProcessingBody.textContent =
+        ui.policyContent.processingBody;
+    if (el.hudNav.policyStorageTitle)
+      el.hudNav.policyStorageTitle.textContent = ui.policyContent.storageTitle;
+    if (el.hudNav.policyStorageBody)
+      el.hudNav.policyStorageBody.textContent = ui.policyContent.storageBody;
+    if (el.hudNav.policyAudioTitle)
+      el.hudNav.policyAudioTitle.textContent = ui.policyContent.audioTitle;
+    if (el.hudNav.policyAudioBody)
+      el.hudNav.policyAudioBody.textContent = ui.policyContent.audioBody;
+    if (el.hudNav.policyTelemetryTitle)
+      el.hudNav.policyTelemetryTitle.textContent =
+        ui.policyContent.telemetryTitle;
+    if (el.hudNav.policyTelemetryBody)
+      el.hudNav.policyTelemetryBody.textContent =
+        ui.policyContent.telemetryBody;
+    if (el.hudNav.policyPerformanceTitle)
+      el.hudNav.policyPerformanceTitle.textContent =
+        ui.policyContent.performanceTitle;
+    if (el.hudNav.policyPerformanceBody)
+      el.hudNav.policyPerformanceBody.textContent =
+        ui.policyContent.performanceBody;
+    if (el.hudNav.policyContactTitle)
+      el.hudNav.policyContactTitle.textContent = ui.policyContent.contactTitle;
+    if (el.hudNav.policyContactBody)
+      el.hudNav.policyContactBody.textContent = ui.policyContent.contactBody;
+    if (el.hudNav.policyRightsTitle)
+      el.hudNav.policyRightsTitle.textContent = ui.policyContent.rightsTitle;
+    if (el.hudNav.policyRightsBody)
+      el.hudNav.policyRightsBody.textContent = ui.policyContent.rightsBody;
     el.exitButton?.setAttribute('aria-label', ui.returnToEntryAria);
     if (el.exitButtonLabel) el.exitButtonLabel.textContent = ui.return;
-    if (el.twoDSectionFrameKicker) el.twoDSectionFrameKicker.textContent = ui.twoDSection;
+    if (el.twoDSectionFrameKicker)
+      el.twoDSectionFrameKicker.textContent = ui.twoDSection;
     if (el.introHintKicker) el.introHintKicker.textContent = ui.entryPoint;
-    if (el.introHintTitle) el.introHintTitle.textContent = ui.enteringAutomatically;
-    if (el.contextHintKicker) el.contextHintKicker.textContent = ui.scrollToBrowse;
-    if (el.contextHintTitle) el.contextHintTitle.textContent = ui.clickCardForDetails;
+    if (el.introHintTitle)
+      el.introHintTitle.textContent = ui.enteringAutomatically;
+    if (el.contextHintKicker)
+      el.contextHintKicker.textContent = ui.scrollToBrowse;
+    if (el.contextHintTitle)
+      el.contextHintTitle.textContent = ui.clickCardForDetails;
   }
 
   private applyToDocument(locale: ManifoldLocale): void {

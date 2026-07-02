@@ -51,7 +51,10 @@ export interface DebugSnapshot {
   visibleScenes: number;
 }
 
-const sceneLoaders: Record<SceneName, () => Promise<{ default: SceneModule | (() => SceneModule) }>> = {
+const sceneLoaders: Record<
+  SceneName,
+  () => Promise<{ default: SceneModule | (() => SceneModule) }>
+> = {
   hero: () => import('../scenes/hero'),
   skills: () => import('../scenes/skills'),
   projects: () => import('../scenes/projects'),
@@ -72,7 +75,9 @@ export class SceneManager {
   private readonly resizeObserver: ResizeObserver;
   private assetLoader: AssetLoader | null = null;
   private sceneCtor: typeof import('three').Scene | null = null;
-  private perspectiveCameraCtor: typeof import('three').PerspectiveCamera | null = null;
+  private perspectiveCameraCtor:
+    | typeof import('three').PerspectiveCamera
+    | null = null;
 
   private rafId = 0;
   private destroyed = false;
@@ -104,8 +109,14 @@ export class SceneManager {
    * @returns A promise that resolves when initialization is complete
    */
   async start(): Promise<void> {
-    const [{ Clock: ClockCtor, PerspectiveCamera: PerspectiveCameraCtor, Scene: SceneCtor }, { AssetLoader }] =
-      await Promise.all([import('three'), import('./AssetLoader')]);
+    const [
+      {
+        Clock: ClockCtor,
+        PerspectiveCamera: PerspectiveCameraCtor,
+        Scene: SceneCtor
+      },
+      { AssetLoader }
+    ] = await Promise.all([import('three'), import('./AssetLoader')]);
     this.clock = new ClockCtor();
     this.sceneCtor = SceneCtor;
     this.perspectiveCameraCtor = PerspectiveCameraCtor;
@@ -155,7 +166,9 @@ export class SceneManager {
 
       if (slot.isSetup && slot.module) {
         slot.module.dispose(slot.ctx);
-        void import('./dispose').then(({ disposeObject }) => disposeObject(slot.scene));
+        void import('./dispose').then(({ disposeObject }) =>
+          disposeObject(slot.scene)
+        );
       }
     }
 
@@ -174,7 +187,9 @@ export class SceneManager {
     const info = this.pipeline.info.render ?? {};
 
     return {
-      activeScenes: Array.from(this.slots.values()).filter((slot) => slot.isSetup).length,
+      activeScenes: Array.from(this.slots.values()).filter(
+        (slot) => slot.isSetup
+      ).length,
       backend: this.pipeline.mode,
       dpr: this.adaptiveQuality.currentDpr,
       drawCalls: info.calls ?? 0,
@@ -261,7 +276,10 @@ export class SceneManager {
 
     const imported = await sceneLoaders[slot.name]();
     const moduleOrFactory = imported.default;
-    slot.module = typeof moduleOrFactory === 'function' ? moduleOrFactory() : moduleOrFactory;
+    slot.module =
+      typeof moduleOrFactory === 'function'
+        ? moduleOrFactory()
+        : moduleOrFactory;
 
     this.refreshSlotBounds(slot);
     slot.ctx.width = Math.max(slot.bounds.width, 1);
@@ -348,7 +366,8 @@ export class SceneManager {
       }
 
       const x = rect.left - this.canvasBounds.left;
-      const y = this.canvasBounds.height - (rect.bottom - this.canvasBounds.top);
+      const y =
+        this.canvasBounds.height - (rect.bottom - this.canvasBounds.top);
       const width = rect.width;
       const height = rect.height;
 
@@ -373,8 +392,14 @@ export class SceneManager {
   };
 
   private resize(): void {
-    const width = Math.max(Math.round(this.canvasBounds.width), window.innerWidth);
-    const height = Math.max(Math.round(this.canvasBounds.height), window.innerHeight);
+    const width = Math.max(
+      Math.round(this.canvasBounds.width),
+      window.innerWidth
+    );
+    const height = Math.max(
+      Math.round(this.canvasBounds.height),
+      window.innerHeight
+    );
     this.pipeline.setPixelRatio(this.adaptiveQuality.currentDpr);
     this.pipeline.setSize(width, height);
   }
@@ -415,8 +440,12 @@ export class SceneManager {
       }
     };
 
-    window.addEventListener('pointermove', handlePointerMove, { passive: true });
-    window.addEventListener('pointerdown', handlePointerDown, { passive: true });
+    window.addEventListener('pointermove', handlePointerMove, {
+      passive: true
+    });
+    window.addEventListener('pointerdown', handlePointerDown, {
+      passive: true
+    });
 
     return () => {
       window.removeEventListener('pointermove', handlePointerMove);
@@ -438,8 +467,12 @@ export class SceneManager {
       clientY <= nextRect.bottom;
 
     this.pointerLocal.inside = inside;
-    this.pointerLocal.x = inside ? ((clientX - nextRect.left) / nextRect.width) * 2 - 1 : 0;
-    this.pointerLocal.y = inside ? -(((clientY - nextRect.top) / nextRect.height) * 2 - 1) : 0;
+    this.pointerLocal.x = inside
+      ? ((clientX - nextRect.left) / nextRect.width) * 2 - 1
+      : 0;
+    this.pointerLocal.y = inside
+      ? -(((clientY - nextRect.top) / nextRect.height) * 2 - 1)
+      : 0;
 
     slot.ctx.pointer.x = this.pointerLocal.x;
     slot.ctx.pointer.y = this.pointerLocal.y;

@@ -12,16 +12,21 @@ self.onmessage = (event: MessageEvent<PhysicsWorkerRequest>) => {
 
   switch (message.type) {
     case 'compute': {
-      const computed = orchestrator.computeItemStates(message.items, message.context);
-      const items: PhysicsWorkerItemResult[] = computed.map((result, index) => ({
-        itemKey: message.items[index]?.itemKey ?? -1,
-        alpha: result.alpha,
-        vizZ: result.vizZ,
-        isNearCamera: result.isNearCamera,
-        isExpandedMorphing: result.isExpandedMorphing,
-        skipAlphaCheck: result.skipAlphaCheck,
-        motion: result.motion
-      }));
+      const computed = orchestrator.computeItemStates(
+        message.items,
+        message.context
+      );
+      const items: PhysicsWorkerItemResult[] = computed.map(
+        (result, index) => ({
+          itemKey: message.items[index]?.itemKey ?? -1,
+          alpha: result.alpha,
+          vizZ: result.vizZ,
+          isNearCamera: result.isNearCamera,
+          isExpandedMorphing: result.isExpandedMorphing,
+          skipAlphaCheck: result.skipAlphaCheck,
+          motion: result.motion
+        })
+      );
       const response: PhysicsWorkerResponse = {
         type: 'result',
         frameId: message.frameId,

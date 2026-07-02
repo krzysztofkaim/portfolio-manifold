@@ -56,7 +56,9 @@ export class ManifoldCardChromeRenderer {
     initialInstanceCapacity = 24
   ) {
     this.instanceCapacity = Math.max(1, initialInstanceCapacity);
-    this.instanceData = new Float32Array(this.instanceCapacity * FLOATS_PER_QUAD);
+    this.instanceData = new Float32Array(
+      this.instanceCapacity * FLOATS_PER_QUAD
+    );
     this.sortedInstances = new Array<CardChromeInstance>(this.instanceCapacity);
     this.gl = canvas.getContext('webgl2', {
       alpha: true,
@@ -160,23 +162,35 @@ export class ManifoldCardChromeRenderer {
     this.program = linkProgram(this.gl, vertexShader, fragmentShader);
     this.vertexArray = this.gl.createVertexArray();
     this.vertexBuffer = this.gl.createBuffer();
-    this.positionLocation = this.gl.getAttribLocation(this.program, 'a_position');
+    this.positionLocation = this.gl.getAttribLocation(
+      this.program,
+      'a_position'
+    );
     this.uvLocation = this.gl.getAttribLocation(this.program, 'a_uv');
     this.opacityLocation = this.gl.getAttribLocation(this.program, 'a_opacity');
     this.accentLocation = this.gl.getAttribLocation(this.program, 'a_accent');
-    this.emphasisLocation = this.gl.getAttribLocation(this.program, 'a_emphasis');
-    this.resolutionLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
+    this.emphasisLocation = this.gl.getAttribLocation(
+      this.program,
+      'a_emphasis'
+    );
+    this.resolutionLocation = this.gl.getUniformLocation(
+      this.program,
+      'u_resolution'
+    );
 
     this.configureVertexAttributes();
   }
 
   isSupported(): boolean {
-    return Boolean(this.gl && this.program && this.vertexBuffer && !this.disabled);
+    return Boolean(
+      this.gl && this.program && this.vertexBuffer && !this.disabled
+    );
   }
 
   disable(): void {
     this.disabled = true;
     this.prewarmed = false;
+    this.destroy();
   }
 
   resize(width: number, height: number): void {
@@ -216,7 +230,13 @@ export class ManifoldCardChromeRenderer {
   }
 
   prewarm(width: number, height: number): void {
-    if (!this.gl || !this.program || !this.vertexBuffer || this.prewarmed || this.disabled) {
+    if (
+      !this.gl ||
+      !this.program ||
+      !this.vertexBuffer ||
+      this.prewarmed ||
+      this.disabled
+    ) {
       return;
     }
 
@@ -234,7 +254,13 @@ export class ManifoldCardChromeRenderer {
     this.gl.useProgram(this.program);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
     this.ensureBufferCapacity();
-    this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this.instanceData, 0, warmupFloats);
+    this.gl.bufferSubData(
+      this.gl.ARRAY_BUFFER,
+      0,
+      this.instanceData,
+      0,
+      warmupFloats
+    );
     this.gl.enable(this.gl.BLEND);
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     this.gl.disable(this.gl.DEPTH_TEST);
@@ -292,7 +318,13 @@ export class ManifoldCardChromeRenderer {
     this.gl.useProgram(this.program);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
     this.ensureBufferCapacity();
-    this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this.instanceData, 0, cursor);
+    this.gl.bufferSubData(
+      this.gl.ARRAY_BUFFER,
+      0,
+      this.instanceData,
+      0,
+      cursor
+    );
     this.gl.enable(this.gl.BLEND);
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     this.gl.disable(this.gl.DEPTH_TEST);
@@ -326,7 +358,9 @@ export class ManifoldCardChromeRenderer {
     }
 
     this.instanceCapacity = nextCapacity;
-    this.instanceData = new Float32Array(this.instanceCapacity * FLOATS_PER_QUAD);
+    this.instanceData = new Float32Array(
+      this.instanceCapacity * FLOATS_PER_QUAD
+    );
     this.sortedInstances = new Array<CardChromeInstance>(this.instanceCapacity);
     this.bufferCapacityBytes = 0;
   }
@@ -341,7 +375,11 @@ export class ManifoldCardChromeRenderer {
       return;
     }
 
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, requiredBytes, this.gl.DYNAMIC_DRAW);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      requiredBytes,
+      this.gl.DYNAMIC_DRAW
+    );
     this.bufferCapacityBytes = requiredBytes;
   }
 
@@ -358,19 +396,54 @@ export class ManifoldCardChromeRenderer {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
 
     this.gl.enableVertexAttribArray(this.positionLocation);
-    this.gl.vertexAttribPointer(this.positionLocation, 2, this.gl.FLOAT, false, stride, 0);
+    this.gl.vertexAttribPointer(
+      this.positionLocation,
+      2,
+      this.gl.FLOAT,
+      false,
+      stride,
+      0
+    );
 
     this.gl.enableVertexAttribArray(this.uvLocation);
-    this.gl.vertexAttribPointer(this.uvLocation, 2, this.gl.FLOAT, false, stride, 2 * Float32Array.BYTES_PER_ELEMENT);
+    this.gl.vertexAttribPointer(
+      this.uvLocation,
+      2,
+      this.gl.FLOAT,
+      false,
+      stride,
+      2 * Float32Array.BYTES_PER_ELEMENT
+    );
 
     this.gl.enableVertexAttribArray(this.opacityLocation);
-    this.gl.vertexAttribPointer(this.opacityLocation, 1, this.gl.FLOAT, false, stride, 4 * Float32Array.BYTES_PER_ELEMENT);
+    this.gl.vertexAttribPointer(
+      this.opacityLocation,
+      1,
+      this.gl.FLOAT,
+      false,
+      stride,
+      4 * Float32Array.BYTES_PER_ELEMENT
+    );
 
     this.gl.enableVertexAttribArray(this.accentLocation);
-    this.gl.vertexAttribPointer(this.accentLocation, 3, this.gl.FLOAT, false, stride, 5 * Float32Array.BYTES_PER_ELEMENT);
+    this.gl.vertexAttribPointer(
+      this.accentLocation,
+      3,
+      this.gl.FLOAT,
+      false,
+      stride,
+      5 * Float32Array.BYTES_PER_ELEMENT
+    );
 
     this.gl.enableVertexAttribArray(this.emphasisLocation);
-    this.gl.vertexAttribPointer(this.emphasisLocation, 1, this.gl.FLOAT, false, stride, 8 * Float32Array.BYTES_PER_ELEMENT);
+    this.gl.vertexAttribPointer(
+      this.emphasisLocation,
+      1,
+      this.gl.FLOAT,
+      false,
+      stride,
+      8 * Float32Array.BYTES_PER_ELEMENT
+    );
 
     if (this.vertexArray) {
       this.gl.bindVertexArray(null);
@@ -396,15 +469,17 @@ export class ManifoldCardChromeRenderer {
     if (
       !this.gl ||
       !this.resolutionLocation ||
-      (
-        this.canvasWidth === this.lastResolutionWidth &&
-        this.canvasHeight === this.lastResolutionHeight
-      )
+      (this.canvasWidth === this.lastResolutionWidth &&
+        this.canvasHeight === this.lastResolutionHeight)
     ) {
       return;
     }
 
-    this.gl.uniform2f(this.resolutionLocation, this.canvasWidth, this.canvasHeight);
+    this.gl.uniform2f(
+      this.resolutionLocation,
+      this.canvasWidth,
+      this.canvasHeight
+    );
     this.lastResolutionWidth = this.canvasWidth;
     this.lastResolutionHeight = this.canvasHeight;
   }
@@ -455,9 +530,23 @@ function writePackedInstance(
   const quad = instance.quad;
   const centerX = (quad[0][0] + quad[1][0] + quad[2][0] + quad[3][0]) * 0.25;
   const centerY = (quad[0][1] + quad[1][1] + quad[2][1] + quad[3][1]) * 0.25;
-  const bboxWidth = Math.max(24, Math.abs(quad[1][0] - quad[0][0]) + Math.abs(quad[2][0] - quad[3][0])) * 0.5;
-  const bboxHeight = Math.max(24, Math.abs(quad[3][1] - quad[0][1]) + Math.abs(quad[2][1] - quad[1][1])) * 0.5;
-  const padPx = Math.max(4, Math.min(9, Math.max(bboxWidth, bboxHeight) * 0.018 + instance.emphasis * 1.1));
+  const bboxWidth =
+    Math.max(
+      24,
+      Math.abs(quad[1][0] - quad[0][0]) + Math.abs(quad[2][0] - quad[3][0])
+    ) * 0.5;
+  const bboxHeight =
+    Math.max(
+      24,
+      Math.abs(quad[3][1] - quad[0][1]) + Math.abs(quad[2][1] - quad[1][1])
+    ) * 0.5;
+  const padPx = Math.max(
+    4,
+    Math.min(
+      9,
+      Math.max(bboxWidth, bboxHeight) * 0.018 + instance.emphasis * 1.1
+    )
+  );
   const scale = 1 + padPx / Math.max(24, Math.max(bboxWidth, bboxHeight));
   const uvPad = (scale - 1) * 0.5;
 
@@ -484,12 +573,84 @@ function writePackedInstance(
   const v3 = 1 + uvPad;
 
   let cursor = offset;
-  cursor = writeVertex(target, cursor, x0, y0, u0, v0, opacity, r, g, b, emphasis);
-  cursor = writeVertex(target, cursor, x1, y1, u1, v1, opacity, r, g, b, emphasis);
-  cursor = writeVertex(target, cursor, x2, y2, u2, v2, opacity, r, g, b, emphasis);
-  cursor = writeVertex(target, cursor, x0, y0, u0, v0, opacity, r, g, b, emphasis);
-  cursor = writeVertex(target, cursor, x2, y2, u2, v2, opacity, r, g, b, emphasis);
-  cursor = writeVertex(target, cursor, x3, y3, u3, v3, opacity, r, g, b, emphasis);
+  cursor = writeVertex(
+    target,
+    cursor,
+    x0,
+    y0,
+    u0,
+    v0,
+    opacity,
+    r,
+    g,
+    b,
+    emphasis
+  );
+  cursor = writeVertex(
+    target,
+    cursor,
+    x1,
+    y1,
+    u1,
+    v1,
+    opacity,
+    r,
+    g,
+    b,
+    emphasis
+  );
+  cursor = writeVertex(
+    target,
+    cursor,
+    x2,
+    y2,
+    u2,
+    v2,
+    opacity,
+    r,
+    g,
+    b,
+    emphasis
+  );
+  cursor = writeVertex(
+    target,
+    cursor,
+    x0,
+    y0,
+    u0,
+    v0,
+    opacity,
+    r,
+    g,
+    b,
+    emphasis
+  );
+  cursor = writeVertex(
+    target,
+    cursor,
+    x2,
+    y2,
+    u2,
+    v2,
+    opacity,
+    r,
+    g,
+    b,
+    emphasis
+  );
+  cursor = writeVertex(
+    target,
+    cursor,
+    x3,
+    y3,
+    u3,
+    v3,
+    opacity,
+    r,
+    g,
+    b,
+    emphasis
+  );
   return cursor;
 }
 

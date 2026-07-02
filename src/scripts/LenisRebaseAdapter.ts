@@ -3,10 +3,10 @@ import Lenis from '@studio-freight/lenis';
 /**
  * AUDIT RESOLUTION (2026-04-17):
  * This adapter accesses private internal state of Lenis (animatedScroll, targetScroll, setScroll).
- * This is CRITICAL for performing "scroll rebasing" in horizontal/vertical loops without 
- * resetting the internal lerp (smoothness). 
- * 
- * RECOMMENDED ACTION: If updating @studio-freight/lenis version, you MUST run regression 
+ * This is CRITICAL for performing "scroll rebasing" in horizontal/vertical loops without
+ * resetting the internal lerp (smoothness).
+ *
+ * RECOMMENDED ACTION: If updating @studio-freight/lenis version, you MUST run regression
  * tests and verify that these internal fields still exist and behave as expected.
  */
 type LenisInternalState = {
@@ -46,8 +46,13 @@ export function createLenisRebaseAdapter(lenis: Lenis): LenisRebaseAdapter {
   const state = lenis as unknown as LenisInternalState;
 
   // Validation: Check if the required internal state exists (at least once during creation)
-  if (typeof state.animatedScroll === 'undefined' || typeof state.targetScroll === 'undefined') {
-    console.error('LenisRebaseAdapter: Critical internal fields missing. Lenis version might be incompatible.');
+  if (
+    typeof state.animatedScroll === 'undefined' ||
+    typeof state.targetScroll === 'undefined'
+  ) {
+    console.error(
+      'LenisRebaseAdapter: Critical internal fields missing. Lenis version might be incompatible.'
+    );
   }
 
   return {

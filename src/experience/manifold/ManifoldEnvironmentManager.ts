@@ -43,7 +43,9 @@ export interface ManifoldEnvironmentContext {
 }
 
 export class ManifoldEnvironmentManager {
-  private static readonly COMMON_REFRESH_CAPS = [60, 75, 90, 100, 120, 144, 165, 180, 240];
+  private static readonly COMMON_REFRESH_CAPS = [
+    60, 75, 90, 100, 120, 144, 165, 180, 240
+  ];
   private fpsSampleElapsed = 0;
   private fpsSampleFrames = 0;
   private fpsSampleTarget = 120;
@@ -63,11 +65,19 @@ export class ManifoldEnvironmentManager {
     const frameTimeBurst =
       delta > state.frameTimeBurst
         ? delta
-        : lerp(state.frameTimeBurst, delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.frameTimeBurstDecayLerp);
+        : lerp(
+            state.frameTimeBurst,
+            delta,
+            MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.frameTimeBurstDecayLerp
+          );
     this.fpsSampleElapsed += delta;
     this.fpsSampleFrames += 1;
-    if (this.fpsSampleElapsed >= MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.fullRateSamplingMs) {
-      this.fpsSampleTarget = (this.fpsSampleFrames * 1000) / this.fpsSampleElapsed;
+    if (
+      this.fpsSampleElapsed >=
+      MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.fullRateSamplingMs
+    ) {
+      this.fpsSampleTarget =
+        (this.fpsSampleFrames * 1000) / this.fpsSampleElapsed;
       this.fpsSampleElapsed = 0;
       this.fpsSampleFrames = 0;
     }
@@ -105,15 +115,25 @@ export class ManifoldEnvironmentManager {
     return Math.round(clamped);
   }
 
-  updateTopbarAndParticles(input: Pick<ManifoldEnvironmentInput, 'introCompleted' | 'targetViewMode' | 'velocityMagnitude'>): void {
+  updateTopbarAndParticles(
+    input: Pick<
+      ManifoldEnvironmentInput,
+      'introCompleted' | 'targetViewMode' | 'velocityMagnitude'
+    >
+  ): void {
     const state = this.context.getState();
-    const topbarTarget = input.introCompleted ? clamp((input.velocityMagnitude - 0.02) / 2.2, 0, 1) : 0;
+    const topbarTarget = input.introCompleted
+      ? clamp((input.velocityMagnitude - 0.02) / 2.2, 0, 1)
+      : 0;
     const topbarEase =
       topbarTarget > state.topbarEnergy
         ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.topbarRiseLerp
         : MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.topbarFallLerp;
     const topbarEnergy = lerp(state.topbarEnergy, topbarTarget, topbarEase);
-    const particleActivity = updateCanvasParticleActivity(state.particleActivity, input);
+    const particleActivity = updateCanvasParticleActivity(
+      state.particleActivity,
+      input
+    );
 
     const topbar = this.context.getTopbar();
     if (topbar) {
@@ -122,7 +142,10 @@ export class ManifoldEnvironmentManager {
       const lineStateKey = Math.round(topbarEnergy * 100);
       if (lineStateKey !== state.topbarLineKey) {
         topbar.style.setProperty('--topbar-line-spread', spread);
-        topbar.style.setProperty('--topbar-line-glow', topbarEnergy > 0.05 ? glow : '0');
+        topbar.style.setProperty(
+          '--topbar-line-glow',
+          topbarEnergy > 0.05 ? glow : '0'
+        );
         this.context.setState({ topbarLineKey: lineStateKey });
       }
     }
@@ -133,13 +156,20 @@ export class ManifoldEnvironmentManager {
     });
   }
 
-  updateWorldEnvironment(input: Pick<ManifoldEnvironmentInput, 'activeViewModeProgress' | 'mouseX' | 'mouseY' | 'viewVelocity'>): void {
+  updateWorldEnvironment(
+    input: Pick<
+      ManifoldEnvironmentInput,
+      'activeViewModeProgress' | 'mouseX' | 'mouseY' | 'viewVelocity'
+    >
+  ): void {
     const state = this.context.getState();
     const flattenTwoDScene = IS_IOS && input.activeViewModeProgress > 0.9;
     const tiltModeMix = flattenTwoDScene ? 0 : 1 - input.activeViewModeProgress;
     const tiltX = (input.mouseY * 5 - input.viewVelocity * 0.5) * tiltModeMix;
     const tiltY = input.mouseX * 5 * tiltModeMix;
-    const worldTransform = flattenTwoDScene ? 'flat' : `${tiltX.toFixed(2)}|${tiltY.toFixed(2)}`;
+    const worldTransform = flattenTwoDScene
+      ? 'flat'
+      : `${tiltX.toFixed(2)}|${tiltY.toFixed(2)}`;
 
     if (worldTransform !== state.lastWorldTransform) {
       this.context.getWorldElement().style.transform = flattenTwoDScene
@@ -152,7 +182,9 @@ export class ManifoldEnvironmentManager {
       MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.perspectiveFar,
       input.activeViewModeProgress
     );
-    const perspective = flattenTwoDScene ? 'none' : `${perspectiveDepth.toFixed(0)}px`;
+    const perspective = flattenTwoDScene
+      ? 'none'
+      : `${perspectiveDepth.toFixed(0)}px`;
 
     if (perspective !== state.lastPerspective) {
       this.context.getViewportElement().style.perspective = perspective;
@@ -167,7 +199,9 @@ export class ManifoldEnvironmentManager {
     });
   }
 
-  renderParticles(input: Parameters<ManifoldCanvasParticleField['render']>[0]): void {
+  renderParticles(
+    input: Parameters<ManifoldCanvasParticleField['render']>[0]
+  ): void {
     this.particleField.render(input);
   }
 }

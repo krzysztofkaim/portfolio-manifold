@@ -1,10 +1,20 @@
 import { lerp } from '../../utils/math';
 import { MANIFOLD_CONSTANTS } from './ManifoldConstants';
-import type { ItemState, ManifoldSceneRuntimeConfig, ManifoldPhaseState, TwoDGridMetrics, ViewMode } from './ManifoldScrollTypes';
+import type {
+  ItemState,
+  ManifoldSceneRuntimeConfig,
+  ManifoldPhaseState,
+  TwoDGridMetrics,
+  ViewMode
+} from './ManifoldScrollTypes';
 
 export interface ManifoldScrollSystemContext {
   getConfig(): ManifoldSceneRuntimeConfig;
-  getExpandedState(): { card: ItemState | null; target: number; quenchUntil: number };
+  getExpandedState(): {
+    card: ItemState | null;
+    target: number;
+    quenchUntil: number;
+  };
   getFeaturedItem(): ItemState | null;
   getLoopSize(): number;
   getNow(): number;
@@ -37,15 +47,17 @@ export class ManifoldScrollSystem {
     const now = this.context.getNow();
     const phaseState = this.context.getPhaseState();
     const expandedState = this.context.getExpandedState();
-    const hasExpandedCardMotion = expandedState.card !== null && expandedState.target > 0.01;
+    const hasExpandedCardMotion =
+      expandedState.card !== null && expandedState.target > 0.01;
     const shouldQuenchExpandedMotion =
-      hasExpandedCardMotion &&
-      now < expandedState.quenchUntil;
+      hasExpandedCardMotion && now < expandedState.quenchUntil;
     const expandedVelocityScale = shouldQuenchExpandedMotion
       ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.expandedMotionVelocityScale
       : velocity < 0
-        ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.expandedMotionReverseVelocityScale
-        : MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.expandedMotionSustainVelocityScale;
+        ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS
+            .expandedMotionReverseVelocityScale
+        : MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS
+            .expandedMotionSustainVelocityScale;
     const expandedScrollLerp = shouldQuenchExpandedMotion
       ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.expandedMotionScrollLerp
       : MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.expandedMotionSustainScrollLerp;
@@ -62,7 +74,10 @@ export class ManifoldScrollSystem {
       ? velocity * expandedVelocityScale
       : velocity;
 
-    if (Math.abs(nextScroll - phaseState.scroll) > 0.02 || Math.abs(nextVelocity) > 0.01) {
+    if (
+      Math.abs(nextScroll - phaseState.scroll) > 0.02 ||
+      Math.abs(nextVelocity) > 0.01
+    ) {
       this.context.markScrollActivity(now);
     }
 
@@ -87,10 +102,13 @@ export class ManifoldScrollSystem {
       return this.getLoopScrollLength() * 1.5;
     }
 
-    return (featuredItem.cardIndex * this.context.getConfig().zGap) / this.context.getConfig().camSpeed;
+    return (
+      (featuredItem.cardIndex * this.context.getConfig().zGap) /
+      this.context.getConfig().camSpeed
+    );
   }
 
- normalizeLoopAnchor(
+  normalizeLoopAnchor(
     anchor: number,
     reference: number,
     mode: 'nearest' | 'forward' | 'backward' | 'smart'
@@ -133,7 +151,8 @@ export class ManifoldScrollSystem {
   stabilizeIncomingScroll(scroll: number, velocity: number): number {
     const continuity = this.context.getScrollContinuityState();
     const loopLength = Math.max(1, this.getLoopScrollLength());
-    const loopChanged = Math.abs(loopLength - continuity.lastInputLoopLength) > 1;
+    const loopChanged =
+      Math.abs(loopLength - continuity.lastInputLoopLength) > 1;
 
     if (!Number.isFinite(continuity.lastIncomingScroll) || loopChanged) {
       this.context.setScrollContinuityState({
@@ -149,9 +168,13 @@ export class ManifoldScrollSystem {
     const directionalThreshold = loopLength * 0.35;
 
     if (directionHint > 0 && scrollDelta < -directionalThreshold) {
-      scrollDelta += Math.ceil((directionalThreshold - scrollDelta) / loopLength) * loopLength;
+      scrollDelta +=
+        Math.ceil((directionalThreshold - scrollDelta) / loopLength) *
+        loopLength;
     } else if (directionHint < 0 && scrollDelta > directionalThreshold) {
-      scrollDelta -= Math.ceil((scrollDelta - directionalThreshold) / loopLength) * loopLength;
+      scrollDelta -=
+        Math.ceil((scrollDelta - directionalThreshold) / loopLength) *
+        loopLength;
     } else if (Math.abs(scrollDelta) > loopLength * 0.5) {
       scrollDelta -= Math.round(scrollDelta / loopLength) * loopLength;
     }
@@ -169,7 +192,9 @@ export class ManifoldScrollSystem {
     return stableInputScroll;
   }
 
-  resetIncomingScrollContinuity(scroll = this.context.getPhaseState().scroll): void {
+  resetIncomingScrollContinuity(
+    scroll = this.context.getPhaseState().scroll
+  ): void {
     this.context.setScrollContinuityState({
       lastIncomingScroll: scroll,
       lastInputLoopLength: Math.max(1, this.getLoopScrollLength()),

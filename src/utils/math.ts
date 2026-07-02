@@ -30,7 +30,11 @@ export function lerp(start: number, end: number, alpha: number): number {
  * @param value - The input value
  * @returns The interpolated value
  */
-export function smoothstep(edge0: number, edge1: number, value: number): number {
+export function smoothstep(
+  edge0: number,
+  edge1: number,
+  value: number
+): number {
   const x = clamp((value - edge0) / (edge1 - edge0), 0, 1);
   return x * x * (3 - 2 * x);
 }

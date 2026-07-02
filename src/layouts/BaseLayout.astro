@@ -1,6 +1,9 @@
 ---
 import '../styles/global.css';
-import { getManifoldLocaleBundle, type ManifoldLocale } from '../i18n/manifoldLocale';
+import {
+  getManifoldLocaleBundle,
+  type ManifoldLocale
+} from '../i18n/manifoldLocale';
 import { getLocalePath } from '../i18n/localeRouting';
 import { siteMetadata } from '../config/siteMetadata';
 
@@ -45,20 +48,30 @@ const structuredDataPayload = structuredData
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} id="meta-description" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
     <meta name="author" content={siteMetadata.name} />
     <meta name="keywords" content={siteMetadata.keywords.join(', ')} />
     <meta name="theme-color" content="#030303" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <link rel="canonical" href={canonicalUrl.toString()} />
     <link rel="alternate" hreflang="en" href={alternates.en} />
     <link rel="alternate" hreflang="pl" href={alternates.pl} />
     <link rel="alternate" hreflang="x-default" href={alternates.xDefault} />
     <link rel="manifest" href="/site.webmanifest" />
     <meta property="og:title" content={title} id="meta-og-title" />
-    <meta property="og:description" content={description} id="meta-og-description" />
+    <meta
+      property="og:description"
+      content={description}
+      id="meta-og-description"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteMetadata.websiteName} />
     <meta property="og:url" content={canonicalUrl.toString()} />
@@ -80,15 +93,29 @@ const structuredDataPayload = structuredData
     <script is:inline src="/boot.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;800&display=swap" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;800&display=swap"
+    />
 
     <title>{title}</title>
-    {structuredDataPayload && (
-      <script is:inline type="application/ld+json" set:html={structuredDataPayload}></script>
-    )}
+    {
+      structuredDataPayload && (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={structuredDataPayload}
+        />
+      )
+    }
   </head>
   <body>
-    <div class="locale-transition-overlay" id="locale-transition-overlay" aria-hidden="true"></div>
+    <div
+      class="locale-transition-overlay"
+      id="locale-transition-overlay"
+      aria-hidden="true"
+    >
+    </div>
     <slot />
     <script>
       import '../scripts/manifold-mode.ts';

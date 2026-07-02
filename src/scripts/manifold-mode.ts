@@ -8,14 +8,29 @@ import { BrowserRuntimeAdapter } from '../ui/adapters/BrowserRuntimeAdapter';
 import { ManifoldAudioController } from './ManifoldAudioController';
 import { logManifoldConsoleBanner } from './ManifoldConsoleBanner';
 import { ManifoldModeSelector } from './ManifoldModeSelector';
-import { ManifoldTelemetry, resolveTelemetryEndpoint } from './ManifoldTelemetry';
+import {
+  ManifoldTelemetry,
+  resolveTelemetryEndpoint
+} from './ManifoldTelemetry';
 import { ManifoldAppCursor, type CursorElements } from './ui/ManifoldAppCursor';
 import { ManifoldAppLocale, type LocaleElements } from './ui/ManifoldAppLocale';
-import { ManifoldAppDiagnostics, type DiagnosticsElements, type LoopTelemetry } from './ui/ManifoldAppDiagnostics';
+import {
+  ManifoldAppDiagnostics,
+  type DiagnosticsElements,
+  type LoopTelemetry
+} from './ui/ManifoldAppDiagnostics';
 import { ManifoldAppScroll } from './ui/ManifoldAppScroll';
 import { StyleAdapter } from '../utils/StyleAdapter';
-import { EVENT_RECORD_PROFILE, type RecordProfileDetail } from '../config/manifold/ManifoldEvents';
-import { IS_ANDROID, IS_ANDROID_LOW_END, IS_IOS, IS_SAFARI } from '../utils/browserDetection';
+import {
+  EVENT_RECORD_PROFILE,
+  type RecordProfileDetail
+} from '../config/manifold/ManifoldEvents';
+import {
+  IS_ANDROID,
+  IS_ANDROID_LOW_END,
+  IS_IOS,
+  IS_SAFARI
+} from '../utils/browserDetection';
 
 type HudSubviewView = 'about' | 'policy';
 
@@ -119,7 +134,20 @@ interface BootElements extends LocaleElements {
   topbarLoaderKicker: HTMLElement;
   topbarCopy: HTMLElement;
   topbarRole: HTMLElement;
-  hud: LocaleElements['hud'] & { root: HTMLElement; section: HTMLElement; card: HTMLElement; coord: HTMLElement; fps: HTMLElement; perfMode: HTMLElement; perfModeSidebar: HTMLElement; velocity: HTMLElement; coordPrefix: HTMLElement; fpsLabel: HTMLElement; perfLabel: HTMLElement; velocityLabel: HTMLElement };
+  hud: LocaleElements['hud'] & {
+    root: HTMLElement;
+    section: HTMLElement;
+    card: HTMLElement;
+    coord: HTMLElement;
+    fps: HTMLElement;
+    perfMode: HTMLElement;
+    perfModeSidebar: HTMLElement;
+    velocity: HTMLElement;
+    coordPrefix: HTMLElement;
+    fpsLabel: HTMLElement;
+    perfLabel: HTMLElement;
+    velocityLabel: HTMLElement;
+  };
   hudFocusFeedback: HTMLElement;
   hudFocusTrigger: HTMLButtonElement;
   advanceButtons: LocaleElements['advanceButtons'];
@@ -156,7 +184,8 @@ class ManifoldApp {
   private loopMetricsUpdateRaf = 0;
   private hudNavigationCloseTimeout = 0;
   private hudNavigationTravelUntil = 0;
-  private hudNavigationFrozenFocus: { section: string; card: string } | null = null;
+  private hudNavigationFrozenFocus: { section: string; card: string } | null =
+    null;
   private lastTopbarKickerText = '';
   private topbarExitHintHoldUntil = 0;
   private hudSectionPrimeTimeout = 0;
@@ -189,7 +218,10 @@ class ManifoldApp {
   private modeSelectorTeardown: (() => void) | null = null;
   private localeTeardown: (() => void) | null = null;
   private debugModeHotkeysTeardown: (() => void) | null = null;
-  private readonly hudSubviewPagers = new Map<HudSubviewView, HudSubviewPagerState>();
+  private readonly hudSubviewPagers = new Map<
+    HudSubviewView,
+    HudSubviewPagerState
+  >();
   private hudSubviewPaginationForce = false;
   private hudSubviewPaginationRaf = 0;
   private lastHudNavRenderAt = 0;
@@ -221,7 +253,9 @@ class ManifoldApp {
 
   constructor(private readonly elements: BootElements) {
     this.spectrumBars = elements.hudNav.spectrumBars;
-    this.lastHudSpectrumBarScales = new Array(this.spectrumBars.length).fill(-1);
+    this.lastHudSpectrumBarScales = new Array(this.spectrumBars.length).fill(
+      -1
+    );
 
     this.telemetry = new ManifoldTelemetry(resolveTelemetryEndpoint());
     this.telemetry.installGlobalErrorHandlers();
@@ -235,7 +269,9 @@ class ManifoldApp {
     this.modeSelector = new ManifoldModeSelector({
       getController: () => this.controller,
       getActiveMode: () => this.activeMode,
-      setActiveMode: (mode) => { this.activeMode = mode; },
+      setActiveMode: (mode) => {
+        this.activeMode = mode;
+      },
       updateLoopMetrics: (nextLength) => {
         if (this.loopMetricsUpdateRaf) {
           window.cancelAnimationFrame(this.loopMetricsUpdateRaf);
@@ -249,26 +285,46 @@ class ManifoldApp {
     });
 
     this.cursor = new ManifoldAppCursor(elements.cursor);
-    this.scroll = new ManifoldAppScroll(this.telemetryState, () => this.controller, () => this.lenis);
+    this.scroll = new ManifoldAppScroll(
+      this.telemetryState,
+      () => this.controller,
+      () => this.lenis
+    );
     this.scroll.attachScrollProxy(elements.scrollProxy);
-    this.locale = new ManifoldAppLocale(elements, null, this.audio, this.modeSelector);
+    this.locale = new ManifoldAppLocale(
+      elements,
+      null,
+      this.audio,
+      this.modeSelector
+    );
     this.hudOrbitsVisible = this.resolveInitialOrbitVisibility();
   }
 
   async setup(): Promise<void> {
     const locale = this.locale.resolveInitialLocale();
     this.localeTeardown = this.locale.setup();
-    try { this.cursor.setup(); } catch (e) { console.error('Failed to init this.cursor.setup()', e); }
-    try { this.scroll.setup(); } catch (e) { console.error('Failed to init this.scroll.setup()', e); }
+    try {
+      this.cursor.setup();
+    } catch (e) {
+      console.error('Failed to init this.cursor.setup()', e);
+    }
+    try {
+      this.scroll.setup();
+    } catch (e) {
+      console.error('Failed to init this.scroll.setup()', e);
+    }
     logManifoldConsoleBanner();
 
     // Setup global recording event listener (v2 Architecture)
-    window.addEventListener(EVENT_RECORD_PROFILE, (event: CustomEvent<RecordProfileDetail>) => {
-      const { durationMs } = event.detail;
-      this.telemetry.track('profile_recording_started', { durationMs });
+    window.addEventListener(
+      EVENT_RECORD_PROFILE,
+      (event: CustomEvent<RecordProfileDetail>) => {
+        const { durationMs } = event.detail;
+        this.telemetry.track('profile_recording_started', { durationMs });
 
-      // Future: integrate with real ProfilerController here
-    });
+        // Future: integrate with real ProfilerController here
+      }
+    );
 
     // Mobile/Safari Optimization: Start decorative layers with a safer quality budget.
     if (IS_SAFARI || this.prefersMobilePerformanceBudget) {
@@ -289,7 +345,9 @@ class ManifoldApp {
       this.elements.liquidGradient.style.display = 'none';
       this.lastBackgroundQuality = 0;
     } else {
-      this.liquidGradient = new LiquidGradientBackground(this.elements.liquidGradient);
+      this.liquidGradient = new LiquidGradientBackground(
+        this.elements.liquidGradient
+      );
       if (IS_SAFARI || this.prefersMobilePerformanceBudget) {
         this.liquidGradient.setQuality(this.lastBackgroundQuality);
       }
@@ -321,7 +379,8 @@ class ManifoldApp {
       dom,
       runtime,
       {
-        onCardExpanded: (cardId) => this.telemetry.track('card_expanded', { cardId }),
+        onCardExpanded: (cardId) =>
+          this.telemetry.track('card_expanded', { cardId }),
         onFourDModeEntered: () => this.telemetry.track('4d_mode_entered'),
         onIntroEntered: () => {
           this.telemetry.track('intro_entered');
@@ -341,7 +400,6 @@ class ManifoldApp {
         },
         onModeSwitched: (from, to) => {
           this.telemetry.track('mode_switched', { from, to });
-
         }
       },
       preferredMode
@@ -351,7 +409,11 @@ class ManifoldApp {
     this.locale.attachManifoldApp(this);
     this.controller.setLocale(locale);
     this.activeMode = this.controller.getViewMode();
-    this.elements.cardChromeLayer.addEventListener('webglcontextlost', this.handleCardChromeContextLost, false);
+    this.elements.cardChromeLayer.addEventListener(
+      'webglcontextlost',
+      this.handleCardChromeContextLost,
+      false
+    );
 
     this.setupLenis();
     this.scroll.setLoopScrollLength(this.controller.getLoopScrollLength());
@@ -362,7 +424,9 @@ class ManifoldApp {
     this.setupHudAdvanceButtons();
     this.setupHudOrbitToggle();
     this.setupHudAdditionalViews();
-    this.modeSelectorTeardown = this.modeSelector.setup(this.elements.modeToggle);
+    this.modeSelectorTeardown = this.modeSelector.setup(
+      this.elements.modeToggle
+    );
     this.modeSelector.syncModeToggleState();
     this.debugModeHotkeysTeardown = this.setupDebugModeHotkeys();
     this.controller.scheduleIntroAutoEnter();
@@ -391,11 +455,14 @@ class ManifoldApp {
     };
 
     this.lenis = new Lenis(options);
-    this.lenis.on('scroll', (e: { animatedScroll: number; velocity: number }) => {
-      let target = e.animatedScroll;
-      target = this.scroll.maybeRebaseLenis(target);
-      this.scroll.handleLenisScroll(target, e.velocity);
-    });
+    this.lenis.on(
+      'scroll',
+      (e: { animatedScroll: number; velocity: number }) => {
+        let target = e.animatedScroll;
+        target = this.scroll.maybeRebaseLenis(target);
+        this.scroll.handleLenisScroll(target, e.velocity);
+      }
+    );
   }
 
   private setupAudio(): void {
@@ -435,20 +502,41 @@ class ManifoldApp {
 
   private showHudIntroHint(): void {
     const bundle = this.locale.getActiveLocaleBundle();
-    this.controller?.showTemporaryHudFocus(bundle.ui.hudHintLineOne, bundle.ui.hudHintLineTwo, 2600);
+    this.controller?.showTemporaryHudFocus(
+      bundle.ui.hudHintLineOne,
+      bundle.ui.hudHintLineTwo,
+      2600
+    );
   }
 
-  private scrollToNavigationAnchor(anchor: number, options?: { immediate?: boolean }): void {
-    const logicalTarget = this.controller?.resolveNavigationScrollTarget(anchor) ?? anchor;
+  private scrollToNavigationAnchor(
+    anchor: number,
+    options?: { immediate?: boolean }
+  ): void {
+    const logicalTarget =
+      this.controller?.resolveNavigationScrollTarget(anchor) ?? anchor;
 
     this.scroll.scrollToLogical(logicalTarget, options);
   }
 
-  private navigateToHudCard(cardIndex: number, options?: { openCard?: boolean; closeNavigation?: boolean; immediate?: boolean }): void {
-    const anchor = this.controller?.getCardNavigationAnchor(cardIndex, 'nearest');
+  private navigateToHudCard(
+    cardIndex: number,
+    options?: {
+      openCard?: boolean;
+      closeNavigation?: boolean;
+      immediate?: boolean;
+    }
+  ): void {
+    const anchor = this.controller?.getCardNavigationAnchor(
+      cardIndex,
+      'nearest'
+    );
 
     if (anchor !== null && anchor !== undefined) {
-      this.scrollToNavigationAnchor(anchor, options?.immediate === false ? { immediate: false } : undefined);
+      this.scrollToNavigationAnchor(
+        anchor,
+        options?.immediate === false ? { immediate: false } : undefined
+      );
     }
 
     if (options?.openCard !== false) {
@@ -462,20 +550,30 @@ class ManifoldApp {
       this.controller?.setProgrammaticJump(false);
     }
 
-    window.setTimeout(() => {
-
-    }, 0);
+    window.setTimeout(() => {}, 0);
   }
 
-  private setHudNavigationTravelState(active: boolean, frozenFocus?: { section: string; card: string } | null): void {
+  private setHudNavigationTravelState(
+    active: boolean,
+    frozenFocus?: { section: string; card: string } | null
+  ): void {
     this.hudNavigationTravelUntil = active ? performance.now() + 1400 : 0;
-    this.hudNavigationFrozenFocus = active ? frozenFocus ?? this.hudNavigationFrozenFocus : null;
+    this.hudNavigationFrozenFocus = active
+      ? (frozenFocus ?? this.hudNavigationFrozenFocus)
+      : null;
     this.elements.hudNav.panel.classList.toggle('is-traveling', active);
 
     const focus = active
-      ? (frozenFocus ?? this.hudNavigationFrozenFocus ?? this.controller?.getActiveHudNavigationFocus() ?? null)
-      : this.controller?.getActiveHudNavigationFocus() ?? null;
-    this.updateHudNavigationHeader(active, focus?.section ?? '', this.controller?.is4DMode() ?? false);
+      ? (frozenFocus ??
+        this.hudNavigationFrozenFocus ??
+        this.controller?.getActiveHudNavigationFocus() ??
+        null)
+      : (this.controller?.getActiveHudNavigationFocus() ?? null);
+    this.updateHudNavigationHeader(
+      active,
+      focus?.section ?? '',
+      this.controller?.is4DMode() ?? false
+    );
   }
 
   private updateHudSpectrum(): void {
@@ -493,16 +591,27 @@ class ManifoldApp {
     // 2. Handle HUD Navigation Header Spectrum
     const isActive = this.cachedIsNavOpen && audioActive;
     const targetAlpha = isActive ? 1 : 0;
-    
-    this.spectrumAlpha += (targetAlpha - this.spectrumAlpha) * (targetAlpha > this.spectrumAlpha ? 0.08 : 0.12);
+
+    this.spectrumAlpha +=
+      (targetAlpha - this.spectrumAlpha) *
+      (targetAlpha > this.spectrumAlpha ? 0.08 : 0.12);
 
     if (this.spectrumAlpha < 0.01) {
       if (this.lastHudSpectrumAlpha !== 0) {
-        StyleAdapter.setNumericProperty(this.elements.hudNav.spectrum, '--spectrum-alpha', 0);
+        StyleAdapter.setNumericProperty(
+          this.elements.hudNav.spectrum,
+          '--spectrum-alpha',
+          0
+        );
         this.lastHudSpectrumAlpha = 0;
       }
       if (this.lastHudSpectrumShiftY !== 0) {
-        StyleAdapter.setNumericProperty(this.elements.hudNav.header, '--hud-nav-shift-y', 0, 'px');
+        StyleAdapter.setNumericProperty(
+          this.elements.hudNav.header,
+          '--hud-nav-shift-y',
+          0,
+          'px'
+        );
         this.lastHudSpectrumShiftY = 0;
       }
       return;
@@ -512,12 +621,21 @@ class ManifoldApp {
     const quantizedShiftY = Math.round(this.spectrumAlpha * -12 * 2) / 2;
 
     if (quantizedAlpha !== this.lastHudSpectrumAlpha) {
-      StyleAdapter.setNumericProperty(this.elements.hudNav.spectrum, '--spectrum-alpha', quantizedAlpha);
+      StyleAdapter.setNumericProperty(
+        this.elements.hudNav.spectrum,
+        '--spectrum-alpha',
+        quantizedAlpha
+      );
       this.lastHudSpectrumAlpha = quantizedAlpha;
     }
 
     if (quantizedShiftY !== this.lastHudSpectrumShiftY) {
-      StyleAdapter.setNumericProperty(this.elements.hudNav.header, '--hud-nav-shift-y', quantizedShiftY, 'px');
+      StyleAdapter.setNumericProperty(
+        this.elements.hudNav.header,
+        '--hud-nav-shift-y',
+        quantizedShiftY,
+        'px'
+      );
       this.lastHudSpectrumShiftY = quantizedShiftY;
     }
 
@@ -532,7 +650,11 @@ class ManifoldApp {
       const quantizedScaleY = Math.round(scaleY * 40) / 40;
 
       if (quantizedScaleY !== this.lastHudSpectrumBarScales[i]) {
-        StyleAdapter.setNumericProperty(this.spectrumBars[i], '--bar-scale', quantizedScaleY);
+        StyleAdapter.setNumericProperty(
+          this.spectrumBars[i],
+          '--bar-scale',
+          quantizedScaleY
+        );
         this.lastHudSpectrumBarScales[i] = quantizedScaleY;
       }
     }
@@ -544,7 +666,8 @@ class ManifoldApp {
     const isNavOpen = this.cachedIsNavOpen;
     const now = performance.now();
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const shouldHoldExitHint = hasExpanded || isNavOpen || now < this.topbarExitHintHoldUntil;
+    const shouldHoldExitHint =
+      hasExpanded || isNavOpen || now < this.topbarExitHintHoldUntil;
 
     let nextText = bundle.ui.systemLoader;
 
@@ -553,7 +676,9 @@ class ManifoldApp {
     }
 
     if (shouldHoldExitHint) {
-      nextText = isTouch ? bundle.ui.scrollToExit : bundle.ui.scrollArrowsToExit;
+      nextText = isTouch
+        ? bundle.ui.scrollToExit
+        : bundle.ui.scrollArrowsToExit;
     }
 
     if (nextText === this.lastTopbarKickerText) {
@@ -565,13 +690,28 @@ class ManifoldApp {
 
     // Force container visibility if we have a message
     if (shouldHoldExitHint) {
-      this.elements.topbarLoaderKicker.parentElement?.style.setProperty('opacity', '1');
-      this.elements.topbarLoaderKicker.parentElement?.style.setProperty('filter', 'blur(0)');
-      this.elements.topbarLoaderKicker.parentElement?.style.setProperty('transform', 'translate(-50%, -50%) scale(1)');
+      this.elements.topbarLoaderKicker.parentElement?.style.setProperty(
+        'opacity',
+        '1'
+      );
+      this.elements.topbarLoaderKicker.parentElement?.style.setProperty(
+        'filter',
+        'blur(0)'
+      );
+      this.elements.topbarLoaderKicker.parentElement?.style.setProperty(
+        'transform',
+        'translate(-50%, -50%) scale(1)'
+      );
     } else {
-      this.elements.topbarLoaderKicker.parentElement?.style.removeProperty('opacity');
-      this.elements.topbarLoaderKicker.parentElement?.style.removeProperty('filter');
-      this.elements.topbarLoaderKicker.parentElement?.style.removeProperty('transform');
+      this.elements.topbarLoaderKicker.parentElement?.style.removeProperty(
+        'opacity'
+      );
+      this.elements.topbarLoaderKicker.parentElement?.style.removeProperty(
+        'filter'
+      );
+      this.elements.topbarLoaderKicker.parentElement?.style.removeProperty(
+        'transform'
+      );
     }
   }
 
@@ -580,7 +720,6 @@ class ManifoldApp {
     primaryCardIndex?: number,
     forcedFocus?: { section: string; card: string }
   ): void {
-
     if (this.hudNavigationCloseTimeout) {
       window.clearTimeout(this.hudNavigationCloseTimeout);
       this.hudNavigationCloseTimeout = 0;
@@ -608,7 +747,10 @@ class ManifoldApp {
         this.hudSectionPrimeTimeout = 0;
       }, 0);
 
-      const cardAnchor = this.controller?.getCardNavigationAnchor(primaryCardIndex, 'nearest');
+      const cardAnchor = this.controller?.getCardNavigationAnchor(
+        primaryCardIndex,
+        'nearest'
+      );
       if (cardAnchor !== null && cardAnchor !== undefined) {
         this.scrollToNavigationAnchor(cardAnchor, { immediate: false });
       } else {
@@ -624,9 +766,7 @@ class ManifoldApp {
       this.hudNavigationCloseTimeout = 0;
     }, 950);
 
-    window.setTimeout(() => {
-
-    }, 0);
+    window.setTimeout(() => {}, 0);
   }
 
   private setupHudAdvanceButtons(): void {
@@ -646,7 +786,8 @@ class ManifoldApp {
   private setupHudNavigation(): void {
     const updateNavigationAnchor = () => {
       const triggerRect = this.elements.hudFocusTrigger.getBoundingClientRect();
-      const panelWidth = this.elements.hudNav.panel.getBoundingClientRect().width || 760;
+      const panelWidth =
+        this.elements.hudNav.panel.getBoundingClientRect().width || 760;
       const viewportPadding = Math.max(16, window.innerWidth * 0.02);
       const triggerCenterX = triggerRect.left + triggerRect.width * 0.5;
       const clampedCenterX = Math.min(
@@ -655,8 +796,14 @@ class ManifoldApp {
       );
       const anchorY = Math.max(24, triggerRect.top - 10);
 
-      this.elements.hudNav.panel.style.setProperty('--hud-nav-anchor-x', `${clampedCenterX}px`);
-      this.elements.hudNav.panel.style.setProperty('--hud-nav-anchor-y', `${anchorY}px`);
+      this.elements.hudNav.panel.style.setProperty(
+        '--hud-nav-anchor-x',
+        `${clampedCenterX}px`
+      );
+      this.elements.hudNav.panel.style.setProperty(
+        '--hud-nav-anchor-y',
+        `${anchorY}px`
+      );
     };
 
     const closeNavigation = () => {
@@ -722,7 +869,9 @@ class ManifoldApp {
     this.elements.hudNav.backdrop.addEventListener('click', closeNavigation);
     window.addEventListener('keydown', handleEscape);
     window.addEventListener('wheel', handleScrollDismiss, { passive: true });
-    window.addEventListener('touchmove', handleScrollDismiss, { passive: true });
+    window.addEventListener('touchmove', handleScrollDismiss, {
+      passive: true
+    });
     window.addEventListener('resize', () => {
       if (document.body.classList.contains('hud-nav-open')) {
         updateNavigationAnchor();
@@ -734,7 +883,9 @@ class ManifoldApp {
   }
 
   private finishLocaleTransition(): void {
-    if (!document.documentElement.classList.contains('locale-transition-active')) {
+    if (
+      !document.documentElement.classList.contains('locale-transition-active')
+    ) {
       return;
     }
 
@@ -754,7 +905,10 @@ class ManifoldApp {
 
   private persistOrbitVisibility(): void {
     try {
-      window.localStorage.setItem('manifold-hud-orbits-visible', this.hudOrbitsVisible ? '1' : '0');
+      window.localStorage.setItem(
+        'manifold-hud-orbits-visible',
+        this.hudOrbitsVisible ? '1' : '0'
+      );
     } catch {
       return;
     }
@@ -775,9 +929,16 @@ class ManifoldApp {
     }
 
     this.lastHudOrbitVisibilitySignature = signature;
-    document.body.classList.toggle('hud-orbits-hidden', !effectiveOrbitVisibility);
-    this.elements.hudNav.orbitToggleButton.setAttribute('aria-pressed', effectiveOrbitVisibility ? 'true' : 'false');
-    this.elements.hudNav.orbitToggleButton.dataset.state = effectiveOrbitVisibility ? 'on' : 'off';
+    document.body.classList.toggle(
+      'hud-orbits-hidden',
+      !effectiveOrbitVisibility
+    );
+    this.elements.hudNav.orbitToggleButton.setAttribute(
+      'aria-pressed',
+      effectiveOrbitVisibility ? 'true' : 'false'
+    );
+    this.elements.hudNav.orbitToggleButton.dataset.state =
+      effectiveOrbitVisibility ? 'on' : 'off';
     this.elements.hudNav.orbitToggleButton.hidden = is4DMode;
     this.syncOrbitToggleLabel();
   }
@@ -793,11 +954,8 @@ class ManifoldApp {
   }
 
   private setupHudAdditionalViews(): void {
-    const {
-      aboutTrigger,
-      policyTrigger,
-      debugGpu, debugForceButton
-    } = this.elements.hudNav;
+    const { aboutTrigger, policyTrigger, debugGpu, debugForceButton } =
+      this.elements.hudNav;
 
     debugGpu.textContent = this.detectGpu();
     this.setupHudSubviewPager('about', this.elements.hudNav.aboutRoot);
@@ -805,8 +963,14 @@ class ManifoldApp {
 
     const toggleView = (view: HudSubviewView) => this.toggleHudSubView(view);
 
-    aboutTrigger.addEventListener('click', (e) => { e.stopPropagation(); toggleView('about'); });
-    policyTrigger.addEventListener('click', (e) => { e.stopPropagation(); toggleView('policy'); });
+    aboutTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleView('about');
+    });
+    policyTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleView('policy');
+    });
     debugForceButton.addEventListener('click', (e) => {
       e.stopPropagation();
       const diag = this.ensureDiagnostics();
@@ -817,12 +981,16 @@ class ManifoldApp {
     });
 
     const observer = new MutationObserver(() => {
-      const isHidden = this.elements.hudNav.overlay.getAttribute('aria-hidden') === 'true';
+      const isHidden =
+        this.elements.hudNav.overlay.getAttribute('aria-hidden') === 'true';
       if (isHidden && this.activeHudSubView !== null) {
         this.toggleHudSubView(this.activeHudSubView);
       }
     });
-    observer.observe(this.elements.hudNav.overlay, { attributes: true, attributeFilter: ['aria-hidden'] });
+    observer.observe(this.elements.hudNav.overlay, {
+      attributes: true,
+      attributeFilter: ['aria-hidden']
+    });
   }
 
   public syncHudSubviewPagers(): void {
@@ -857,13 +1025,17 @@ class ManifoldApp {
 
     const prevButton = document.createElement('button');
     prevButton.type = 'button';
-    prevButton.className = 'hud-subview-pager__nav hud-subview-pager__nav--prev';
-    prevButton.innerHTML = '<span class="hud-subview-pager__nav-icon" aria-hidden="true">&#x2039;</span>';
+    prevButton.className =
+      'hud-subview-pager__nav hud-subview-pager__nav--prev';
+    prevButton.innerHTML =
+      '<span class="hud-subview-pager__nav-icon" aria-hidden="true">&#x2039;</span>';
 
     const nextButton = document.createElement('button');
     nextButton.type = 'button';
-    nextButton.className = 'hud-subview-pager__nav hud-subview-pager__nav--next';
-    nextButton.innerHTML = '<span class="hud-subview-pager__nav-icon" aria-hidden="true">&#x203A;</span>';
+    nextButton.className =
+      'hud-subview-pager__nav hud-subview-pager__nav--next';
+    nextButton.innerHTML =
+      '<span class="hud-subview-pager__nav-icon" aria-hidden="true">&#x203A;</span>';
 
     const status = document.createElement('div');
     status.className = 'hud-subview-pager__status';
@@ -915,9 +1087,13 @@ class ManifoldApp {
     this.updateHudSubviewPagerLabels(state);
   }
 
-  private collectHudSubviewBlocks(state: HudSubviewPagerState): HudSubviewBlockDescriptor[] {
+  private collectHudSubviewBlocks(
+    state: HudSubviewPagerState
+  ): HudSubviewBlockDescriptor[] {
     const blocks: HudSubviewBlockDescriptor[] = [];
-    const intro = state.source.querySelector<HTMLElement>(':scope > .privacy-intro');
+    const intro = state.source.querySelector<HTMLElement>(
+      ':scope > .privacy-intro'
+    );
     const introText = intro?.textContent?.trim() ?? '';
     if (intro && introText) {
       blocks.push({
@@ -928,7 +1104,11 @@ class ManifoldApp {
       });
     }
 
-    const items = Array.from(state.source.querySelectorAll<HTMLElement>(':scope > .privacy-section > .privacy-item'));
+    const items = Array.from(
+      state.source.querySelectorAll<HTMLElement>(
+        ':scope > .privacy-section > .privacy-item'
+      )
+    );
     items.forEach((item, index) => {
       const actionButton = item.querySelector<HTMLButtonElement>('button');
       if (actionButton) {
@@ -941,9 +1121,15 @@ class ManifoldApp {
       }
 
       blocks.push({
-        bodyText: item.querySelector<HTMLElement>('.privacy-title')?.textContent?.trim() ?? '',
+        bodyText:
+          item
+            .querySelector<HTMLElement>('.privacy-title')
+            ?.textContent?.trim() ?? '',
         key: `item-${index}`,
-        kickerText: item.querySelector<HTMLElement>('.privacy-kicker')?.textContent?.trim() ?? '',
+        kickerText:
+          item
+            .querySelector<HTMLElement>('.privacy-kicker')
+            ?.textContent?.trim() ?? '',
         source: item,
         type: 'item'
       });
@@ -952,7 +1138,9 @@ class ManifoldApp {
     return blocks;
   }
 
-  private buildHudSubviewContentSignature(blocks: HudSubviewBlockDescriptor[]): string {
+  private buildHudSubviewContentSignature(
+    blocks: HudSubviewBlockDescriptor[]
+  ): string {
     return blocks
       .map((block) => {
         if (block.type === 'action') {
@@ -1012,9 +1200,16 @@ class ManifoldApp {
     state.viewport.style.maxHeight = `${maxPageHeight}px`;
     state.measurePage.style.width = `${state.viewport.getBoundingClientRect().width || viewportWidth}px`;
 
-    const fragments = blocks.flatMap((block) => this.buildHudSubviewFragments(state, block, maxPageHeight));
-    const pages = this.groupHudSubviewFragmentsIntoPages(state, fragments, maxPageHeight);
-    const nextPages = pages.length > 0 ? pages : [[this.createHudSubviewFallbackNode()]];
+    const fragments = blocks.flatMap((block) =>
+      this.buildHudSubviewFragments(state, block, maxPageHeight)
+    );
+    const pages = this.groupHudSubviewFragmentsIntoPages(
+      state,
+      fragments,
+      maxPageHeight
+    );
+    const nextPages =
+      pages.length > 0 ? pages : [[this.createHudSubviewFallbackNode()]];
     const previousPage = force ? 0 : state.currentPage;
 
     state.viewport.replaceChildren();
@@ -1033,9 +1228,12 @@ class ManifoldApp {
     const panel = this.elements.hudNav.panel;
     const panelStyle = window.getComputedStyle(panel);
     const rootStyle = window.getComputedStyle(state.root);
-    const maxPanelHeight = parseFloat(panelStyle.maxHeight) || window.innerHeight * 0.85;
-    const panelPaddingY = parseFloat(panelStyle.paddingTop) + parseFloat(panelStyle.paddingBottom);
-    const rootPaddingY = parseFloat(rootStyle.paddingTop) + parseFloat(rootStyle.paddingBottom);
+    const maxPanelHeight =
+      parseFloat(panelStyle.maxHeight) || window.innerHeight * 0.85;
+    const panelPaddingY =
+      parseFloat(panelStyle.paddingTop) + parseFloat(panelStyle.paddingBottom);
+    const rootPaddingY =
+      parseFloat(rootStyle.paddingTop) + parseFloat(rootStyle.paddingBottom);
     const pagerGap = 12;
     const statusHeight = state.status.getBoundingClientRect().height || 18;
     const siblingHeight = Array.from(panel.children).reduce((sum, child) => {
@@ -1050,7 +1248,17 @@ class ManifoldApp {
       return sum + child.getBoundingClientRect().height;
     }, 0);
 
-    return Math.max(136, Math.floor(maxPanelHeight - panelPaddingY - rootPaddingY - siblingHeight - statusHeight - pagerGap));
+    return Math.max(
+      136,
+      Math.floor(
+        maxPanelHeight -
+          panelPaddingY -
+          rootPaddingY -
+          siblingHeight -
+          statusHeight -
+          pagerGap
+      )
+    );
   }
 
   private buildHudSubviewFragments(
@@ -1081,7 +1289,13 @@ class ManifoldApp {
     let start = 0;
 
     while (start < tokens.length) {
-      const end = this.findHudSubviewTokenBreak(state, block, tokens, start, maxPageHeight);
+      const end = this.findHudSubviewTokenBreak(
+        state,
+        block,
+        tokens,
+        start,
+        maxPageHeight
+      );
       const segmentText = this.joinHudSubviewTokens(tokens.slice(start, end));
       if (!segmentText) {
         break;
@@ -1125,7 +1339,10 @@ class ManifoldApp {
 
     while (low <= high) {
       const mid = Math.floor((low + high) / 2);
-      const node = this.createHudSubviewNode(block, this.joinHudSubviewTokens(tokens.slice(start, mid)));
+      const node = this.createHudSubviewNode(
+        block,
+        this.joinHudSubviewTokens(tokens.slice(start, mid))
+      );
       if (this.measureHudSubviewNodeHeight(state, node) <= maxPageHeight) {
         best = mid;
         low = mid + 1;
@@ -1151,7 +1368,10 @@ class ManifoldApp {
       const mid = Math.floor((charLow + charHigh) / 2);
       const segmentTokens = [...tokens.slice(start, start + 1)];
       segmentTokens[0] = token.slice(0, mid);
-      const node = this.createHudSubviewNode(block, this.joinHudSubviewTokens(segmentTokens));
+      const node = this.createHudSubviewNode(
+        block,
+        this.joinHudSubviewTokens(segmentTokens)
+      );
       if (this.measureHudSubviewNodeHeight(state, node) <= maxPageHeight) {
         bestCharLength = mid;
         charLow = mid + 1;
@@ -1161,7 +1381,12 @@ class ManifoldApp {
     }
 
     if (bestCharLength < token.length) {
-      tokens.splice(start, 1, token.slice(0, bestCharLength), token.slice(bestCharLength));
+      tokens.splice(
+        start,
+        1,
+        token.slice(0, bestCharLength),
+        token.slice(bestCharLength)
+      );
     }
 
     return start + 1;
@@ -1177,7 +1402,10 @@ class ManifoldApp {
 
     fragments.forEach((fragment) => {
       const candidatePage = [...currentPage, fragment];
-      if (currentPage.length > 0 && !this.doesHudSubviewPageFit(state, candidatePage, maxPageHeight)) {
+      if (
+        currentPage.length > 0 &&
+        !this.doesHudSubviewPageFit(state, candidatePage, maxPageHeight)
+      ) {
         pages.push(currentPage);
         currentPage = [fragment];
         return;
@@ -1193,22 +1421,34 @@ class ManifoldApp {
     return pages;
   }
 
-  private doesHudSubviewPageFit(state: HudSubviewPagerState, nodes: HTMLElement[], maxPageHeight: number): boolean {
-    const measureNodes = nodes.map((node) => node.cloneNode(true) as HTMLElement);
+  private doesHudSubviewPageFit(
+    state: HudSubviewPagerState,
+    nodes: HTMLElement[],
+    maxPageHeight: number
+  ): boolean {
+    const measureNodes = nodes.map(
+      (node) => node.cloneNode(true) as HTMLElement
+    );
     state.measurePage.replaceChildren(...measureNodes);
     const fits = state.measurePage.scrollHeight <= maxPageHeight + 1;
     state.measurePage.replaceChildren();
     return fits;
   }
 
-  private measureHudSubviewNodeHeight(state: HudSubviewPagerState, node: HTMLElement): number {
+  private measureHudSubviewNodeHeight(
+    state: HudSubviewPagerState,
+    node: HTMLElement
+  ): number {
     state.measurePage.replaceChildren(node.cloneNode(true));
     const height = state.measurePage.scrollHeight;
     state.measurePage.replaceChildren();
     return height;
   }
 
-  private createHudSubviewNode(block: HudSubviewBlockDescriptor, bodyTextOverride?: string): HTMLElement {
+  private createHudSubviewNode(
+    block: HudSubviewBlockDescriptor,
+    bodyTextOverride?: string
+  ): HTMLElement {
     if (block.type === 'intro') {
       const intro = document.createElement('p');
       intro.className = 'privacy-intro';
@@ -1252,12 +1492,14 @@ class ManifoldApp {
     node.removeAttribute('inert');
     node.hidden = false;
 
-    node.querySelectorAll<HTMLElement>('[id], [aria-hidden], [inert], [hidden]').forEach((element) => {
-      element.removeAttribute('id');
-      element.removeAttribute('aria-hidden');
-      element.removeAttribute('inert');
-      element.hidden = false;
-    });
+    node
+      .querySelectorAll<HTMLElement>('[id], [aria-hidden], [inert], [hidden]')
+      .forEach((element) => {
+        element.removeAttribute('id');
+        element.removeAttribute('aria-hidden');
+        element.removeAttribute('inert');
+        element.hidden = false;
+      });
   }
 
   private createHudSubviewFallbackNode(): HTMLElement {
@@ -1270,7 +1512,10 @@ class ManifoldApp {
     return fallback;
   }
 
-  private setHudSubviewPage(state: HudSubviewPagerState, pageIndex: number): void {
+  private setHudSubviewPage(
+    state: HudSubviewPagerState,
+    pageIndex: number
+  ): void {
     const previousIndex = state.currentPage;
     const maxIndex = Math.max(0, state.pages.length - 1);
     const nextIndex = Math.min(maxIndex, Math.max(0, pageIndex));
@@ -1330,10 +1575,17 @@ class ManifoldApp {
 
     const statusText = state.status.textContent ?? '';
     if (statusText) {
-      this.textEffectManager.setTextContent(state.status, statusText, true, true);
+      this.textEffectManager.setTextContent(
+        state.status,
+        statusText,
+        true,
+        true
+      );
     }
 
-    const kickers = Array.from(activePage.querySelectorAll<HTMLElement>('.privacy-kicker'));
+    const kickers = Array.from(
+      activePage.querySelectorAll<HTMLElement>('.privacy-kicker')
+    );
     kickers.slice(0, 6).forEach((element, index) => {
       const target = element.dataset.originalText || element.textContent || '';
       if (!element.dataset.originalText) {
@@ -1366,26 +1618,48 @@ class ManifoldApp {
       ? `${ui.additionalOptions} ${ui.additionalOptionsHint}`
       : ui.additionalOptions;
 
-    if (this.elements.hudNav.additionalLabel.textContent !== additionalLabelText) {
+    if (
+      this.elements.hudNav.additionalLabel.textContent !== additionalLabelText
+    ) {
       this.elements.hudNav.additionalLabel.textContent = additionalLabelText;
     }
-    const aboutLabel = isAboutOpen ? bundle.ui.aboutCloseLabel : bundle.ui.aboutLabel;
-    const policyLabel = isPolicyOpen ? bundle.ui.policyCloseLabel : bundle.ui.policyLabel;
+    const aboutLabel = isAboutOpen
+      ? bundle.ui.aboutCloseLabel
+      : bundle.ui.aboutLabel;
+    const policyLabel = isPolicyOpen
+      ? bundle.ui.policyCloseLabel
+      : bundle.ui.policyLabel;
 
     if (this.elements.hudNav.aboutLabel.textContent !== aboutLabel) {
-      this.textEffectManager.setTextContent(this.elements.hudNav.aboutLabel, aboutLabel, true);
+      this.textEffectManager.setTextContent(
+        this.elements.hudNav.aboutLabel,
+        aboutLabel,
+        true
+      );
     }
 
     if (this.elements.hudNav.policyLabel.textContent !== policyLabel) {
-      this.textEffectManager.setTextContent(this.elements.hudNav.policyLabel, policyLabel, true);
+      this.textEffectManager.setTextContent(
+        this.elements.hudNav.policyLabel,
+        policyLabel,
+        true
+      );
     }
 
     if (this.diagnostics) {
       const isDiagOpen = this.diagnostics.isDiagnosticsOpen();
-      const diagLabel = isDiagOpen ? bundle.ui.systemOverlayOn : bundle.ui.systemOverlayOff;
-      const labelEl = this.elements.hudNav.debugForceButton.querySelector('.topbar-chip-label, .hud-nav-label');
+      const diagLabel = isDiagOpen
+        ? bundle.ui.systemOverlayOn
+        : bundle.ui.systemOverlayOff;
+      const labelEl = this.elements.hudNav.debugForceButton.querySelector(
+        '.topbar-chip-label, .hud-nav-label'
+      );
       if (labelEl && labelEl.textContent !== diagLabel) {
-        this.textEffectManager.setTextContent(labelEl as HTMLElement, diagLabel, true);
+        this.textEffectManager.setTextContent(
+          labelEl as HTMLElement,
+          diagLabel,
+          true
+        );
       }
     }
   }
@@ -1393,8 +1667,14 @@ class ManifoldApp {
   public syncOrbitToggleLabel(): void {
     const bundle = this.locale.getActiveLocaleBundle();
     const is4DMode = this.controller?.is4DMode() ?? false;
-    const label = !is4DMode && this.hudOrbitsVisible ? bundle.ui.orbitToggleActive : bundle.ui.orbitToggleInactive;
-    if (this.lastOrbitToggleLabel !== label || this.elements.hudNav.orbitToggleLabel.textContent !== label) {
+    const label =
+      !is4DMode && this.hudOrbitsVisible
+        ? bundle.ui.orbitToggleActive
+        : bundle.ui.orbitToggleInactive;
+    if (
+      this.lastOrbitToggleLabel !== label ||
+      this.elements.hudNav.orbitToggleLabel.textContent !== label
+    ) {
       this.lastOrbitToggleLabel = label;
       this.elements.hudNav.orbitToggleLabel.textContent = label;
     }
@@ -1412,15 +1692,24 @@ class ManifoldApp {
     const signature = is4DMode ? '4d' : 'section';
     if (signature !== this.lastHudNavigationModeSignature) {
       this.lastHudNavigationModeSignature = signature;
-      this.elements.hudNav.panel.classList.toggle('is-section-navigation-hidden', is4DMode);
+      this.elements.hudNav.panel.classList.toggle(
+        'is-section-navigation-hidden',
+        is4DMode
+      );
       this.elements.hudNav.orbitToggleButton.hidden = is4DMode;
     }
     this.applyHudOrbitVisibility();
   }
 
-  private updateHudNavigationHeader(travelLocked: boolean, focusSectionTitle: string, is4DMode: boolean): void {
+  private updateHudNavigationHeader(
+    travelLocked: boolean,
+    focusSectionTitle: string,
+    is4DMode: boolean
+  ): void {
     const bundle = this.locale.getActiveLocaleBundle();
-    const nextKicker = travelLocked ? bundle.ui.hudTravelLineOne : bundle.ui.sceneNavigation;
+    const nextKicker = travelLocked
+      ? bundle.ui.hudTravelLineOne
+      : bundle.ui.sceneNavigation;
     const nextTitle = travelLocked
       ? focusSectionTitle
       : is4DMode
@@ -1443,22 +1732,31 @@ class ManifoldApp {
     this.syncHudNavigationMode();
     const targets = this.controller.getSceneNavigationTargets();
     const travelLocked = this.hudNavigationTravelUntil > performance.now();
-    const focus = travelLocked && this.hudNavigationFrozenFocus
-      ? this.hudNavigationFrozenFocus
-      : this.controller.getActiveHudNavigationFocus();
+    const focus =
+      travelLocked && this.hudNavigationFrozenFocus
+        ? this.hudNavigationFrozenFocus
+        : this.controller.getActiveHudNavigationFocus();
     this.elements.hudNav.panel.classList.toggle('is-traveling', travelLocked);
     const is2DMode = this.controller.is2DMode();
     const is4DMode = this.controller.is4DMode();
+    const bundle = this.locale.getActiveLocaleBundle();
     const canNavigateSections = !is4DMode;
     const canNavigateCards = true;
-    this.elements.hudNav.panel.classList.toggle('is-scene-navigation-disabled', false);
+    this.elements.hudNav.panel.classList.toggle(
+      'is-scene-navigation-disabled',
+      false
+    );
     this.updateHudNavigationHeader(travelLocked, focus.section, is4DMode);
-    const activeSection = targets.find((section) => section.section === focus.section) ?? targets[0] ?? null;
+    const activeSection =
+      targets.find((section) => section.section === focus.section) ??
+      targets[0] ??
+      null;
     const activeCards = activeSection?.cards ?? [];
 
     const targetsSignature = targets
-      .map((section) =>
-        `${section.section}:${Math.round(section.anchor)}:${section.cards.map((card) => `${card.cardIndex}-${Math.round(card.anchor)}`).join(',')}`
+      .map(
+        (section) =>
+          `${section.section}:${Math.round(section.anchor)}:${section.cards.map((card) => `${card.cardIndex}-${Math.round(card.anchor)}`).join(',')}`
       )
       .join('|');
     const signature = `${focus.section}:${focus.card}:${is2DMode}:${is4DMode}:${this.locale.getActiveLocale()}:${targetsSignature}`;
@@ -1468,27 +1766,33 @@ class ManifoldApp {
     }
     this.lastHudNavSignature = signature;
     const tree = this.elements.hudNav.tree;
+    tree.setAttribute('role', 'navigation');
+    tree.setAttribute('aria-label', bundle.ui.sceneNavigation);
     tree.replaceChildren();
     this.renderHudOrbit(
       this.elements.hudOrbit.sections,
       canNavigateSections
         ? targets.map((section) => ({
-          active: focus.section === section.section,
-          disabled: false,
-          label: section.section,
-          onClick: () => {
-            const target = this.controller?.getSectionNavigationTarget(section.section) ?? null;
-            if (!target) {
-              return;
-            }
+            active: focus.section === section.section,
+            disabled: false,
+            label: section.section,
+            onClick: () => {
+              const target =
+                this.controller?.getSectionNavigationTarget(section.section) ??
+                null;
+              if (!target) {
+                return;
+              }
 
-            this.scrollToNavigationAnchor(target.anchor, { immediate: false });
+              this.scrollToNavigationAnchor(target.anchor, {
+                immediate: false
+              });
 
-            if (is2DMode && target.cardIndex !== null) {
-              this.controller?.focusCardIn2D(target.cardIndex, false);
+              if (is2DMode && target.cardIndex !== null) {
+                this.controller?.focusCardIn2D(target.cardIndex, false);
+              }
             }
-          }
-        }))
+          }))
         : [],
       'left'
     );
@@ -1502,15 +1806,23 @@ class ManifoldApp {
           if (!canNavigateCards) {
             return;
           }
-          this.navigateToHudCard(card.cardIndex, { openCard: true, closeNavigation: false });
+          this.navigateToHudCard(card.cardIndex, {
+            openCard: true,
+            closeNavigation: false
+          });
         }
       })),
       'right'
     );
 
-    targets.forEach(section => {
+    targets.forEach((section) => {
       const sectionEl = document.createElement('div');
       sectionEl.className = 'hud-nav-section';
+      sectionEl.setAttribute('role', 'group');
+      sectionEl.setAttribute(
+        'aria-label',
+        `${bundle.ui.sectionKicker}: ${section.section}`
+      );
       const sectionIsActive = focus.section === section.section;
       sectionEl.classList.toggle('is-active-scope', sectionIsActive);
 
@@ -1520,13 +1832,22 @@ class ManifoldApp {
       sectionButton.disabled = !canNavigateSections;
       sectionButton.classList.toggle('is-active', sectionIsActive);
       sectionButton.classList.toggle('is-disabled', !canNavigateSections);
-      sectionButton.innerHTML = `<span class="hud-nav-section-kicker">SECTION</span><strong>${section.section}</strong>`;
+      sectionButton.setAttribute(
+        'aria-label',
+        `${bundle.ui.sectionKicker}: ${section.section}`
+      );
+      sectionButton.toggleAttribute('aria-current', sectionIsActive);
+      if (sectionIsActive) {
+        sectionButton.setAttribute('aria-current', 'location');
+      }
+      sectionButton.innerHTML = `<span class="hud-nav-section-kicker">${bundle.ui.sectionKicker}</span><strong>${section.section}</strong>`;
       sectionButton.addEventListener('click', () => {
         if (!canNavigateSections) {
           return;
         }
 
-        const target = this.controller?.getSectionNavigationTarget(section.section) ?? null;
+        const target =
+          this.controller?.getSectionNavigationTarget(section.section) ?? null;
         if (!target) {
           return;
         }
@@ -1543,21 +1864,38 @@ class ManifoldApp {
 
       const cardsEl = document.createElement('div');
       cardsEl.className = 'hud-nav-cards';
+      cardsEl.setAttribute('role', 'group');
+      cardsEl.setAttribute(
+        'aria-label',
+        `${bundle.ui.jumpAcrossCards}: ${section.section}`
+      );
       sectionEl.classList.toggle('is-cards-only', is4DMode);
 
-      section.cards.forEach(card => {
+      section.cards.forEach((card) => {
         const cardEl = document.createElement('button');
-        const cardIsActive = !is2DMode && sectionIsActive && focus.card === card.card;
+        const cardIsActive =
+          !is2DMode && sectionIsActive && focus.card === card.card;
         cardEl.className = 'hud-nav-card';
         cardEl.disabled = !canNavigateCards;
         cardEl.classList.toggle('is-active', cardIsActive);
         cardEl.classList.toggle('is-disabled', !canNavigateCards);
+        cardEl.setAttribute(
+          'aria-label',
+          `${bundle.ui.clickCardForDetails}: ${card.card}. ${bundle.ui.sectionKicker}: ${section.section}`
+        );
+        cardEl.toggleAttribute('aria-current', cardIsActive);
+        if (cardIsActive) {
+          cardEl.setAttribute('aria-current', 'location');
+        }
         cardEl.textContent = card.card;
         cardEl.addEventListener('click', () => {
           if (!canNavigateCards) {
             return;
           }
-          this.navigateToHudCard(card.cardIndex, { openCard: true, closeNavigation: true });
+          this.navigateToHudCard(card.cardIndex, {
+            openCard: true,
+            closeNavigation: true
+          });
         });
         cardsEl.appendChild(cardEl);
       });
@@ -1574,9 +1912,19 @@ class ManifoldApp {
 
   private renderHudOrbit(
     root: HTMLElement,
-    entries: Array<{ active: boolean; disabled?: boolean; label: string; onClick: () => void }>,
+    entries: Array<{
+      active: boolean;
+      disabled?: boolean;
+      label: string;
+      onClick: () => void;
+    }>,
     side: 'left' | 'right'
   ): void {
+    const bundle = this.locale.getActiveLocaleBundle();
+    const orbitLabel =
+      side === 'left'
+        ? bundle.ui.jumpAcrossSections
+        : bundle.ui.jumpAcrossCards;
     root.classList.toggle('hud-orbit--left', side === 'left');
     root.classList.toggle('hud-orbit--right', side === 'right');
 
@@ -1600,6 +1948,8 @@ class ManifoldApp {
       tree.className = 'hud-orbit__tree';
       root.appendChild(tree);
     }
+    tree.setAttribute('role', 'navigation');
+    tree.setAttribute('aria-label', orbitLabel);
 
     kicker.style.display = 'none';
 
@@ -1609,13 +1959,18 @@ class ManifoldApp {
     }
 
     const count = entries.length;
-    const activeIndex = Math.max(0, entries.findIndex((entry) => entry.active));
+    const activeIndex = Math.max(
+      0,
+      entries.findIndex((entry) => entry.active)
+    );
     const nextLabels = new Set();
-    
+
     // We want exactly 5 slots: -2, -1, 0, 1, 2 relative to activeIndex
     const slots = [-2, -1, 0, 1, 2];
     const existingButtons = new Map(
-      Array.from(tree.querySelectorAll<HTMLButtonElement>('.hud-orbit__item')).map((button) => [button.dataset.key ?? '', button])
+      Array.from(
+        tree.querySelectorAll<HTMLButtonElement>('.hud-orbit__item')
+      ).map((button) => [button.dataset.key ?? '', button])
     );
 
     slots.forEach((relativeSlot) => {
@@ -1637,10 +1992,16 @@ class ManifoldApp {
       button.dataset.label = entry.label;
       button.onclick = entry.onClick;
       button.disabled = entry.disabled === true;
-      button.querySelector<HTMLElement>('.hud-orbit__label')!.textContent = entry.label;
+      button.querySelector<HTMLElement>('.hud-orbit__label')!.textContent =
+        entry.label;
       button.classList.toggle('is-active', relativeSlot === 0);
       button.classList.toggle('is-disabled', entry.disabled === true);
-      button.setAttribute('aria-pressed', relativeSlot === 0 ? 'true' : 'false');
+      button.setAttribute('aria-label', `${orbitLabel}: ${entry.label}`);
+      button.toggleAttribute('aria-current', relativeSlot === 0);
+      if (relativeSlot === 0) {
+        button.setAttribute('aria-current', 'location');
+      }
+      button.removeAttribute('aria-pressed');
 
       const relativeIndex = relativeSlot;
       const maxVisibleDistance = 3.0;
@@ -1649,13 +2010,21 @@ class ManifoldApp {
       const baseX = 8;
       const radiusX = 132;
 
-      const clampedDistance = Math.min(Math.abs(relativeIndex), maxVisibleDistance);
-      const normalizedDistance = Math.min(1, clampedDistance / maxVisibleDistance);
+      const clampedDistance = Math.min(
+        Math.abs(relativeIndex),
+        maxVisibleDistance
+      );
+      const normalizedDistance = Math.min(
+        1,
+        clampedDistance / maxVisibleDistance
+      );
       const curvature = 1 - Math.pow(normalizedDistance, 1.45);
       const x = Math.round(baseX + curvature * radiusX);
       const y = Math.round(centerY + relativeIndex * stepY);
       const isActive = relativeSlot === 0;
-      const opacity = isActive ? 1 : Math.max(0.12, 0.54 - normalizedDistance * 0.42);
+      const opacity = isActive
+        ? 1
+        : Math.max(0.12, 0.54 - normalizedDistance * 0.42);
       const scale = isActive ? 1 : 0.9 - normalizedDistance * 0.12;
       const blur = isActive ? 0 : normalizedDistance * 1.8;
 
@@ -1665,12 +2034,22 @@ class ManifoldApp {
       StyleAdapter.setNumericProperty(button, '--orbit-scale', scale);
       StyleAdapter.setNumericProperty(button, '--orbit-blur', blur, 'px');
       StyleAdapter.setNumericProperty(button, '--orbit-translate-y', y, 'px');
-      StyleAdapter.setNumericProperty(button, '--orbit-distance', normalizedDistance);
-      StyleAdapter.setNumericProperty(button, '--orbit-sign', side === 'left' ? 1 : -1);
+      StyleAdapter.setNumericProperty(
+        button,
+        '--orbit-distance',
+        normalizedDistance
+      );
+      StyleAdapter.setNumericProperty(
+        button,
+        '--orbit-sign',
+        side === 'left' ? 1 : -1
+      );
 
       button.classList.toggle('is-dimmed', !isActive);
       button.classList.toggle('is-hidden-orbit', false);
-      button.style.zIndex = isActive ? '3' : String(2 - Math.min(1, Math.round(clampedDistance)));
+      button.style.zIndex = isActive
+        ? '3'
+        : String(2 - Math.min(1, Math.round(clampedDistance)));
 
       tree.appendChild(button);
       existingButtons.delete(slotKey);
@@ -1697,8 +2076,16 @@ class ManifoldApp {
         this.hudSubViewUpdateInterval = 0;
       }
 
-      this.elements.hudNav.aboutRoot.style.setProperty('display', 'none', 'important');
-      this.elements.hudNav.policyRoot.style.setProperty('display', 'none', 'important');
+      this.elements.hudNav.aboutRoot.style.setProperty(
+        'display',
+        'none',
+        'important'
+      );
+      this.elements.hudNav.policyRoot.style.setProperty(
+        'display',
+        'none',
+        'important'
+      );
       this.elements.hudNav.tree.style.setProperty('display', '', '');
       this.elements.hudNav.header.style.setProperty('display', '', '');
     }
@@ -1720,7 +2107,12 @@ class ManifoldApp {
       if (!this.running) return;
 
       const frameStartedAt = performance.now();
-      let perf = { backgroundScale: 0.36, frameInterval: 0, pixelScale: 1, transitionActive: false };
+      let perf = {
+        backgroundScale: 0.36,
+        frameInterval: 0,
+        pixelScale: 1,
+        transitionActive: false
+      };
 
       this.scroll.update(time);
       const scrollVelocity = Math.abs(this.scroll.getTargetVelocity());
@@ -1731,31 +2123,32 @@ class ManifoldApp {
       if (this.controller) {
         perf = this.controller.getPerformanceProfile();
         const forceResponsiveRate =
-          scrollVelocity > 0.0035 ||
-          time - this.lastInteractionBurstAt < 1400;
+          scrollVelocity > 0.0035 || time - this.lastInteractionBurstAt < 1400;
         const audioActive = this.audio.getAudioActiveState();
         const iosInteractiveInterval = 1000 / 24;
         const iosIdleInterval = 1000 / 10;
         const effectiveFrameInterval = IS_IOS
           ? Math.max(
-            perf.frameInterval || 0,
-            forceResponsiveRate || perf.transitionActive || audioActive || this.cachedHasExpandedCard
-              ? iosInteractiveInterval
-              : iosIdleInterval
-          )
+              perf.frameInterval || 0,
+              forceResponsiveRate ||
+                perf.transitionActive ||
+                audioActive ||
+                this.cachedHasExpandedCard
+                ? iosInteractiveInterval
+                : iosIdleInterval
+            )
           : perf.frameInterval;
         const shouldRunControllerPass = IS_IOS
           ? time - this.lastControllerRenderAt >= effectiveFrameInterval
-          : (
-            perf.frameInterval <= 0 ||
+          : perf.frameInterval <= 0 ||
             forceResponsiveRate ||
-            time - this.lastControllerRenderAt >= perf.frameInterval
-          );
+            time - this.lastControllerRenderAt >= perf.frameInterval;
 
         if (shouldRunControllerPass) {
           const controllerStartedAt = performance.now();
           this.controller.render(time);
-          this.telemetryState.controllerMs = performance.now() - controllerStartedAt;
+          this.telemetryState.controllerMs =
+            performance.now() - controllerStartedAt;
           this.lastControllerRenderAt = time;
           perf = this.controller.getPerformanceProfile();
         } else {
@@ -1769,29 +2162,40 @@ class ManifoldApp {
       }
 
       const backgroundInterval = this.prefersMobilePerformanceBudget
-        ? (perf.transitionActive ? 1000 / 24 : 1000 / 18)
+        ? perf.transitionActive
+          ? 1000 / 24
+          : 1000 / 18
         : perf.transitionActive
           ? 1000 / 36
           : 0;
-      if (!backgroundInterval || time - this.lastBackgroundRenderAt >= backgroundInterval) {
+      if (
+        !backgroundInterval ||
+        time - this.lastBackgroundRenderAt >= backgroundInterval
+      ) {
         const backgroundStartedAt = performance.now();
         this.liquidGradient?.update(time, this.scroll.getTargetVelocity());
         this.lastBackgroundRenderAt = time;
-        this.telemetryState.backgroundMs = performance.now() - backgroundStartedAt;
+        this.telemetryState.backgroundMs =
+          performance.now() - backgroundStartedAt;
       } else {
         this.telemetryState.backgroundMs = 0;
       }
 
-      const isInteracting = scrollVelocity > 0.0035 || time - this.lastInteractionBurstAt < 1400;
+      const isInteracting =
+        scrollVelocity > 0.0035 || time - this.lastInteractionBurstAt < 1400;
       const isMotionActive = perf.transitionActive || isInteracting;
       const audioActive = this.audio.getAudioActiveState();
-      const iosUiInterval = isMotionActive || audioActive ? 1000 / 16 : 1000 / 5;
-      const shouldRunIosUiPass = !IS_IOS || time - this.lastIosUiTickAt >= iosUiInterval;
+      const iosUiInterval =
+        isMotionActive || audioActive ? 1000 / 16 : 1000 / 5;
+      const shouldRunIosUiPass =
+        !IS_IOS || time - this.lastIosUiTickAt >= iosUiInterval;
 
       // On iOS, skip HUD refresh when both controller pass AND UI pass were skipped
       // to minimize main-thread work on idle frames.
       const shouldRefreshHud = shouldRunIosUiPass
-        ? (isMotionActive ? (time - this.lastHudNavRenderAt > 120) : (time - this.lastHudNavRenderAt > 2400))
+        ? isMotionActive
+          ? time - this.lastHudNavRenderAt > 120
+          : time - this.lastHudNavRenderAt > 2400
         : false;
 
       const uiStartedAt = performance.now();
@@ -1807,7 +2211,8 @@ class ManifoldApp {
         }
 
         // Sync cached body class state with the rest of the UI pass.
-        this.cachedHasExpandedCard = document.body.classList.contains('has-expanded-card');
+        this.cachedHasExpandedCard =
+          document.body.classList.contains('has-expanded-card');
         this.updateTopbarLoaderKicker();
         this.updateQualities(perf, scrollVelocity);
         this.cursor.update();
@@ -1823,14 +2228,21 @@ class ManifoldApp {
         this.telemetryState.controllerParticlesMs = renderTelemetry.particlesMs;
         this.telemetryState.controllerFourDMs = renderTelemetry.fourDMs;
         this.telemetryState.controllerItemsMs = renderTelemetry.itemsMs;
-        this.telemetryState.controllerSectionFrameMs = renderTelemetry.sectionFrameMs;
-        this.telemetryState.controllerInteractionMs = renderTelemetry.interactionMs;
+        this.telemetryState.controllerSectionFrameMs =
+          renderTelemetry.sectionFrameMs;
+        this.telemetryState.controllerInteractionMs =
+          renderTelemetry.interactionMs;
         this.telemetryState.controllerHudCommitMs = renderTelemetry.hudCommitMs;
-        this.telemetryState.controllerVisibleItems = renderTelemetry.visibleItems;
-        this.telemetryState.controllerVisibleCards = renderTelemetry.visibleCards;
-        this.telemetryState.controllerVisibleTexts = renderTelemetry.visibleTexts;
-        this.telemetryState.controllerSpectrumCards = renderTelemetry.spectrumCards;
-        this.telemetryState.controllerTransitionActive = renderTelemetry.transitionActive;
+        this.telemetryState.controllerVisibleItems =
+          renderTelemetry.visibleItems;
+        this.telemetryState.controllerVisibleCards =
+          renderTelemetry.visibleCards;
+        this.telemetryState.controllerVisibleTexts =
+          renderTelemetry.visibleTexts;
+        this.telemetryState.controllerSpectrumCards =
+          renderTelemetry.spectrumCards;
+        this.telemetryState.controllerTransitionActive =
+          renderTelemetry.transitionActive;
       }
 
       this.telemetryState.frameMs = performance.now() - frameStartedAt;
@@ -1839,7 +2251,14 @@ class ManifoldApp {
     requestAnimationFrame(frame);
   }
 
-  private updateQualities(perf: { backgroundScale: number; pixelScale: number; transitionActive: boolean }, velocity = 0): void {
+  private updateQualities(
+    perf: {
+      backgroundScale: number;
+      pixelScale: number;
+      transitionActive: boolean;
+    },
+    velocity = 0
+  ): void {
     PixelCanvas.setTransitionMode(perf.transitionActive);
 
     // Safari Optimization: Adaptive target downscaling when under performance stress or high velocity
@@ -1848,7 +2267,7 @@ class ManifoldApp {
       if (document.body.classList.contains('is-frame-stressed')) {
         stressMultiplier = IS_IOS ? 0.78 : 0.84;
       }
-      
+
       // Extreme Stability: If scrolling fast on Safari, drop background quality by an additional 50%
       // to prioritize foreground fluidity and prevent compositing hangs.
       if (velocity > 0.22) {
@@ -1857,7 +2276,9 @@ class ManifoldApp {
     }
 
     if (this.prefersMobilePerformanceBudget) {
-      stressMultiplier *= document.body.classList.contains('is-frame-stressed') ? 0.82 : 0.92;
+      stressMultiplier *= document.body.classList.contains('is-frame-stressed')
+        ? 0.82
+        : 0.92;
 
       if (velocity > 0.12) {
         stressMultiplier *= 0.82;
@@ -1866,7 +2287,8 @@ class ManifoldApp {
 
     if (!perf.transitionActive) {
       const targetPixel = perf.pixelScale * stressMultiplier;
-      const nextPixel = this.lastPixelQuality + (targetPixel - this.lastPixelQuality) * 0.12;
+      const nextPixel =
+        this.lastPixelQuality + (targetPixel - this.lastPixelQuality) * 0.12;
       if (Math.abs(nextPixel - this.lastPixelQuality) > 0.01) {
         PixelCanvas.setGlobalQuality(nextPixel);
         this.lastPixelQuality = nextPixel;
@@ -1874,7 +2296,9 @@ class ManifoldApp {
     }
 
     const targetBg = perf.backgroundScale * stressMultiplier;
-    const nextBg = this.lastBackgroundQuality + (targetBg - this.lastBackgroundQuality) * 0.1;
+    const nextBg =
+      this.lastBackgroundQuality +
+      (targetBg - this.lastBackgroundQuality) * 0.1;
     if (Math.abs(nextBg - this.lastBackgroundQuality) > 0.01) {
       this.liquidGradient?.setQuality(nextBg);
       this.lastBackgroundQuality = nextBg;
@@ -1886,11 +2310,13 @@ class ManifoldApp {
       return '2d';
     }
 
-    const isLowSpec = ((navigator as { deviceMemory?: number }).deviceMemory ?? 8) <= 4 || navigator.hardwareConcurrency <= 4;
+    const isLowSpec =
+      ((navigator as { deviceMemory?: number }).deviceMemory ?? 8) <= 4 ||
+      navigator.hardwareConcurrency <= 4;
     if (IS_ANDROID_LOW_END) {
       return '2d';
     }
-    return (window.innerWidth <= 720 || isLowSpec) ? '2d' : '3d';
+    return window.innerWidth <= 720 || isLowSpec ? '2d' : '3d';
   }
 
   destroy(): void {
@@ -1915,7 +2341,11 @@ class ManifoldApp {
     this.localeTeardown = null;
     this.debugModeHotkeysTeardown?.();
     this.debugModeHotkeysTeardown = null;
-    this.elements.cardChromeLayer.removeEventListener('webglcontextlost', this.handleCardChromeContextLost, false);
+    this.elements.cardChromeLayer.removeEventListener(
+      'webglcontextlost',
+      this.handleCardChromeContextLost,
+      false
+    );
     PixelCanvas.setTransitionMode(false);
     this.lenis?.destroy();
     this.controller?.destroy();
@@ -1999,15 +2429,21 @@ class ManifoldApp {
         this.cachedGpuName = 'SOFTWARE_EMULATION';
         return this.cachedGpuName;
       }
-      const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info');
+      const debugInfo = (gl as WebGLRenderingContext).getExtension(
+        'WEBGL_debug_renderer_info'
+      );
       if (debugInfo) {
-        const renderer = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        const renderer = (gl as WebGLRenderingContext).getParameter(
+          debugInfo.UNMASKED_RENDERER_WEBGL
+        );
         this.cachedGpuName = `${renderer} (${'gpu' in navigator ? 'WebGPU' : 'WebGL2'})`;
       } else {
         this.cachedGpuName = `GENERIC_ACCELERATOR (${'gpu' in navigator ? 'WebGPU' : 'WebGL2'})`;
       }
       // Explicitly lose the context to free the GPU-backed buffer immediately
-      const loseCtx = (gl as WebGLRenderingContext).getExtension('WEBGL_lose_context');
+      const loseCtx = (gl as WebGLRenderingContext).getExtension(
+        'WEBGL_lose_context'
+      );
       loseCtx?.loseContext();
       return this.cachedGpuName;
     } catch {
@@ -2020,15 +2456,22 @@ class ManifoldApp {
     if (this.activeHudSubView !== 'about') return;
 
     const ua = navigator.userAgent;
-    const userAgentDataPlatform = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform;
-    const platform = userAgentDataPlatform || (/iPad|iPhone|iPod/.test(ua) || (ua.includes('Mac') && navigator.maxTouchPoints > 1)
-      ? 'iOS / iPadOS'
-      : ua.includes('Android')
-        ? 'Android'
-        : ua.includes('Mac')
-          ? 'macOS'
-          : 'Unknown platform');
-    const cores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} Cores` : 'Cores unknown';
+    const userAgentDataPlatform = (
+      navigator as Navigator & { userAgentData?: { platform?: string } }
+    ).userAgentData?.platform;
+    const platform =
+      userAgentDataPlatform ||
+      (/iPad|iPhone|iPod/.test(ua) ||
+      (ua.includes('Mac') && navigator.maxTouchPoints > 1)
+        ? 'iOS / iPadOS'
+        : ua.includes('Android')
+          ? 'Android'
+          : ua.includes('Mac')
+            ? 'macOS'
+            : 'Unknown platform');
+    const cores = navigator.hardwareConcurrency
+      ? `${navigator.hardwareConcurrency} Cores`
+      : 'Cores unknown';
     let browser = 'Unknown Browser';
     if (ua.includes('Firefox')) browser = 'Firefox';
     else if (ua.includes('Chrome')) browser = 'Chrome';
@@ -2039,7 +2482,11 @@ class ManifoldApp {
 
     const t = this.telemetryState;
     const fps = t.frameMs > 0 ? (1000 / t.frameMs).toFixed(0) : '60';
-    const memory = (performance as Performance & { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+    const memory = (
+      performance as Performance & {
+        memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number };
+      }
+    ).memory;
     const heap = memory
       ? `JS HEAP: ${Math.round(memory.usedJSHeapSize / 1048576)}MB / ${Math.round(memory.jsHeapSizeLimit / 1048576)}MB`
       : 'Memory data restricted';
@@ -2049,7 +2496,7 @@ class ManifoldApp {
 
   private updateManifoldState(): void {
     if (this.activeHudSubView !== 'about' || !this.controller) return;
-    const spin = `[ ${(Math.random() * 2).toFixed(2)}rad, ${(Math.random() * -1).toFixed(2)}rad, ${(Math.random()).toFixed(2)}rad ]`;
+    const spin = `[ ${(Math.random() * 2).toFixed(2)}rad, ${(Math.random() * -1).toFixed(2)}rad, ${Math.random().toFixed(2)}rad ]`;
     this.elements.hudNav.debugManifold.textContent = `Spin ${spin} // 16 Active Vertices`;
   }
 
@@ -2066,11 +2513,14 @@ class ManifoldApp {
       hour12: false
     }).format(now);
 
-    const krakowHour = parseInt(new Intl.DateTimeFormat('en-GB', {
-      timeZone: 'Europe/Warsaw',
-      hour: 'numeric',
-      hour12: false
-    }).format(now), 10);
+    const krakowHour = parseInt(
+      new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Warsaw',
+        hour: 'numeric',
+        hour12: false
+      }).format(now),
+      10
+    );
 
     let status = statuses.chilling;
     if (krakowHour >= 2 && krakowHour < 8) {
@@ -2090,9 +2540,14 @@ class ManifoldApp {
 
   public toggleHudSubView(view: HudSubviewView): void {
     const {
-      aboutTrigger, aboutRoot,
-      policyTrigger, policyRoot,
-      tree, header, orbitToggleButton, panel
+      aboutTrigger,
+      aboutRoot,
+      policyTrigger,
+      policyRoot,
+      tree,
+      header,
+      orbitToggleButton,
+      panel
     } = this.elements.hudNav;
     const { audioButton, exitButton } = this.elements;
 
@@ -2101,19 +2556,35 @@ class ManifoldApp {
 
     // Start transition
     panel.classList.add('is-switching');
-    
+
     // Lock current height for the imminent transition
     const startHeight = panel.getBoundingClientRect().height;
 
     // Wait exactly 200ms for opacity to fade out
     window.setTimeout(() => {
       const isExtraOpen = this.activeHudSubView !== null;
-      
+
       // Fast DOM display swaps
-      tree.style.setProperty('display', isExtraOpen ? 'none' : '', isExtraOpen ? 'important' : '');
-      header.style.setProperty('display', isExtraOpen ? 'none' : '', isExtraOpen ? 'important' : '');
-      aboutRoot.style.setProperty('display', this.activeHudSubView === 'about' ? 'flex' : 'none', 'important');
-      policyRoot.style.setProperty('display', this.activeHudSubView === 'policy' ? 'flex' : 'none', 'important');
+      tree.style.setProperty(
+        'display',
+        isExtraOpen ? 'none' : '',
+        isExtraOpen ? 'important' : ''
+      );
+      header.style.setProperty(
+        'display',
+        isExtraOpen ? 'none' : '',
+        isExtraOpen ? 'important' : ''
+      );
+      aboutRoot.style.setProperty(
+        'display',
+        this.activeHudSubView === 'about' ? 'flex' : 'none',
+        'important'
+      );
+      policyRoot.style.setProperty(
+        'display',
+        this.activeHudSubView === 'policy' ? 'flex' : 'none',
+        'important'
+      );
 
       if (isExtraOpen) {
         if (!this.hudSubViewUpdateInterval) {
@@ -2146,18 +2617,18 @@ class ManifoldApp {
 
       // Let browser natively compute the new intrinsic height
       const targetHeight = panel.getBoundingClientRect().height;
-      
+
       // Execute a high-priority hardware-accelerated animation via Web Animations API.
       // This completely overrides the sluggish CSS transitions and prevents main thread stutter.
       if (startHeight !== targetHeight) {
-        panel.animate([
-          { height: `${startHeight}px` },
-          { height: `${targetHeight}px` }
-        ], {
-          duration: 320,
-          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-          fill: 'none' // Ensures property reverts to pure CSS "auto" height instantly after finishing
-        });
+        panel.animate(
+          [{ height: `${startHeight}px` }, { height: `${targetHeight}px` }],
+          {
+            duration: 320,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            fill: 'none' // Ensures property reverts to pure CSS "auto" height instantly after finishing
+          }
+        );
       }
 
       // Re-enable visibility (starts fade in)
@@ -2166,13 +2637,21 @@ class ManifoldApp {
       // Start High-Performance Staggered Text Scramble
       const root =
         this.activeHudSubView === 'about'
-          ? aboutRoot.querySelector<HTMLElement>('.hud-subview-page.is-active') ?? aboutRoot
+          ? (aboutRoot.querySelector<HTMLElement>(
+              '.hud-subview-page.is-active'
+            ) ?? aboutRoot)
           : this.activeHudSubView === 'policy'
-            ? policyRoot.querySelector<HTMLElement>('.hud-subview-page.is-active') ?? policyRoot
+            ? (policyRoot.querySelector<HTMLElement>(
+                '.hud-subview-page.is-active'
+              ) ?? policyRoot)
             : header;
-            
-      const targetElements = Array.from(root.querySelectorAll('.privacy-kicker, .privacy-title, .privacy-intro, .hud-nav-kicker, strong'));
-      
+
+      const targetElements = Array.from(
+        root.querySelectorAll(
+          '.privacy-kicker, .privacy-title, .privacy-intro, .hud-nav-kicker, strong'
+        )
+      );
+
       let batchIndex = 0;
       const processBatch = () => {
         // Micro-batch 4 string mutations per frame
@@ -2189,14 +2668,19 @@ class ManifoldApp {
           requestAnimationFrame(processBatch);
         }
       };
-      
+
       // Delay text manipulation to allow animation to start seamlessly
       requestAnimationFrame(() => requestAnimationFrame(processBatch));
-
     }, 200);
 
     const isExtraOpen = this.activeHudSubView !== null;
-    const allButtons = [audioButton, exitButton, orbitToggleButton, aboutTrigger, policyTrigger];
+    const allButtons = [
+      audioButton,
+      exitButton,
+      orbitToggleButton,
+      aboutTrigger,
+      policyTrigger
+    ];
 
     allButtons.forEach((btn) => {
       if (!btn) return;
@@ -2207,7 +2691,8 @@ class ManifoldApp {
     if (isExtraOpen) {
       allButtons.forEach((btn) => {
         if (!btn) return;
-        const isActiveTrigger = (this.activeHudSubView === 'about' && btn === aboutTrigger) ||
+        const isActiveTrigger =
+          (this.activeHudSubView === 'about' && btn === aboutTrigger) ||
           (this.activeHudSubView === 'policy' && btn === policyTrigger);
 
         if (!isActiveTrigger) {
@@ -2229,7 +2714,8 @@ if (elements) {
 }
 
 function getElements(): BootElements | null {
-  const get = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
+  const get = <T extends HTMLElement>(id: string) =>
+    document.getElementById(id) as T | null;
   const getAny = <T extends HTMLElement>(...ids: string[]) => {
     for (const id of ids) {
       const node = get<T>(id);
@@ -2239,7 +2725,8 @@ function getElements(): BootElements | null {
     }
     return null;
   };
-  const sel = <T extends Element>(q: string) => document.querySelector(q) as T | null;
+  const sel = <T extends Element>(q: string) =>
+    document.querySelector(q) as T | null;
   const missing: string[] = [];
   const requireNode = <T>(name: string, node: T | null): T => {
     if (!node) {
@@ -2271,7 +2758,8 @@ function getElements(): BootElements | null {
   const topbarMark = get<HTMLElement>('topbar-mark');
   const topbarRole = get<HTMLElement>('topbar-role');
   const cursorCore = sel<HTMLElement>('.custom-cursor-core');
-  const cursorRoot = getAny<HTMLElement>('custom-cursor') ?? sel<HTMLElement>('.custom-cursor');
+  const cursorRoot =
+    getAny<HTMLElement>('custom-cursor') ?? sel<HTMLElement>('.custom-cursor');
   const cursorRing = sel<HTMLElement>('.custom-cursor-ring');
   const exitButton = get<HTMLButtonElement>('exit-world');
   const hudFocusFeedback = get<HTMLElement>('hud-focus-feedback');
@@ -2282,7 +2770,8 @@ function getElements(): BootElements | null {
   const modeOption2D = get<HTMLButtonElement>('hud-mode-option-2d');
   const modeOption3D = get<HTMLButtonElement>('hud-mode-option-3d');
   const modeOption4D = get<HTMLButtonElement>('hud-mode-option-4d');
-  const modePicker = get<HTMLElement>('hud-mode-picker') ?? sel<HTMLElement>('.hud-mode-picker');
+  const modePicker =
+    get<HTMLElement>('hud-mode-picker') ?? sel<HTMLElement>('.hud-mode-picker');
   const hudNavBackdrop = get<HTMLButtonElement>('hud-nav-backdrop');
   const hudNavKicker = document.getElementById('hud-nav-kicker');
   const orbitToggleButton = get<HTMLButtonElement>('toggle-hud-orbits');
@@ -2297,7 +2786,10 @@ function getElements(): BootElements | null {
   const policyRoot = get<HTMLElement>('hud-nav-policy');
   const aboutStack = getAny<HTMLElement>('about-stack', 'about-stack-label');
   const aboutTrivia = getAny<HTMLElement>('about-trivia', 'about-trivia-label');
-  const aboutRuntime = getAny<HTMLElement>('about-runtime', 'about-runtime-label');
+  const aboutRuntime = getAny<HTMLElement>(
+    'about-runtime',
+    'about-runtime-label'
+  );
   const aboutTime = getAny<HTMLElement>('about-time', 'about-time-label');
   const policyIntro = get<HTMLElement>('policy-intro');
   const policyProcessingTitle = get<HTMLElement>('policy-processing-title');
@@ -2319,8 +2811,10 @@ function getElements(): BootElements | null {
   const hudNavHeader = document.getElementById('hud-nav-header');
   const hudNavTitle = document.getElementById('hud-nav-title');
   const hudNavSpectrum = document.getElementById('hud-nav-spectrum');
-  const hudNavSpectrumBars = hudNavSpectrum 
-    ? Array.from(hudNavSpectrum.querySelectorAll('.hud-nav-spectrum-bar')) as HTMLElement[]
+  const hudNavSpectrumBars = hudNavSpectrum
+    ? (Array.from(
+        hudNavSpectrum.querySelectorAll('.hud-nav-spectrum-bar')
+      ) as HTMLElement[])
     : [];
   const hudNavTree = document.getElementById('hud-nav-tree');
   const debugGpu = get<HTMLElement>('debug-gpu-name');
@@ -2348,7 +2842,9 @@ function getElements(): BootElements | null {
   const twoDSectionFrameKicker = get<HTMLElement>('two-d-section-frame-kicker');
   const contextHintKicker = get<HTMLElement>('context-hint-kicker');
   const contextHintTitle = get<HTMLElement>('context-hint-title');
-  const liquidGradient = get<HTMLCanvasElement>('liquid-gradient') ?? sel<HTMLCanvasElement>('.liquid-gradient');
+  const liquidGradient =
+    get<HTMLCanvasElement>('liquid-gradient') ??
+    sel<HTMLCanvasElement>('.liquid-gradient');
   const footerPrivacyLink = get<HTMLAnchorElement>('footer-privacy-link');
   requireNode('.hud', hudRoot);
   const scrollProxy = sel<HTMLElement>('.scroll-proxy');
@@ -2456,7 +2952,10 @@ function getElements(): BootElements | null {
   requireNode('exit-world-label', exitButtonLabel);
 
   if (missing.length > 0) {
-    console.error('Manifold boot missing required elements:', missing.join(', '));
+    console.error(
+      'Manifold boot missing required elements:',
+      missing.join(', ')
+    );
     return null;
   }
 
@@ -2468,7 +2967,7 @@ function getElements(): BootElements | null {
       button: diagButton,
       popover: diagPopover,
       root: diagRoot,
-      perfMode,
+      perfMode
     },
     advanceButtons: {
       next: advanceNext,

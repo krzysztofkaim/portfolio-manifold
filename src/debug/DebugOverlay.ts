@@ -1,5 +1,8 @@
 import type { DebugSnapshot } from '../engine/SceneManager';
-import { EVENT_RECORD_PROFILE, type RecordProfileDetail } from '../config/manifold/ManifoldEvents';
+import {
+  EVENT_RECORD_PROFILE,
+  type RecordProfileDetail
+} from '../config/manifold/ManifoldEvents';
 
 export interface DebugOverlayMetric {
   label: string;
@@ -94,11 +97,11 @@ export class DebugOverlay {
     triangles: string;
     visible: string;
   };
-  
+
   private readonly host = document.createElement('div');
   private readonly shadow = this.host.attachShadow({ mode: 'open' });
   private readonly container = document.createElement('div');
-  
+
   private readonly backendValue;
   private readonly fpsValue;
   private readonly scenesValue;
@@ -106,14 +109,19 @@ export class DebugOverlay {
   private readonly trianglesValue;
   private readonly dprValue;
   private readonly heapValue;
-  private readonly extraRows = new Map<string, { row: HTMLDivElement; value: HTMLSpanElement }>();
+  private readonly extraRows = new Map<
+    string,
+    { row: HTMLDivElement; value: HTMLSpanElement }
+  >();
   private intervalId = 0;
 
   constructor(
     private readonly source: DebugOverlaySource,
     private readonly options: DebugOverlayOptions = {}
   ) {
-    const locale = options.locale ?? (document.documentElement.lang.startsWith('pl') ? 'pl' : 'en');
+    const locale =
+      options.locale ??
+      (document.documentElement.lang.startsWith('pl') ? 'pl' : 'en');
     this.strings =
       locale === 'pl'
         ? {
@@ -157,12 +165,12 @@ export class DebugOverlay {
 
     const style = document.createElement('style');
     style.textContent = DEBUG_STYLES;
-    
+
     this.container.className = 'debug-overlay';
     this.container.setAttribute('aria-live', 'polite');
-    
+
     this.shadow.append(style, this.container);
-    
+
     const children: HTMLElement[] = [this.createTitle()];
     if (this.options.enableRecording) {
       const recordBtn = document.createElement('button');
@@ -171,14 +179,14 @@ export class DebugOverlay {
       recordBtn.onclick = () => {
         recordBtn.textContent = this.strings.recording;
         recordBtn.classList.add('debug-overlay__record-btn--recording');
-        
+
         // Dispatch type-safe custom event
         window.dispatchEvent(
           new CustomEvent(EVENT_RECORD_PROFILE, {
             detail: { durationMs: 5000 } as RecordProfileDetail
           })
         );
-        
+
         setTimeout(() => {
           recordBtn.textContent = this.strings.record;
           recordBtn.classList.remove('debug-overlay__record-btn--recording');
@@ -199,7 +207,7 @@ export class DebugOverlay {
 
     this.container.append(...children);
     document.body.append(this.host);
-    
+
     this.render();
     this.intervalId = window.setInterval(() => this.render(), 500);
   }
@@ -212,9 +220,10 @@ export class DebugOverlay {
 
   private render(): void {
     const stats = this.source.getDebugSnapshot();
-    const memory = 'memory' in performance
-      ? `${Math.round((performance as Performance & { memory: { usedJSHeapSize: number } }).memory.usedJSHeapSize / 1048576)} MB`
-      : 'n/a';
+    const memory =
+      'memory' in performance
+        ? `${Math.round((performance as Performance & { memory: { usedJSHeapSize: number } }).memory.usedJSHeapSize / 1048576)} MB`
+        : 'n/a';
 
     this.backendValue.value.textContent = stats.backend;
     this.fpsValue.value.textContent = `${stats.fps.toFixed(1)} / ${stats.ms.toFixed(1)} ${this.strings.ms}`;
@@ -233,17 +242,20 @@ export class DebugOverlay {
     return title;
   }
 
-  private createValueRow(label: string): { row: HTMLDivElement; value: HTMLSpanElement } {
+  private createValueRow(label: string): {
+    row: HTMLDivElement;
+    value: HTMLSpanElement;
+  } {
     const row = document.createElement('div');
     row.className = 'debug-overlay__row';
-    
+
     const prefix = document.createElement('span');
     prefix.className = 'debug-overlay__label';
     prefix.textContent = `${label}: `;
-    
+
     const value = document.createElement('span');
     value.className = 'debug-overlay__value';
-    
+
     row.append(prefix, value);
     return { row, value };
   }

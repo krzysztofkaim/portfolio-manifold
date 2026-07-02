@@ -17,7 +17,10 @@ export function disposeObject(object: Object3D): void {
     const geometry = primitive.geometry;
 
     if (geometry) {
-      if (geometry.boundsTree && typeof geometry.disposeBoundsTree === 'function') {
+      if (
+        geometry.boundsTree &&
+        typeof geometry.disposeBoundsTree === 'function'
+      ) {
         geometry.disposeBoundsTree();
       }
 
@@ -31,7 +34,9 @@ export function disposeObject(object: Object3D): void {
       : [];
 
     for (const material of materials) {
-      for (const value of Object.values(material as unknown as Record<string, unknown>)) {
+      for (const value of Object.values(
+        material as unknown as Record<string, unknown>
+      )) {
         if (value instanceof Texture) {
           value.dispose();
         }

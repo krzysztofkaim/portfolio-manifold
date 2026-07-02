@@ -2,7 +2,7 @@ import { clamp, lerp } from '../../utils/math';
 import type { ItemState } from './ManifoldTypes';
 import { StyleAdapter } from '../../utils/StyleAdapter';
 import { scheduleCardTitleMarqueeSync } from './CardTitleMarquee';
-import { IS_IOS, IS_SAFARI } from '../../utils/browserDetection';
+import { IS_IOS, IS_SAFARI, IS_ANDROID } from '../../utils/browserDetection';
 
 export interface RendererContext {
   viewportWidth: number;
@@ -19,7 +19,11 @@ export class ManifoldDomRenderer {
     item.pixelCanvasEl?.setHostVisibility?.(visible);
   }
 
-  updateItemVisibility(item: ItemState, alpha: number, isVisible: boolean): boolean {
+  updateItemVisibility(
+    item: ItemState,
+    alpha: number,
+    isVisible: boolean
+  ): boolean {
     item.currentAlpha = alpha;
 
     if (!isVisible) {
@@ -44,9 +48,18 @@ export class ManifoldDomRenderer {
     return true;
   }
 
-  renderTextItem(item: ItemState, alpha: number, context: RendererContext, vizZ: number): void {
+  renderTextItem(
+    item: ItemState,
+    alpha: number,
+    context: RendererContext,
+    vizZ: number
+  ): void {
     const { activeViewModeProgress } = context;
-    const textOpacityValue = clamp(alpha * (1 - activeViewModeProgress * 0.92), 0, 1);
+    const textOpacityValue = clamp(
+      alpha * (1 - activeViewModeProgress * 0.92),
+      0,
+      1
+    );
     const textOpacity = textOpacityValue.toFixed(3);
 
     if (textOpacity !== item.lastOpacity) {
@@ -65,14 +78,24 @@ export class ManifoldDomRenderer {
     item.currentScreenX = item.x;
     item.currentScreenY = item.y;
     item.hasCurrentScreenQuad = false;
-    item.currentDepth = lerp(vizZ, -1200 - Math.abs(item.y) * 0.04, activeViewModeProgress);
-    
+    item.currentDepth = lerp(
+      vizZ,
+      -1200 - Math.abs(item.y) * 0.04,
+      activeViewModeProgress
+    );
+
     // Transform application will be called from orchestrator to avoid passing setRotatedTransform multiple times
   }
 
-  renderCardVisibility(item: ItemState, opacity: number, keepVisible: boolean, allowTitleMarqueeSync: boolean): boolean {
+  renderCardVisibility(
+    item: ItemState,
+    opacity: number,
+    keepVisible: boolean,
+    allowTitleMarqueeSync: boolean
+  ): boolean {
     const modeAwareOpacity = opacity.toFixed(3);
-    const targetVisibility = opacity <= 0.001 && !keepVisible ? 'none' : 'block';
+    const targetVisibility =
+      opacity <= 0.001 && !keepVisible ? 'none' : 'block';
     const previousVisibility = this.visibilityCache.get(item);
 
     if (modeAwareOpacity !== item.lastOpacity) {
@@ -89,7 +112,10 @@ export class ManifoldDomRenderer {
 
     if (targetVisibility === 'block') {
       if (allowTitleMarqueeSync) {
-        if (previousVisibility !== targetVisibility || item.pendingTitleMarqueeSync) {
+        if (
+          previousVisibility !== targetVisibility ||
+          item.pendingTitleMarqueeSync
+        ) {
           scheduleCardTitleMarqueeSync(item.titleEl);
           item.pendingTitleMarqueeSync = false;
         }
@@ -121,14 +147,14 @@ export class ManifoldDomRenderer {
 
     const posKey = xr + yr * 10000 + zr * 100000000;
     const rotKey = rr + txr * 10000 + tyr * 100000000;
-    
+
     if (item.lastBasePosKey !== posKey || item.lastBaseRotKey !== rotKey) {
       if (IS_SAFARI && item.lastBasePosKey !== undefined) {
         const dx = Math.abs(x - (item.lastX || 0));
         const dy = Math.abs(y - (item.lastY || 0));
         const dz = Math.abs(z + shiftZ - (item.lastZ || 0));
         const dr = Math.abs(rot - (item.lastRot || 0));
-        
+
         // Coarse threshold for Safari: don't update if it's less than 0.1px or 0.05deg change
         // We MUST check DZ because section titles primarily move in depth during 3D scrolling.
         if (dx < 0.1 && dy < 0.1 && dz < 0.1 && dr < 0.05) {
@@ -137,20 +163,27 @@ export class ManifoldDomRenderer {
       }
 
       const precision = IS_SAFARI ? 1 : 2;
-      const flatTransform = IS_IOS && Math.abs(z + shiftZ) < 0.05 && Math.abs(tiltX) < 0.05 && Math.abs(tiltY) < 0.05;
+      const flatTransform =
+        IS_IOS &&
+        Math.abs(z + shiftZ) < 0.05 &&
+        Math.abs(tiltX) < 0.05 &&
+        Math.abs(tiltY) < 0.05;
       const transform = flatTransform
         ? `translate(${x.toFixed(precision)}px, ${y.toFixed(precision)}px) rotate(${rot.toFixed(precision)}deg)`
         : `translate3d(${x.toFixed(precision)}px, ${y.toFixed(precision)}px, ${(z + shiftZ).toFixed(precision)}px) rotateZ(${rot.toFixed(precision)}deg)`;
       item.el.style.transform = transform;
-      
+
       // Also update rotation vars for the child .card if they changed significantly
-      if (Math.abs(tiltX - (item.lastTiltX || 0)) > 0.1 || Math.abs(tiltY - (item.lastTiltY || 0)) > 0.1) {
+      if (
+        Math.abs(tiltX - (item.lastTiltX || 0)) > 0.1 ||
+        Math.abs(tiltY - (item.lastTiltY || 0)) > 0.1
+      ) {
         StyleAdapter.setNumericProperty(item.el, '--card-rot-x', tiltX, 'deg');
         StyleAdapter.setNumericProperty(item.el, '--card-rot-y', tiltY, 'deg');
         item.lastTiltX = tiltX;
         item.lastTiltY = tiltY;
       }
-      
+
       item.lastBasePosKey = posKey;
       item.lastBaseRotKey = rotKey;
       item.lastX = x;
@@ -175,11 +208,22 @@ export class ManifoldDomRenderer {
     item.currentCardScale = scale;
     const rounded = Math.round(scale * 1000);
     const textRounded = Math.round(textScale * 1000);
-    
-    if (rounded !== item.lastCardScaleRounded || textRounded !== item.lastTextScaleRounded) {
+
+    if (
+      rounded !== item.lastCardScaleRounded ||
+      textRounded !== item.lastTextScaleRounded
+    ) {
       StyleAdapter.setNumericProperty(item.fxEl, '--card-scale', scale);
-      StyleAdapter.setNumericProperty(item.fxEl, '--card-text-scale', textScale);
-      StyleAdapter.setProperty(item.fxEl, '--card-rail-dot-display', scale < 0.72 ? 'none' : 'block');
+      StyleAdapter.setNumericProperty(
+        item.fxEl,
+        '--card-text-scale',
+        textScale
+      );
+      StyleAdapter.setProperty(
+        item.fxEl,
+        '--card-rail-dot-display',
+        scale < 0.72 ? 'none' : 'block'
+      );
       item.lastCardScaleRounded = rounded;
       item.lastTextScaleRounded = textRounded;
     }
@@ -187,21 +231,34 @@ export class ManifoldDomRenderer {
 
   setEntryGridAlpha(item: ItemState, alpha: number): void {
     if (item.entryGridEl) {
-      StyleAdapter.setNumericProperty(item.entryGridEl, '--entry-grid-alpha', alpha);
+      StyleAdapter.setNumericProperty(
+        item.entryGridEl,
+        '--entry-grid-alpha',
+        alpha
+      );
     }
   }
 
   updateCardLayout(
     item: ItemState,
     expanded: boolean,
-    layout: { compactWidth: string; compactHeight: string; expandedWidth: string; expandedHeight: string },
+    layout: {
+      compactWidth: string;
+      compactHeight: string;
+      expandedWidth: string;
+      expandedHeight: string;
+    },
     fades?: { layoutFade: number; shellFade: number }
   ): void {
     const nextState = expanded ? 'expanded' : 'compact';
     const nextWidth = expanded ? layout.expandedWidth : layout.compactWidth;
     const nextHeight = expanded ? layout.expandedHeight : layout.compactHeight;
 
-    if (item.lastLayoutState !== nextState || item.lastCardWidth !== nextWidth || item.lastCardHeight !== nextHeight) {
+    if (
+      item.lastLayoutState !== nextState ||
+      item.lastCardWidth !== nextWidth ||
+      item.lastCardHeight !== nextHeight
+    ) {
       StyleAdapter.setProperty(item.fxEl, '--card-width', nextWidth);
       StyleAdapter.setProperty(item.fxEl, '--card-height', nextHeight);
       item.lastLayoutState = nextState;
@@ -213,11 +270,19 @@ export class ManifoldDomRenderer {
     if (expanded && fades) {
       const { layoutFade, shellFade } = fades;
       if (layoutFade !== item.lastLayoutFade) {
-        StyleAdapter.setNumericProperty(item.fxEl, '--card-expand-layout', layoutFade);
+        StyleAdapter.setNumericProperty(
+          item.fxEl,
+          '--card-expand-layout',
+          layoutFade
+        );
         item.lastLayoutFade = layoutFade;
       }
       if (shellFade !== item.lastShellFade) {
-        StyleAdapter.setNumericProperty(item.fxEl, '--card-expand-shell', shellFade);
+        StyleAdapter.setNumericProperty(
+          item.fxEl,
+          '--card-expand-shell',
+          shellFade
+        );
         item.lastShellFade = shellFade;
       }
     } else if (!expanded) {
@@ -243,18 +308,23 @@ export class ManifoldDomRenderer {
     const tiltXR = Math.round(tiltX * 100);
     const tiltYR = Math.round(tiltY * 100);
     const tiltZR = Math.round(tiltZ * 100);
-    
+
     // Integer key avoids string allocation on every frame
-    const key = (shiftZR & 0xFFFF) * 0x1_0000_0000
-      + (tiltXR & 0xFFFF) * 0x1_0000
-      + (tiltYR & 0xFF)   * 0x100
-      + (tiltZR & 0xFF);
+    const key =
+      (shiftZR & 0xffff) * 0x1_0000_0000 +
+      (tiltXR & 0xffff) * 0x1_0000 +
+      (tiltYR & 0xff) * 0x100 +
+      (tiltZR & 0xff);
 
     if (key !== item.lastFxKey) {
       const precision = IS_SAFARI ? 1 : 2;
       const cardScale = item.currentCardScale || 1;
-      const flatTransform = IS_IOS && Math.abs(shiftZ) < 0.05 && Math.abs(tiltX) < 0.05 && Math.abs(tiltY) < 0.05;
-      
+      const flatTransform =
+        IS_IOS &&
+        Math.abs(shiftZ) < 0.05 &&
+        Math.abs(tiltX) < 0.05 &&
+        Math.abs(tiltY) < 0.05;
+
       // We must include translate(-50%, -50%) because the card is absolutely positioned and centered
       item.fxEl.style.transform = flatTransform
         ? `translate(-50%, -50%) rotate(${tiltZ.toFixed(precision)}deg) scale(${cardScale.toFixed(precision + 1)})`
@@ -263,7 +333,12 @@ export class ManifoldDomRenderer {
     }
   }
 
-  setTranslatedTransform(item: ItemState, tx: number, ty: number, tz: number): void {
+  setTranslatedTransform(
+    item: ItemState,
+    tx: number,
+    ty: number,
+    tz: number
+  ): void {
     const txr = Math.round(tx * 100);
     const tyr = Math.round(ty * 100);
     const tzr = Math.round(tz * 100);
@@ -271,9 +346,10 @@ export class ManifoldDomRenderer {
 
     if (item.lastBasePosKey !== key) {
       const precision = IS_SAFARI ? 1 : 2;
-      item.el.style.transform = IS_IOS && Math.abs(tz) < 0.05
-        ? `translate(${tx.toFixed(precision)}px, ${ty.toFixed(precision)}px)`
-        : `translate3d(${tx.toFixed(precision)}px, ${ty.toFixed(precision)}px, ${tz.toFixed(precision)}px)`;
+      item.el.style.transform =
+        IS_IOS && Math.abs(tz) < 0.05
+          ? `translate(${tx.toFixed(precision)}px, ${ty.toFixed(precision)}px)`
+          : `translate3d(${tx.toFixed(precision)}px, ${ty.toFixed(precision)}px, ${tz.toFixed(precision)}px)`;
       item.lastBasePosKey = key;
     }
   }
@@ -284,9 +360,9 @@ export class ManifoldDomRenderer {
     energy: number,
     alpha: number
   ): void {
-    // Safari: Audio spectrum visuals are disabled via CSS (--music-alpha: 0 !important)
+    // Safari/iOS/Android: Audio spectrum visuals are disabled via CSS (--music-alpha: 0 !important)
     // Skip all JS-side CSS variable writes to eliminate per-card style mutation pressure.
-    if (IS_SAFARI) return;
+    if (IS_SAFARI || IS_IOS || IS_ANDROID) return;
 
     const spectrumEl = item.spectrumEl;
     if (!spectrumEl) return;
@@ -294,11 +370,14 @@ export class ManifoldDomRenderer {
     const cardAlpha = alpha * (item.currentAlpha || 1.0);
     if (cardAlpha < 0.005) return;
 
-    const targetPresence = (spectrum && energy > 0.001) ? 1 : 0;
+    const targetPresence = spectrum && energy > 0.001 ? 1 : 0;
     const currentPresence = item.lastMusicPresence ?? 0;
-    
+
     // Simple lerp for smooth entry/exit
-    const nextPresence = currentPresence + (targetPresence - currentPresence) * (targetPresence > currentPresence ? 0.12 : 0.08);
+    const nextPresence =
+      currentPresence +
+      (targetPresence - currentPresence) *
+        (targetPresence > currentPresence ? 0.12 : 0.08);
     item.lastMusicPresence = nextPresence;
 
     if (nextPresence < 0.01) {
@@ -313,10 +392,16 @@ export class ManifoldDomRenderer {
     const musicAlpha = Math.max(0.12, energy * 2.5) * nextPresence;
     const quantizedMusicAlpha = Math.round(musicAlpha * 50) / 50;
 
-    const alphaDelta = Math.abs(quantizedMusicAlpha - (item.lastMusicAlpha ?? -1));
+    const alphaDelta = Math.abs(
+      quantizedMusicAlpha - (item.lastMusicAlpha ?? -1)
+    );
     const shouldUpdateAlpha = alphaDelta > 0.019;
     if (shouldUpdateAlpha) {
-      StyleAdapter.setNumericProperty(spectrumEl, '--music-alpha', quantizedMusicAlpha);
+      StyleAdapter.setNumericProperty(
+        spectrumEl,
+        '--music-alpha',
+        quantizedMusicAlpha
+      );
       item.lastMusicAlpha = quantizedMusicAlpha;
     }
   }

@@ -23,7 +23,7 @@ export default function createProjectsScene(): SceneModule {
 
     async setup(ctx) {
       root = new Group();
-      
+
       knotGeometry = new TorusKnotGeometry(0.78, 0.22, 40, 6);
       knotMaterial = new MeshPhysicalMaterial({
         color: 0xf8fbff,
@@ -60,7 +60,7 @@ export default function createProjectsScene(): SceneModule {
         ctx.scene.remove(root);
         disposeObject(root);
       }
-      
+
       knotGeometry?.dispose();
       knotMaterial?.dispose();
 

@@ -1,7 +1,10 @@
 ---
 import { homePageSeoCopy, siteMetadata } from '../config/siteMetadata';
 import Hero from './Hero.astro';
-import { getManifoldLocaleBundle, type ManifoldLocale } from '../i18n/manifoldLocale';
+import {
+  getManifoldLocaleBundle,
+  type ManifoldLocale
+} from '../i18n/manifoldLocale';
 import { getLocalePath } from '../i18n/localeRouting';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
@@ -16,6 +19,14 @@ const uiStrings = bundle.ui;
 const seoCopy = homePageSeoCopy[locale];
 const siteUrl = Astro.site?.toString() ?? 'https://kaim.dev/';
 const localizedUrl = new URL(getLocalePath(locale), siteUrl).toString();
+const skipToReadableProfile =
+  locale === 'pl'
+    ? 'Przejdź do czytelnego profilu'
+    : 'Skip to readable profile';
+const returnToExperience =
+  locale === 'pl'
+    ? 'Wróć do interaktywnego portfolio'
+    : 'Return to interactive portfolio';
 
 const structuredData = [
   {
@@ -60,23 +71,35 @@ const structuredData = [
   structuredData={structuredData}
 >
   <main>
-    <section class="seo-content" aria-labelledby="seo-page-title">
+    <a class="skip-link" href="#readable-profile">{skipToReadableProfile}</a>
+    <section
+      class="seo-content"
+      id="readable-profile"
+      tabindex="-1"
+      aria-labelledby="seo-page-title"
+    >
       <h1 id="seo-page-title">{seoCopy.headline}</h1>
       <p>{seoCopy.intro}</p>
       <ul>
-        {seoCopy.sections.map((item) => (
-          <li>{item}</li>
-        ))}
+        {seoCopy.sections.map((item) => <li>{item}</li>)}
       </ul>
+      <a class="reader-return-link" href="#interactive-experience"
+        >{returnToExperience}</a
+      >
     </section>
+    <span id="interactive-experience" tabindex="-1"></span>
     <Hero locale={locale} />
     <noscript>
       <section class="seo-noscript">
-        <h2>{locale === 'pl' ? 'Interaktywne portfolio' : 'Interactive portfolio'}</h2>
+        <h2>
+          {locale === 'pl' ? 'Interaktywne portfolio' : 'Interactive portfolio'}
+        </h2>
         <p>
-          {locale === 'pl'
-            ? 'To portfolio zostało zaprojektowane jako interaktywne doświadczenie manifold. Do przeglądania animowanej sceny i szczegółów kart wymagany jest JavaScript.'
-            : 'This portfolio is designed as an interactive manifold experience. JavaScript is required to browse the animated scene and card details.'}
+          {
+            locale === 'pl'
+              ? 'To portfolio zostało zaprojektowane jako interaktywne doświadczenie manifold. Do przeglądania animowanej sceny i szczegółów kart wymagany jest JavaScript.'
+              : 'This portfolio is designed as an interactive manifold experience. JavaScript is required to browse the animated scene and card details.'
+          }
         </p>
       </section>
     </noscript>

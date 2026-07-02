@@ -36,12 +36,19 @@ self.onmessage = (event: MessageEvent<WorkerMessage>) => {
 
   switch (message.type) {
     case 'init': {
-      const context = message.canvas.getContext('2d', { alpha: false, desynchronized: true });
+      const context = message.canvas.getContext('2d', {
+        alpha: false,
+        desynchronized: true
+      });
       if (!context) {
         return;
       }
 
-      kernel = new LiquidGradientKernel(message.canvas, context, message.maxBlobs);
+      kernel = new LiquidGradientKernel(
+        message.canvas,
+        context,
+        message.maxBlobs
+      );
       kernel.setQuality(message.quality);
       kernel.resize(message.viewportWidth, message.viewportHeight);
       return;

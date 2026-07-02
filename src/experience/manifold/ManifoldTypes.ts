@@ -284,7 +284,6 @@ interface ViewportSize {
   readonly height: number;
 }
 
-
 export interface TesseractProjectionInput {
   readonly fourDProgress: number;
   readonly scroll: number;

@@ -1,12 +1,17 @@
 import { clamp, lerp } from '../utils/math';
 import { StyleAdapter } from '../utils/StyleAdapter';
-import { IS_ANDROID, IS_ANDROID_LOW_END, IS_IOS, IS_SAFARI, SAFARI_VERSION } from '../utils/browserDetection';
+import {
+  IS_ANDROID,
+  IS_ANDROID_LOW_END,
+  IS_IOS,
+  IS_SAFARI,
+  SAFARI_VERSION
+} from '../utils/browserDetection';
 import {
   MANIFOLD_MOBILE_BREAKPOINT,
   MANIFOLD_SCENE_CONFIG,
   MANIFOLD_SECTION_HEADINGS,
   MANIFOLD_SECTION_TONES,
-  CARD_ICON_PATHS,
   CARD_PIXEL_PRESETS,
   createManifoldSceneRuntimeConfig,
   type ManifoldSceneRuntimeConfig
@@ -19,14 +24,28 @@ import {
   localizeSectionTitle,
   type ManifoldLocale
 } from '../i18n/manifoldLocale';
-import { createManifoldAtlasState, createManifoldPhaseState } from '../ui/manifold/ManifoldState';
+import {
+  createManifoldAtlasState,
+  createManifoldPhaseState
+} from '../ui/manifold/ManifoldState';
 import type { IDomAdapter, IRuntimeAdapter } from '../ui/ports';
 import { pretextLayoutService } from '../ui/text/PretextLayoutService';
 import { ObjectPool } from '../utils/ObjectPool';
-import { computeDampedLerp, computeCardProjectionMatrix, easeInOutCubic, projectMatrix3dPoint } from './manifold/HyperMath';
-import { ManifoldCardChromeRenderer, type CardChromeInstance } from './manifold/ManifoldCardChromeRenderer';
+import {
+  computeDampedLerp,
+  computeCardProjectionMatrix,
+  easeInOutCubic,
+  projectMatrix3dPoint
+} from './manifold/HyperMath';
+import {
+  ManifoldCardChromeRenderer,
+  type CardChromeInstance
+} from './manifold/ManifoldCardChromeRenderer';
 import { MANIFOLD_CONSTANTS } from './manifold/ManifoldConstants';
-import { ManifoldHudRenderer, type ManifoldHudSnapshot } from './manifold/ManifoldHudRenderer';
+import {
+  ManifoldHudRenderer,
+  type ManifoldHudSnapshot
+} from './manifold/ManifoldHudRenderer';
 import { ManifoldHintController } from './manifold/ManifoldHintController';
 import { ManifoldInputController } from './manifold/ManifoldInputController';
 import { ManifoldInputService } from './manifold/ManifoldInputService';
@@ -74,7 +93,8 @@ import type {
   ViewMode
 } from './manifold/ManifoldTypes';
 
-const MANIFOLD_FOUR_D_CARD_SIZE = MANIFOLD_CONSTANTS.TESSERACT_PHYSICS.faceCardExtent;
+const MANIFOLD_FOUR_D_CARD_SIZE =
+  MANIFOLD_CONSTANTS.TESSERACT_PHYSICS.faceCardExtent;
 const INTRO_AUTO_ENTER_DELAY_MS = 900;
 const INITIAL_ENTRY_SCROLL_OFFSET_PX = 180;
 const ACTIVE_FOUR_D_VARIANT: FourDSceneState['variant'] = 'classic';
@@ -82,7 +102,10 @@ const CARD_ACCESSIBILITY_ALLOW_FOCUS = 1 << 0;
 const CARD_ACCESSIBILITY_ALLOW_EXPANDED_PANEL = 1 << 1;
 const CARD_ACCESSIBILITY_ALLOW_EXPANDED_CONTROLS = 1 << 2;
 const CARD_ACCESSIBILITY_HIDDEN = 1 << 3;
-const CARD_SPECTRUM_VARIABLES = Array.from({ length: 16 }, (_, index) => `--f-${index}`);
+const CARD_SPECTRUM_VARIABLES = Array.from(
+  { length: 16 },
+  (_, index) => `--f-${index}`
+);
 
 interface HintCopyMeasurement {
   height: number;
@@ -148,7 +171,10 @@ export class ManifoldModeController {
   private readonly items: ItemState[] = [];
   private currentAudioSpectrum: Float32Array | null = null;
   private currentAudioEnergy = 0;
-  private readonly sectionAccentRgbCache = new Map<string, [number, number, number]>();
+  private readonly sectionAccentRgbCache = new Map<
+    string,
+    [number, number, number]
+  >();
   private readonly resizeObserver: ResizeObserver;
   private readonly deviceMemory =
     'deviceMemory' in navigator
@@ -158,7 +184,9 @@ export class ManifoldModeController {
   private readonly isAndroidLowEnd = IS_ANDROID_LOW_END;
   private readonly shouldBypassIntro = IS_IOS || IS_ANDROID;
   private isMobileViewport = false;
-  private readonly prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  private readonly prefersReducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  ).matches;
   private locale: ManifoldLocale = 'en';
 
   private readonly config: ManifoldSceneRuntimeConfig;
@@ -172,7 +200,8 @@ export class ManifoldModeController {
   private currentWorldTiltX = 0;
   private currentWorldTiltY = 0;
   private lastPerspective = '';
-  private currentPerspectiveDepth: number = MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.perspectiveNear;
+  private currentPerspectiveDepth: number =
+    MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.perspectiveNear;
   private particleActivity = 0;
   private featuredItem: ItemState | null = null;
   private introProgress = 0;
@@ -198,13 +227,25 @@ export class ManifoldModeController {
   private twoDTransitionGridOrder = new Map<number, number>();
   private twoDTransitionOrderMix = 1;
   private exitingFourDTo2D = false;
-  private get targetViewMode(): ViewMode { return this.transitionManager.getState().targetViewMode; }
+  private get targetViewMode(): ViewMode {
+    return this.transitionManager.getState().targetViewMode;
+  }
 
-  private get viewModeProgress(): number { return this.transitionManager.getState().viewModeProgress; }
-  private get viewModeTarget(): number { return this.transitionManager.getState().viewModeTarget; }
-  private get fourDProgress(): number { return this.transitionManager.getState().fourDProgress; }
-  private get fourDTarget(): number { return this.transitionManager.getState().fourDTarget; }
-  private get fourDTransitionProgress(): number { return this.transitionManager.getState().fourDTransitionProgress; }
+  private get viewModeProgress(): number {
+    return this.transitionManager.getState().viewModeProgress;
+  }
+  private get viewModeTarget(): number {
+    return this.transitionManager.getState().viewModeTarget;
+  }
+  private get fourDProgress(): number {
+    return this.transitionManager.getState().fourDProgress;
+  }
+  private get fourDTarget(): number {
+    return this.transitionManager.getState().fourDTarget;
+  }
+  private get fourDTransitionProgress(): number {
+    return this.transitionManager.getState().fourDTransitionProgress;
+  }
 
   private continuousSceneScroll = 0;
   private lastSceneScrollForLoop = 0;
@@ -242,7 +283,9 @@ export class ManifoldModeController {
   private audioActive = false;
   private sharedSpectrumActive = false;
   private currentQuantizedSpectrum = new Float32Array(16).fill(0.01);
-  private readonly lastAppliedSharedSpectrum = new Float32Array(16).fill(Number.NaN);
+  private readonly lastAppliedSharedSpectrum = new Float32Array(16).fill(
+    Number.NaN
+  );
   private lastIntroHintGeometry = '';
   private introHintMeasurement: HintCopyMeasurement = { width: 0, height: 0 };
   private lastContextHintAlpha = '';
@@ -333,68 +376,100 @@ export class ManifoldModeController {
       IS_IOS || IS_ANDROID ? 0 : this.config.starCount
     );
 
-    this.chromeInstancesPool = createCardChromeInstancePool(this.config.itemCount);
+    this.chromeInstancesPool = createCardChromeInstancePool(
+      this.config.itemCount
+    );
     this.fourDWireframe = elements.fourDWireframe;
     // iOS: Skip 2D context creation — the canvas is hidden via CSS (display: none !important)
     // but getContext() still allocates a GPU-backed buffer that wastes VRAM.
-    this.fourDWireframeContext = (IS_IOS || this.isAndroidLowEnd)
-      ? null
-      : this.fourDWireframe.getContext('2d', { alpha: true, desynchronized: !IS_SAFARI || SAFARI_VERSION >= 17 });
+    this.fourDWireframeContext =
+      IS_IOS || this.isAndroidLowEnd
+        ? null
+        : this.fourDWireframe.getContext('2d', {
+            alpha: true,
+            desynchronized: !IS_SAFARI || SAFARI_VERSION >= 17
+          });
     this.introHint = elements.introHint;
-    this.introHintCopy = this.introHint.querySelector<HTMLElement>('#intro-hint-copy');
-    this.introHintPath = this.introHint.querySelector<SVGPathElement>('#intro-hint-path');
-    this.introHintDot = this.introHint.querySelector<SVGCircleElement>('#intro-hint-dot');
+    this.introHintCopy =
+      this.introHint.querySelector<HTMLElement>('#intro-hint-copy');
+    this.introHintPath =
+      this.introHint.querySelector<SVGPathElement>('#intro-hint-path');
+    this.introHintDot =
+      this.introHint.querySelector<SVGCircleElement>('#intro-hint-dot');
     this.introHintKickerText =
-      this.introHintCopy?.querySelector<HTMLElement>('.intro-hint-kicker')?.textContent?.trim() || 'Entry Point';
+      this.introHintCopy
+        ?.querySelector<HTMLElement>('.intro-hint-kicker')
+        ?.textContent?.trim() || 'Entry Point';
     this.introHintTitleText =
-      this.introHintCopy?.querySelector<HTMLElement>('strong')?.textContent?.trim() || 'Entering Automatically';
+      this.introHintCopy
+        ?.querySelector<HTMLElement>('strong')
+        ?.textContent?.trim() || 'Entering Automatically';
     this.contextHint = elements.contextHint;
-    this.contextHintCopy = this.contextHint.querySelector<HTMLElement>('#context-hint-copy');
-    this.contextHintPath = this.contextHint.querySelector<SVGPathElement>('#context-hint-path');
-    this.contextHintDot = this.contextHint.querySelector<SVGCircleElement>('#context-hint-dot');
+    this.contextHintCopy =
+      this.contextHint.querySelector<HTMLElement>('#context-hint-copy');
+    this.contextHintPath =
+      this.contextHint.querySelector<SVGPathElement>('#context-hint-path');
+    this.contextHintDot =
+      this.contextHint.querySelector<SVGCircleElement>('#context-hint-dot');
     this.contextHintKickerText =
-      this.contextHintCopy?.querySelector<HTMLElement>('.intro-hint-kicker')?.textContent?.trim() || 'Scroll To Browse';
+      this.contextHintCopy
+        ?.querySelector<HTMLElement>('.intro-hint-kicker')
+        ?.textContent?.trim() || 'Scroll To Browse';
     this.contextHintTitleText =
-      this.contextHintCopy?.querySelector<HTMLElement>('strong')?.textContent?.trim() || 'Click Card For Details';
+      this.contextHintCopy
+        ?.querySelector<HTMLElement>('strong')
+        ?.textContent?.trim() || 'Click Card For Details';
     this.hudRenderer = new ManifoldHudRenderer(elements.hud);
     this.hudRenderer.setLocale({
-      performanceMode: (modeLabel) => getLocalePerfModeLabel(this.locale, modeLabel),
+      performanceMode: (modeLabel) =>
+        getLocalePerfModeLabel(this.locale, modeLabel),
       scrollPrompt: getManifoldLocaleBundle(this.locale).ui.scrollPrompt
     });
     this.fourDFaceOverlayPool = new ObjectPool<HTMLElement, ItemState>({
       create: (sourceItem) => this.createFourDFaceOverlay(sourceItem),
-      activate: (overlay, sourceItem) => this.activateFourDFaceOverlay(overlay, sourceItem),
+      activate: (overlay, sourceItem) =>
+        this.activateFourDFaceOverlay(overlay, sourceItem),
       reset: (overlay) => this.resetFourDFaceOverlayElement(overlay),
       destroy: (overlay) => overlay.remove()
     });
-    this.transitionManager = new ManifoldTransitionManager({
-      isIntroCompleted: () => this.introCompleted,
-      onModeSwitched: (previous, current) => this.observer.onModeSwitched?.(previous, current),
-      onFourDModeEntered: () => this.observer.onFourDModeEntered?.(),
-      onModeTransitionStarted: (mode) => {
-        if (mode === '2d') {
-          const focusCard = this.expandedCard ?? this.getEffectiveFocusCard() ?? this.featuredItem;
-          if (focusCard) {
-            this.twoDController.focusCardIn2D(focusCard.cardIndex, false);
+    this.transitionManager = new ManifoldTransitionManager(
+      {
+        isIntroCompleted: () => this.introCompleted,
+        onModeSwitched: (previous, current) =>
+          this.observer.onModeSwitched?.(previous, current),
+        onFourDModeEntered: () => this.observer.onFourDModeEntered?.(),
+        onModeTransitionStarted: (mode) => {
+          if (mode === '2d') {
+            const focusCard =
+              this.expandedCard ??
+              this.getEffectiveFocusCard() ??
+              this.featuredItem;
+            if (focusCard) {
+              this.twoDController.focusCardIn2D(focusCard.cardIndex, false);
+            }
+          } else {
+            this.twoDController.clear2DSectionFrame();
+            this.twoDController.clear2DLayoutTargets();
+            if (this.lastCentered2DCard) {
+              this.lastCentered2DCard = null;
+            }
           }
-        } else {
-          this.twoDController.clear2DSectionFrame();
-          this.twoDController.clear2DLayoutTargets();
-          if (this.lastCentered2DCard) {
-            this.lastCentered2DCard = null;
-          }
+        },
+        captureTwoDTransitionGridOrder: () =>
+          this.captureTwoDTransitionGridOrder(),
+        clearTwoDTransitionGridOrder: () => {
+          this.twoDTransitionGridOrder.clear();
+          this.twoDTransitionOrderMix = 1;
         }
       },
-      captureTwoDTransitionGridOrder: () => this.captureTwoDTransitionGridOrder(),
-      clearTwoDTransitionGridOrder: () => {
-        this.twoDTransitionGridOrder.clear();
-        this.twoDTransitionOrderMix = 1;
-      }
-    }, this.initialViewMode);
+      this.initialViewMode
+    );
 
     this.visualStateManager = new ManifoldVisualStateManager({
-      toggleBodyClass: (className, active) => this.dom.toggleBodyClass(className, active),
-      toggleRootClass: (className, active) => this.dom.toggleRootClass(className, active),
+      toggleBodyClass: (className, active) =>
+        this.dom.toggleBodyClass(className, active),
+      toggleRootClass: (className, active) =>
+        this.dom.toggleRootClass(className, active),
       getWorldElement: () => this.world
     });
 
@@ -418,18 +493,29 @@ export class ManifoldModeController {
           topbarLineKey: this.topbarLineKey
         }),
         setState: (next) => {
-          if (next.currentPerspectiveDepth !== undefined) this.currentPerspectiveDepth = next.currentPerspectiveDepth;
-          if (next.currentWorldTiltX !== undefined) this.currentWorldTiltX = next.currentWorldTiltX;
-          if (next.currentWorldTiltY !== undefined) this.currentWorldTiltY = next.currentWorldTiltY;
-          if (next.estimatedRefreshCap !== undefined) this.estimatedRefreshCap = next.estimatedRefreshCap;
+          if (next.currentPerspectiveDepth !== undefined)
+            this.currentPerspectiveDepth = next.currentPerspectiveDepth;
+          if (next.currentWorldTiltX !== undefined)
+            this.currentWorldTiltX = next.currentWorldTiltX;
+          if (next.currentWorldTiltY !== undefined)
+            this.currentWorldTiltY = next.currentWorldTiltY;
+          if (next.estimatedRefreshCap !== undefined)
+            this.estimatedRefreshCap = next.estimatedRefreshCap;
           if (next.fpsDisplay !== undefined) this.fpsDisplay = next.fpsDisplay;
-          if (next.frameTimeBurst !== undefined) this.frameTimeBurst = next.frameTimeBurst;
-          if (next.frameTimeEma !== undefined) this.frameTimeEma = next.frameTimeEma;
-          if (next.lastPerspective !== undefined) this.lastPerspective = next.lastPerspective;
-          if (next.lastWorldTransform !== undefined) this.lastWorldTransform = next.lastWorldTransform;
-          if (next.particleActivity !== undefined) this.particleActivity = next.particleActivity;
-          if (next.topbarEnergy !== undefined) this.topbarEnergy = next.topbarEnergy;
-          if (next.topbarLineKey !== undefined) this.topbarLineKey = next.topbarLineKey;
+          if (next.frameTimeBurst !== undefined)
+            this.frameTimeBurst = next.frameTimeBurst;
+          if (next.frameTimeEma !== undefined)
+            this.frameTimeEma = next.frameTimeEma;
+          if (next.lastPerspective !== undefined)
+            this.lastPerspective = next.lastPerspective;
+          if (next.lastWorldTransform !== undefined)
+            this.lastWorldTransform = next.lastWorldTransform;
+          if (next.particleActivity !== undefined)
+            this.particleActivity = next.particleActivity;
+          if (next.topbarEnergy !== undefined)
+            this.topbarEnergy = next.topbarEnergy;
+          if (next.topbarLineKey !== undefined)
+            this.topbarLineKey = next.topbarLineKey;
         },
         getTopbar: () => this.topbar,
         getViewportElement: () => this.elements.viewport,
@@ -476,33 +562,46 @@ export class ManifoldModeController {
         targetSpeed: this.phaseState.targetSpeed,
         velocity: this.phaseState.velocity
       }),
-      getLocalizedSectionTitle: (sectionTitle) => this.getLocalizedSectionTitle(sectionTitle),
+      getLocalizedSectionTitle: (sectionTitle) =>
+        this.getLocalizedSectionTitle(sectionTitle),
       getSectionFrameElements: () => ({
         label: this.twoDSectionFrameLabel,
         root: this.twoDSectionFrameRoot
       }),
-      getViewportSize: () => ({ height: this.viewportHeight, width: this.viewportWidth }),
+      getViewportSize: () => ({
+        height: this.viewportHeight,
+        width: this.viewportWidth
+      }),
       getWorldState: () => ({
         exitReturnActive: this.exitReturnActive,
         expandedCard: this.expandedCard,
         expandedProgress: this.expandedProgress
       }),
       setFrameSamplingState: (next) => {
-        if (next.lastFrameState !== undefined) this.lastTwoDSectionFrameState = next.lastFrameState;
-        if (next.lastFrameVisualState !== undefined) this.lastTwoDSectionFrameVisualState = next.lastFrameVisualState;
-        if (next.lastLabel !== undefined) this.lastTwoDSectionFrameLabel = next.lastLabel;
-        if (next.stillness !== undefined) this.twoDSectionFrameStillness = next.stillness;
+        if (next.lastFrameState !== undefined)
+          this.lastTwoDSectionFrameState = next.lastFrameState;
+        if (next.lastFrameVisualState !== undefined)
+          this.lastTwoDSectionFrameVisualState = next.lastFrameVisualState;
+        if (next.lastLabel !== undefined)
+          this.lastTwoDSectionFrameLabel = next.lastLabel;
+        if (next.stillness !== undefined)
+          this.twoDSectionFrameStillness = next.stillness;
         if (next.x !== undefined) this.twoDSectionFrameX = next.x;
         if (next.y !== undefined) this.twoDSectionFrameY = next.y;
         if (next.width !== undefined) this.twoDSectionFrameWidth = next.width;
-        if (next.height !== undefined) this.twoDSectionFrameHeight = next.height;
+        if (next.height !== undefined)
+          this.twoDSectionFrameHeight = next.height;
       },
       setLayoutState: (next) => {
-        if (next.lastCentered2DCard !== undefined) this.lastCentered2DCard = next.lastCentered2DCard;
-        if (next.targetCardIndex !== undefined) this.twoDTargetCardIndex = next.targetCardIndex;
-        if (next.transitionOrderMix !== undefined) this.twoDTransitionOrderMix = next.transitionOrderMix;
+        if (next.lastCentered2DCard !== undefined)
+          this.lastCentered2DCard = next.lastCentered2DCard;
+        if (next.targetCardIndex !== undefined)
+          this.twoDTargetCardIndex = next.targetCardIndex;
+        if (next.transitionOrderMix !== undefined)
+          this.twoDTransitionOrderMix = next.transitionOrderMix;
         if (next.twoDOffsetX !== undefined) this.twoDOffsetX = next.twoDOffsetX;
-        if (next.twoDOffsetXTarget !== undefined) this.twoDOffsetXTarget = next.twoDOffsetXTarget;
+        if (next.twoDOffsetXTarget !== undefined)
+          this.twoDOffsetXTarget = next.twoDOffsetXTarget;
       },
       updateActivity: (now) => {
         this.lastActivityAt = now;
@@ -541,12 +640,17 @@ export class ManifoldModeController {
         this.stableInputScroll = next.stableInputScroll;
       }
     });
-    this.physicsRuntime = new ManifoldPhysicsRuntime(new ManifoldPhysicsOrchestrator());
+    this.physicsRuntime = new ManifoldPhysicsRuntime(
+      new ManifoldPhysicsOrchestrator()
+    );
     this.domRenderer = new ManifoldDomRenderer();
     this.cardExpandController = new ManifoldCardExpandController({
-      animateCardHandoff: (item, expanded) => this.textEffectManager.animateCardHandoff(item, expanded),
-      animateCardTitle: (item, expanded) => this.textEffectManager.animateCardTitle(item, expanded),
-      focusCardIn2D: (cardIndex, immediate) => this.twoDController.focusCardIn2D(cardIndex, immediate),
+      animateCardHandoff: (item, expanded) =>
+        this.textEffectManager.animateCardHandoff(item, expanded),
+      animateCardTitle: (item, expanded) =>
+        this.textEffectManager.animateCardTitle(item, expanded),
+      focusCardIn2D: (cardIndex, immediate) =>
+        this.twoDController.focusCardIn2D(cardIndex, immediate),
       getExpandedState: () => ({
         card: this.expandedCard,
         progress: this.expandedProgress,
@@ -555,20 +659,25 @@ export class ManifoldModeController {
         schedulerToken: this.expandedRevealSchedulerToken,
         target: this.expandedTarget
       }),
-      getRevealLayers: (element) => this.textEffectManager.getRevealLayers(element),
+      getRevealLayers: (element) =>
+        this.textEffectManager.getRevealLayers(element),
       getRuntimeNow: () => this.runtime.now(),
       getViewMode: () => this.targetViewMode,
       isIntroCompleted: () => this.introCompleted,
       isMobileViewport: () => this.isMobileViewport,
       is2DMode: () => this.is2DMode(),
-      requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
+      requestAnimationFrame: (callback) =>
+        window.requestAnimationFrame(callback),
       scheduleTimeout: (callback, delay) => window.setTimeout(callback, delay),
       setCardMobilePage: (item, page) => this.setCardMobilePage(item, page),
       setExpandedState: (next) => {
         if (next.card !== undefined) this.expandedCard = next.card;
-        if (next.quenchUntil !== undefined) this.expandedMotionQuenchUntil = next.quenchUntil;
-        if (next.schedulerRaf !== undefined) this.expandedRevealSchedulerRaf = next.schedulerRaf;
-        if (next.schedulerToken !== undefined) this.expandedRevealSchedulerToken = next.schedulerToken;
+        if (next.quenchUntil !== undefined)
+          this.expandedMotionQuenchUntil = next.quenchUntil;
+        if (next.schedulerRaf !== undefined)
+          this.expandedRevealSchedulerRaf = next.schedulerRaf;
+        if (next.schedulerToken !== undefined)
+          this.expandedRevealSchedulerToken = next.schedulerToken;
         if (next.target !== undefined) this.expandedTarget = next.target;
       },
       setPhaseVelocityScale: (scale) => {
@@ -581,7 +690,8 @@ export class ManifoldModeController {
       }
     });
     this.hintController = new ManifoldHintController({
-      hasExpandedCardOpen: () => this.expandedCard !== null && this.expandedTarget > 0.01,
+      hasExpandedCardOpen: () =>
+        this.expandedCard !== null && this.expandedTarget > 0.01,
       getClosestVisibleCard: () => this.getClosestVisibleCard(),
       getContextHintState: () => ({
         anchorX: this.contextHintAnchorX,
@@ -642,31 +752,67 @@ export class ManifoldModeController {
       setContextHintState: (next) => {
         if (next.anchorX !== undefined) this.contextHintAnchorX = next.anchorX;
         if (next.anchorY !== undefined) this.contextHintAnchorY = next.anchorY;
-        if (next.geometry !== undefined) this.lastContextHintGeometry = next.geometry;
+        if (next.geometry !== undefined)
+          this.lastContextHintGeometry = next.geometry;
         if (next.labelX !== undefined) this.contextHintLabelX = next.labelX;
         if (next.labelY !== undefined) this.contextHintLabelY = next.labelY;
-        if (next.lastAlpha !== undefined) this.lastContextHintAlpha = next.lastAlpha;
-        if (next.lastSide !== undefined) this.lastContextHintSide = next.lastSide;
-        if (next.measurement !== undefined) this.contextHintMeasurement = next.measurement;
-        if (next.motionKey !== undefined) this._lastContextHintMotionKey = next.motionKey;
+        if (next.lastAlpha !== undefined)
+          this.lastContextHintAlpha = next.lastAlpha;
+        if (next.lastSide !== undefined)
+          this.lastContextHintSide = next.lastSide;
+        if (next.measurement !== undefined)
+          this.contextHintMeasurement = next.measurement;
+        if (next.motionKey !== undefined)
+          this._lastContextHintMotionKey = next.motionKey;
       },
       setIntroHintState: (next) => {
         if (next.anchorX !== undefined) this.introHintAnchorX = next.anchorX;
         if (next.anchorY !== undefined) this.introHintAnchorY = next.anchorY;
-        if (next.geometry !== undefined) this.lastIntroHintGeometry = next.geometry;
+        if (next.geometry !== undefined)
+          this.lastIntroHintGeometry = next.geometry;
         if (next.labelX !== undefined) this.introHintLabelX = next.labelX;
         if (next.labelY !== undefined) this.introHintLabelY = next.labelY;
-        if (next.measurement !== undefined) this.introHintMeasurement = next.measurement;
-        if (next.motionKey !== undefined) this._lastIntroHintProgress = next.motionKey;
+        if (next.measurement !== undefined)
+          this.introHintMeasurement = next.measurement;
+        if (next.motionKey !== undefined)
+          this._lastIntroHintProgress = next.motionKey;
       }
     });
 
+    let lastWidth = window.innerWidth;
+    let lastHeight = window.innerHeight;
     this.resizeObserver = this.dom.createResizeObserver(() => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const widthChanged = w !== lastWidth;
+      const heightChanged = h !== lastHeight;
+
+      // On mobile viewports, ignore small height changes (e.g. keyboard triggers or URL bar collapse/expand)
+      if (
+        (IS_IOS || IS_ANDROID) &&
+        !widthChanged &&
+        heightChanged &&
+        Math.abs(h - lastHeight) < 110
+      ) {
+        return;
+      }
+
+      lastWidth = w;
+      lastHeight = h;
+
       pretextLayoutService.syncRootFontPx();
       this.layoutItems();
       this.refreshHintMeasurements();
-      this.particleField.resize(this.viewportWidth, this.viewportHeight, window.devicePixelRatio || 1);
-      this.particleField.layout(this.loopSize, this.viewportWidth, this.viewportHeight);
+      this.particleField.resize(
+        this.viewportWidth,
+        this.viewportHeight,
+        window.devicePixelRatio || 1
+      );
+      this.particleField.layout(
+        this.loopSize,
+        this.viewportWidth,
+        this.viewportHeight
+      );
       this.cardChromeRenderer?.resize(this.viewportWidth, this.viewportHeight);
     });
 
@@ -674,8 +820,16 @@ export class ManifoldModeController {
     this.createItems();
     this.layoutItems();
     this.refreshHintMeasurements();
-    this.particleField.resize(this.viewportWidth, this.viewportHeight, window.devicePixelRatio || 1);
-    this.particleField.layout(this.loopSize, this.viewportWidth, this.viewportHeight);
+    this.particleField.resize(
+      this.viewportWidth,
+      this.viewportHeight,
+      window.devicePixelRatio || 1
+    );
+    this.particleField.layout(
+      this.loopSize,
+      this.viewportWidth,
+      this.viewportHeight
+    );
     const initCardChrome = () => {
       if (IS_IOS || this.isAndroidLowEnd) {
         // iOS WebKit can occasionally composite this fullscreen WebGL layer as opaque black
@@ -683,11 +837,17 @@ export class ManifoldModeController {
         // the decorative fullscreen pass is disproportionately expensive there.
         this.gpuCardChromeDisabled = true;
         elements.cardChromeLayer.style.display = 'none';
-        this.dom.removeBodyClass('has-gpu-card-chrome', 'has-gpu-card-chrome-active');
+        this.dom.removeBodyClass(
+          'has-gpu-card-chrome',
+          'has-gpu-card-chrome-active'
+        );
         return;
       }
 
-      this.cardChromeRenderer = new ManifoldCardChromeRenderer(elements.cardChromeLayer, this.config.itemCount);
+      this.cardChromeRenderer = new ManifoldCardChromeRenderer(
+        elements.cardChromeLayer,
+        this.config.itemCount
+      );
       if (this.cardChromeRenderer.isSupported()) {
         this.dom.addBodyClass('has-gpu-card-chrome');
       }
@@ -739,22 +899,43 @@ export class ManifoldModeController {
         this.phaseState.mouseY = mouseY;
       }
     });
-    this.inputController = new ManifoldInputController(this.runtime, {
-      exitButton: this.elements.exitButton,
-      featuredInteractiveEl: this.featuredItem?.fxEl ?? null,
-      viewport: this.elements.viewport
-    }, {
-      handleExitClick: this.inputService.handleExitClick.bind(this.inputService),
-      handleFeaturedClick: this.inputService.handleFeaturedClick.bind(this.inputService),
-      handleFeaturedKeydown: this.inputService.handleFeaturedKeydown.bind(this.inputService),
-      handleGlobalKeydown: this.inputService.handleGlobalKeydown.bind(this.inputService),
-      handlePointerLeave: this.inputService.handlePointerLeave.bind(this.inputService),
-      handlePointerMove: this.inputService.handlePointerMove.bind(this.inputService),
-      handleViewportClick: this.inputService.handleViewportClick.bind(this.inputService),
-      handleViewportPointerDown: this.inputService.handleViewportPointerDown.bind(this.inputService),
-      handleViewportPointerUp: this.inputService.handleViewportPointerUp.bind(this.inputService),
-      handleWheel: this.inputService.handleWheel.bind(this.inputService)
-    });
+    this.inputController = new ManifoldInputController(
+      this.runtime,
+      {
+        exitButton: this.elements.exitButton,
+        featuredInteractiveEl: this.featuredItem?.fxEl ?? null,
+        viewport: this.elements.viewport
+      },
+      {
+        handleExitClick: this.inputService.handleExitClick.bind(
+          this.inputService
+        ),
+        handleFeaturedClick: this.inputService.handleFeaturedClick.bind(
+          this.inputService
+        ),
+        handleFeaturedKeydown: this.inputService.handleFeaturedKeydown.bind(
+          this.inputService
+        ),
+        handleGlobalKeydown: this.inputService.handleGlobalKeydown.bind(
+          this.inputService
+        ),
+        handlePointerLeave: this.inputService.handlePointerLeave.bind(
+          this.inputService
+        ),
+        handlePointerMove: this.inputService.handlePointerMove.bind(
+          this.inputService
+        ),
+        handleViewportClick: this.inputService.handleViewportClick.bind(
+          this.inputService
+        ),
+        handleViewportPointerDown:
+          this.inputService.handleViewportPointerDown.bind(this.inputService),
+        handleViewportPointerUp: this.inputService.handleViewportPointerUp.bind(
+          this.inputService
+        ),
+        handleWheel: this.inputService.handleWheel.bind(this.inputService)
+      }
+    );
     this.dom.observeResize(this.resizeObserver, this.elements.viewport);
     this.inputController.attach();
     if (this.shouldBypassIntro) {
@@ -769,29 +950,41 @@ export class ManifoldModeController {
 
   private setupInteractiveButtonHooks(): void {
     const chips = this.dom.querySelectorAll<HTMLElement>('.topbar-chip');
-    const hudButtons = this.dom.querySelectorAll<HTMLElement>('.hud-mode-option, .hud-side-toggle');
-    
+    const hudButtons = this.dom.querySelectorAll<HTMLElement>(
+      '.hud-mode-option, .hud-side-toggle'
+    );
+
     const attachHover = (el: HTMLElement) => {
       // Find the specific text targets. If explicitly marked, use those to preserve sibling HTML spacing/colors.
-      let targets = Array.from(el.querySelectorAll<HTMLElement>('.scramble-target'));
-      
+      let targets = Array.from(
+        el.querySelectorAll<HTMLElement>('.scramble-target')
+      );
+
       // Fallback to standard labels if no explicit targets are defined
       if (targets.length === 0) {
-        const label = el.querySelector<HTMLElement>('.topbar-chip-label, .hud-mode-toggle-label, span:not([class*="glyph"]):not([class*="icon"])');
+        const label = el.querySelector<HTMLElement>(
+          '.topbar-chip-label, .hud-mode-toggle-label, span:not([class*="glyph"]):not([class*="icon"])'
+        );
         if (label) targets = [label];
       }
-      
+
       if (targets.length === 0) return;
 
       el.addEventListener('mouseenter', () => {
-        targets.forEach(target => {
+        targets.forEach((target) => {
           // Resolve original text, cache it so we don't accidentally grab partial scrambles
-          const targetText = target.dataset.originalText || target.textContent?.trim() || '';
+          const targetText =
+            target.dataset.originalText || target.textContent?.trim() || '';
           if (!target.dataset.originalText && targetText) {
             target.dataset.originalText = targetText;
           }
           if (targetText) {
-            this.textEffectManager.setTextContent(target, targetText, true, true);
+            this.textEffectManager.setTextContent(
+              target,
+              targetText,
+              true,
+              true
+            );
           }
         });
       });
@@ -828,7 +1021,10 @@ export class ManifoldModeController {
       return this.getFeaturedCardScrollAnchor();
     }
 
-    return this.getFeaturedCardScrollAnchor() - INITIAL_ENTRY_SCROLL_OFFSET_PX / this.config.camSpeed;
+    return (
+      this.getFeaturedCardScrollAnchor() -
+      INITIAL_ENTRY_SCROLL_OFFSET_PX / this.config.camSpeed
+    );
   }
 
   isIntroComplete(): boolean {
@@ -855,7 +1051,11 @@ export class ManifoldModeController {
     return this.locale;
   }
 
-  showTemporaryHudFocus(section: string, card: string, durationMs = 2600): void {
+  showTemporaryHudFocus(
+    section: string,
+    card: string,
+    durationMs = 2600
+  ): void {
     this.hudRenderer.showTemporaryFocus(section, card, durationMs);
   }
 
@@ -922,14 +1122,17 @@ export class ManifoldModeController {
       window.clearTimeout(this.introAutoEnterTimeout);
     }
 
-    this.introAutoEnterTimeout = window.setTimeout(() => {
-      this.introAutoEnterTimeout = 0;
-      if (this.introCompleted || this.introTarget >= 1) {
-        return;
-      }
+    this.introAutoEnterTimeout = window.setTimeout(
+      () => {
+        this.introAutoEnterTimeout = 0;
+        if (this.introCompleted || this.introTarget >= 1) {
+          return;
+        }
 
-      this.triggerIntroEnter();
-    }, Math.max(0, delayMs));
+        this.triggerIntroEnter();
+      },
+      Math.max(0, delayMs)
+    );
   }
 
   focusCardIn2D(cardIndex: number, immediate = false): void {
@@ -941,7 +1144,9 @@ export class ManifoldModeController {
   }
 
   isSettledNearScroll(anchor: number, tolerance = 18): boolean {
-    const scrollSettled = Math.abs(this.phaseState.scroll - anchor) <= tolerance && Math.abs(this.phaseState.velocity) <= 0.08;
+    const scrollSettled =
+      Math.abs(this.phaseState.scroll - anchor) <= tolerance &&
+      Math.abs(this.phaseState.velocity) <= 0.08;
 
     if (!scrollSettled || !this.is2DMode()) {
       return scrollSettled;
@@ -955,7 +1160,11 @@ export class ManifoldModeController {
   }
 
   getCurrentSceneScroll(): number {
-    const sceneOffset = this.exitReturnActive ? this.exitSceneOffset : this.introCompleted ? this.stableSceneOffset : 0;
+    const sceneOffset = this.exitReturnActive
+      ? this.exitSceneOffset
+      : this.introCompleted
+        ? this.stableSceneOffset
+        : 0;
     return this.introScrollAnchor + sceneOffset;
   }
 
@@ -966,12 +1175,17 @@ export class ManifoldModeController {
       return currentSceneScroll;
     }
 
-    const focusCard = this.expandedCard ?? this.getEffectiveFocusCard() ?? this.featuredItem;
+    const focusCard =
+      this.expandedCard ?? this.getEffectiveFocusCard() ?? this.featuredItem;
     if (!focusCard) {
       return currentSceneScroll;
     }
 
-    return this.normalizeLoopAnchor(this.getAnchorForCard(focusCard), currentSceneScroll, 'nearest');
+    return this.normalizeLoopAnchor(
+      this.getAnchorForCard(focusCard),
+      currentSceneScroll,
+      'nearest'
+    );
   }
 
   resolveNavigationScrollTarget(anchor: number): number {
@@ -979,33 +1193,52 @@ export class ManifoldModeController {
   }
 
   normalizeNavigationAnchor(anchor: number): number {
-    return this.normalizeLoopAnchor(anchor, this.getSectionNavigationReferenceScroll(), 'nearest');
+    return this.normalizeLoopAnchor(
+      anchor,
+      this.getSectionNavigationReferenceScroll(),
+      'nearest'
+    );
   }
 
-  getCardNavigationAnchor(cardIndex: number, mode: 'nearest' | 'forward' | 'backward' | 'smart' = 'nearest'): number | null {
+  getCardNavigationAnchor(
+    cardIndex: number,
+    mode: 'nearest' | 'forward' | 'backward' | 'smart' = 'nearest'
+  ): number | null {
     return resolveCardNavigationAnchor({
       cardIndex,
       cardItems: this.cardItemsCache,
       getAnchorForCard: (item) => this.getAnchorForCard(item),
       mode,
-      normalizeAnchor: (anchor, anchorMode) => this.normalizeLoopAnchor(anchor, this.getCurrentSceneScroll(), anchorMode)
+      normalizeAnchor: (anchor, anchorMode) =>
+        this.normalizeLoopAnchor(
+          anchor,
+          this.getCurrentSceneScroll(),
+          anchorMode
+        )
     });
   }
 
-  getAdjacentCardNavigation(direction: 1 | -1): { anchor: number; cardIndex: number } | null {
+  getAdjacentCardNavigation(
+    direction: 1 | -1
+  ): { anchor: number; cardIndex: number } | null {
     return resolveAdjacentCardNavigation({
       cardItems: this.cardItemsCache,
       currentCard: this.expandedCard ?? this.getEffectiveFocusCard(),
       direction,
       featuredItem: this.featuredItem,
       getAnchorForCard: (item) => this.getAnchorForCard(item),
-      normalizeAnchor: (anchor, anchorMode) => this.normalizeLoopAnchor(anchor, this.getCurrentSceneScroll(), anchorMode)
+      normalizeAnchor: (anchor, anchorMode) =>
+        this.normalizeLoopAnchor(
+          anchor,
+          this.getCurrentSceneScroll(),
+          anchorMode
+        )
     });
   }
 
   getSectionNavigationAnchor(sectionKey: string): number {
     const targets = this.getSceneNavigationTargets();
-    const target = targets.find(t => t.section === sectionKey);
+    const target = targets.find((t) => t.section === sectionKey);
     if (!target) return 0;
     return target.anchor;
   }
@@ -1035,7 +1268,10 @@ export class ManifoldModeController {
     }
 
     for (let i = 0; i < 16; i += 1) {
-      this.currentQuantizedSpectrum[i] = Math.max(0.01, Math.round((spectrum[i] ?? 0) * 100) / 100);
+      this.currentQuantizedSpectrum[i] = Math.max(
+        0.01,
+        Math.round((spectrum[i] ?? 0) * 100) / 100
+      );
     }
     this.sharedSpectrumActive = true;
     this.syncSharedSpectrumCss();
@@ -1050,7 +1286,11 @@ export class ManifoldModeController {
       const value = this.currentQuantizedSpectrum[i] ?? 0.01;
       if (this.lastAppliedSharedSpectrum[i] !== value) {
         this.lastAppliedSharedSpectrum[i] = value;
-        StyleAdapter.setNumericProperty(this.world, CARD_SPECTRUM_VARIABLES[i]!, value);
+        StyleAdapter.setNumericProperty(
+          this.world,
+          CARD_SPECTRUM_VARIABLES[i]!,
+          value
+        );
       }
     }
   }
@@ -1059,8 +1299,14 @@ export class ManifoldModeController {
     return resolveSectionNavigationTargets({
       cardItems: this.cardItemsCache,
       getAnchorForCard: (item) => this.getAnchorForCard(item),
-      getAnchorForItemIndex: (itemIndex) => this.getScrollAnchorForItemIndex(itemIndex),
-      normalizeAnchor: (anchor, mode) => this.normalizeLoopAnchor(anchor, this.getSectionNavigationReferenceScroll(), mode),
+      getAnchorForItemIndex: (itemIndex) =>
+        this.getScrollAnchorForItemIndex(itemIndex),
+      normalizeAnchor: (anchor, mode) =>
+        this.normalizeLoopAnchor(
+          anchor,
+          this.getSectionNavigationReferenceScroll(),
+          mode
+        ),
       sectionHeadings: MANIFOLD_SECTION_HEADINGS
     }).map((section) => ({
       ...section,
@@ -1068,17 +1314,23 @@ export class ManifoldModeController {
     }));
   }
 
-  getSectionNavigationTarget(sectionTitle: string): { anchor: number; cardIndex: number | null; section: string } | null {
+  getSectionNavigationTarget(
+    sectionTitle: string
+  ): { anchor: number; cardIndex: number | null; section: string } | null {
     const rawSectionTitle =
-      MANIFOLD_SECTION_HEADINGS.find((candidate) =>
-        candidate === sectionTitle || this.getLocalizedSectionTitle(candidate) === sectionTitle
+      MANIFOLD_SECTION_HEADINGS.find(
+        (candidate) =>
+          candidate === sectionTitle ||
+          this.getLocalizedSectionTitle(candidate) === sectionTitle
       ) ?? null;
 
     if (!rawSectionTitle) {
       return null;
     }
 
-    const sectionCards = [...(this.cardItemsBySectionCache.get(rawSectionTitle) ?? [])]
+    const sectionCards = [
+      ...(this.cardItemsBySectionCache.get(rawSectionTitle) ?? [])
+    ]
       .filter((item) => item.type === 'card')
       .sort((left, right) => left.cardIndex - right.cardIndex);
 
@@ -1086,14 +1338,21 @@ export class ManifoldModeController {
       return null;
     }
 
-    const representativeCard = sectionCards[Math.floor(sectionCards.length * 0.5)] ?? sectionCards[0] ?? null;
+    const representativeCard =
+      sectionCards[Math.floor(sectionCards.length * 0.5)] ??
+      sectionCards[0] ??
+      null;
     if (!representativeCard) {
       return null;
     }
 
     const anchor =
       this.getCardNavigationAnchor(representativeCard.cardIndex, 'nearest') ??
-      this.normalizeLoopAnchor(this.getAnchorForCard(representativeCard), this.getSectionNavigationReferenceScroll(), 'nearest');
+      this.normalizeLoopAnchor(
+        this.getAnchorForCard(representativeCard),
+        this.getSectionNavigationReferenceScroll(),
+        'nearest'
+      );
 
     return {
       anchor,
@@ -1122,17 +1381,21 @@ export class ManifoldModeController {
 
     const hudRefreshInterval =
       this.introCompleted &&
-        this.targetViewMode === '3d' &&
-        !this.expandedCard &&
-        this.viewModeProgress < 0.08 &&
-        Math.max(Math.abs(this.phaseState.targetSpeed), Math.abs(this.phaseState.velocity)) > 0.18
+      this.targetViewMode === '3d' &&
+      !this.expandedCard &&
+      this.viewModeProgress < 0.08 &&
+      Math.max(
+        Math.abs(this.phaseState.targetSpeed),
+        Math.abs(this.phaseState.velocity)
+      ) > 0.18
         ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.hudRefreshMs * 2.2
         : MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.hudRefreshMs;
 
     if (this.hudTimer >= hudRefreshInterval) {
       this.hudTimer = 0;
       const loopCoord =
-        ((this.phaseState.scroll % this.getLoopScrollLength()) + this.getLoopScrollLength()) %
+        ((this.phaseState.scroll % this.getLoopScrollLength()) +
+          this.getLoopScrollLength()) %
         this.getLoopScrollLength();
 
       this.pendingHudSnapshot = {
@@ -1151,7 +1414,9 @@ export class ManifoldModeController {
       MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.velocitySmoothingLerp
     );
     this.environmentManager.updateFrameMetrics(delta);
-    const activeViewModeProgress = this.introCompleted ? this.viewModeProgress : 0;
+    const activeViewModeProgress = this.introCompleted
+      ? this.viewModeProgress
+      : 0;
 
     const velocityMagnitude = Math.abs(this.phaseState.velocity);
     if (this.introCompleted && velocityMagnitude > 0.05) {
@@ -1159,8 +1424,12 @@ export class ManifoldModeController {
     }
     const highRefreshFrameBudget = 1000 / 120;
     const frameStressThreshold =
-      highRefreshFrameBudget * MANIFOLD_CONSTANTS.PERFORMANCE_THRESHOLDS.frameStressEmaMultiplier;
-    const frameStressSpan = Math.max(1, frameStressThreshold - highRefreshFrameBudget);
+      highRefreshFrameBudget *
+      MANIFOLD_CONSTANTS.PERFORMANCE_THRESHOLDS.frameStressEmaMultiplier;
+    const frameStressSpan = Math.max(
+      1,
+      frameStressThreshold - highRefreshFrameBudget
+    );
 
     this.transitionManager.update(delta);
 
@@ -1198,13 +1467,24 @@ export class ManifoldModeController {
       velocityMagnitude
     });
 
-    const expandedEase = computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.expandedEnvelope);
-    this.expandedProgress = lerp(this.expandedProgress, this.expandedTarget, expandedEase);
+    const expandedEase = computeDampedLerp(
+      delta,
+      MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.expandedEnvelope
+    );
+    this.expandedProgress = lerp(
+      this.expandedProgress,
+      this.expandedTarget,
+      expandedEase
+    );
     if (this.expandedCard || this.expandedTarget > 0.01) {
       this.collapsedExpandedCard = null;
       this.collapsedExpandedFade = 0;
     } else if (this.collapsedExpandedCard) {
-      this.collapsedExpandedFade = lerp(this.collapsedExpandedFade, 0, expandedEase);
+      this.collapsedExpandedFade = lerp(
+        this.collapsedExpandedFade,
+        0,
+        expandedEase
+      );
       if (this.collapsedExpandedFade < 0.015) {
         this.collapsedExpandedCard = null;
         this.collapsedExpandedFade = 0;
@@ -1213,12 +1493,15 @@ export class ManifoldModeController {
 
     const twoDPresentationProgress = this.introCompleted
       ? clamp(
-        this.transitionManager.getState().exitingFourDTo2D
-          ? Math.max(this.viewModeProgress, (1 - clamp(this.fourDTransitionProgress, 0, 1)) * 1.24 + 0.04)
-          : this.viewModeProgress,
-        0,
-        1
-      )
+          this.transitionManager.getState().exitingFourDTo2D
+            ? Math.max(
+                this.viewModeProgress,
+                (1 - clamp(this.fourDTransitionProgress, 0, 1)) * 1.24 + 0.04
+              )
+            : this.viewModeProgress,
+          0,
+          1
+        )
       : 0;
 
     const twoDTransitionOrderTarget =
@@ -1228,7 +1511,10 @@ export class ManifoldModeController {
     this.twoDTransitionOrderMix = lerp(
       this.twoDTransitionOrderMix,
       twoDTransitionOrderTarget,
-      computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.lateralPanBase)
+      computeDampedLerp(
+        delta,
+        MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.lateralPanBase
+      )
     );
     if (
       this.twoDTransitionGridOrder.size > 0 &&
@@ -1243,8 +1529,14 @@ export class ManifoldModeController {
       this.twoDOffsetX,
       this.twoDOffsetXTarget,
       this.viewModeTarget > 0.5
-        ? computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.lateralPanFast)
-        : computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.lateralPanBase)
+        ? computeDampedLerp(
+            delta,
+            MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.lateralPanFast
+          )
+        : computeDampedLerp(
+            delta,
+            MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.lateralPanBase
+          )
     );
 
     const transitionMorphPressure = Math.max(
@@ -1252,7 +1544,9 @@ export class ManifoldModeController {
       Math.abs(this.fourDTarget - this.fourDTransitionProgress)
     );
     const framePressure = clamp(
-      (Math.max(this.frameTimeEma, this.frameTimeBurst) - highRefreshFrameBudget) / frameStressSpan,
+      (Math.max(this.frameTimeEma, this.frameTimeBurst) -
+        highRefreshFrameBudget) /
+        frameStressSpan,
       0,
       1
     );
@@ -1265,13 +1559,20 @@ export class ManifoldModeController {
             velocityMagnitude > 0.55 ||
             Math.abs(this.phaseState.targetSpeed) > 0.55)));
 
-    if (this.expandedTarget === 0 && this.expandedProgress < 0.01 && this.expandedCard) {
+    if (
+      this.expandedTarget === 0 &&
+      this.expandedProgress < 0.01 &&
+      this.expandedCard
+    ) {
       this.collapsedExpandedCard =
         this.fourDTransitionProgress > 0.001 ? this.expandedCard : null;
       this.collapsedExpandedFade = this.collapsedExpandedCard ? 1 : 0;
       this.expandedCard.fxEl.classList.remove('is-expanded');
       this.expandedCard = null;
-      this.adaptiveCooldownUntil = Math.max(this.adaptiveCooldownUntil, this.runtime.now() + 1800);
+      this.adaptiveCooldownUntil = Math.max(
+        this.adaptiveCooldownUntil,
+        this.runtime.now() + 1800
+      );
     }
 
     if (this.pendingIntroExit && this.viewModeProgress < 0.02) {
@@ -1292,7 +1593,10 @@ export class ManifoldModeController {
     const rawSceneOffset = this.phaseState.scroll - this.worldScrollReference;
 
     if (this.exitReturnActive) {
-      const returnEase = computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.exitEnvelope);
+      const returnEase = computeDampedLerp(
+        delta,
+        MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.exitEnvelope
+      );
       this.exitSceneOffset = lerp(this.exitSceneOffset, 0, returnEase);
 
       if (Math.abs(this.exitSceneOffset) < 2.5) {
@@ -1314,7 +1618,17 @@ export class ManifoldModeController {
         this.lastSceneScrollForLoop = 0;
         this.resetIncomingScrollContinuity(this.phaseState.scroll);
         this.stableSceneOffset = 0;
-        this.dom.removeBodyClass('intro-complete', 'is-2d-mode', 'is-4d-mode', 'has-4d-presence', 'is-2d-fast', 'is-frame-stressed', 'is-view-morphing', 'is-card-morphing', 'is-exiting-2d-mode');
+        this.dom.removeBodyClass(
+          'intro-complete',
+          'is-2d-mode',
+          'is-4d-mode',
+          'has-4d-presence',
+          'is-2d-fast',
+          'is-frame-stressed',
+          'is-view-morphing',
+          'is-card-morphing',
+          'is-exiting-2d-mode'
+        );
         this.dom.removeRootClass('is-2d-mode', 'is-4d-mode', 'has-4d-presence');
         this.dom.removeBodyClass('is-transition-snapshots');
         this.dom.addBodyClass('is-intro-active');
@@ -1325,7 +1639,8 @@ export class ManifoldModeController {
       let sceneOffsetDelta = rawSceneOffset - this.lastRawSceneOffset;
 
       if (Math.abs(sceneOffsetDelta) > loopLength * 0.7) {
-        sceneOffsetDelta -= Math.round(sceneOffsetDelta / loopLength) * loopLength;
+        sceneOffsetDelta -=
+          Math.round(sceneOffsetDelta / loopLength) * loopLength;
       }
 
       this.stableSceneOffset += sceneOffsetDelta;
@@ -1336,10 +1651,17 @@ export class ManifoldModeController {
       this.lastRawSceneOffset = 0;
     }
 
-    const introEase = computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.introEnvelope);
+    const introEase = computeDampedLerp(
+      delta,
+      MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.introEnvelope
+    );
     this.introProgress = lerp(this.introProgress, this.introTarget, introEase);
 
-    if (!this.introCompleted && this.introTarget === 1 && this.introProgress > 0.80) {
+    if (
+      !this.introCompleted &&
+      this.introTarget === 1 &&
+      this.introProgress > 0.8
+    ) {
       this.introCompleted = true;
 
       this.setAccessibilityState(true);
@@ -1360,15 +1682,24 @@ export class ManifoldModeController {
     }
 
     const introMix = easeInOutCubic(this.introProgress);
-    const introHintAlpha = this.exitReturnActive ? 0 : clamp(1 - introMix, 0, 1);
+    const introHintAlpha = this.exitReturnActive
+      ? 0
+      : clamp(1 - introMix, 0, 1);
     const introHintAlphaText = introHintAlpha.toFixed(3);
 
     if (introHintAlphaText !== this.lastIntroHintAlpha) {
-      this.introHint.style.setProperty('--intro-hint-alpha', introHintAlphaText);
+      this.introHint.style.setProperty(
+        '--intro-hint-alpha',
+        introHintAlphaText
+      );
       this.lastIntroHintAlpha = introHintAlphaText;
     }
 
-    const sceneOffset = this.exitReturnActive ? this.exitSceneOffset : this.introCompleted ? this.stableSceneOffset : 0;
+    const sceneOffset = this.exitReturnActive
+      ? this.exitSceneOffset
+      : this.introCompleted
+        ? this.stableSceneOffset
+        : 0;
     const sceneScroll = this.introScrollAnchor + sceneOffset;
 
     if (this.introCompleted) {
@@ -1383,23 +1714,20 @@ export class ManifoldModeController {
     }
     const cameraZ = sceneScroll * this.config.camSpeed;
     const activeFourDProgress = this.introCompleted ? this.fourDProgress : 0;
-    const visualFourDProgress = this.introCompleted ? this.fourDTransitionProgress : 0;
+    const visualFourDProgress = this.introCompleted
+      ? this.fourDTransitionProgress
+      : 0;
     const baseParticleRenderIntervalMs = this.transitionPerformanceMode
       ? 1000 / 20
-      : (
-        this.targetViewMode === '3d'
-          ? (
-            this.particleActivity > 0.22 || velocityMagnitude > 0.12
-              ? 1000 / 48
-              : 1000 / 36
-          )
-          : (
-            this.introCompleted
-              ? 1000 / 24
-              : 1000 / 36
-          )
-      );
-    const particleRenderIntervalMs = baseParticleRenderIntervalMs * (this.isMobileViewport ? 1.45 : 1);
+      : this.targetViewMode === '3d'
+        ? this.particleActivity > 0.22 || velocityMagnitude > 0.12
+          ? 1000 / 48
+          : 1000 / 36
+        : this.introCompleted
+          ? 1000 / 24
+          : 1000 / 36;
+    const particleRenderIntervalMs =
+      baseParticleRenderIntervalMs * (this.isMobileViewport ? 1.45 : 1);
     const shouldRenderParticles =
       this.lastParticleRenderAt === 0 ||
       time - this.lastParticleRenderAt >= particleRenderIntervalMs;
@@ -1423,13 +1751,19 @@ export class ManifoldModeController {
     }
     const featuredPose = this.computeFeaturedPose(time, cameraZ);
     const twoDGridMetrics =
-      activeViewModeProgress > 0.01 || this.viewModeTarget > 0.5 ? this.get2DGridMetrics() : null;
+      activeViewModeProgress > 0.01 || this.viewModeTarget > 0.5
+        ? this.get2DGridMetrics()
+        : null;
     const centered2DCard =
-      this.is2DMode() && twoDPresentationProgress > 0.08 ? this.getCentered2DCard() : this.lastCentered2DCard;
+      this.is2DMode() && twoDPresentationProgress > 0.08
+        ? this.getCentered2DCard()
+        : this.lastCentered2DCard;
     this.lastCentered2DCard = centered2DCard ?? null;
     const active2DSectionTitle =
       this.is2DMode() && twoDPresentationProgress > 0.08
-        ? (this.expandedCard?.sectionTitle ?? centered2DCard?.sectionTitle ?? '')
+        ? (this.expandedCard?.sectionTitle ??
+          centered2DCard?.sectionTitle ??
+          '')
         : '';
     const shouldTrack2DFrameBounds =
       !this.expandedCard &&
@@ -1437,41 +1771,48 @@ export class ManifoldModeController {
       twoDPresentationProgress > (this.exitingFourDTo2D ? 0.34 : 0.5) &&
       active2DSectionTitle.length > 0 &&
       (this.viewModeTarget > 0.5 || twoDPresentationProgress > 0.5);
-    this.current2DFrameSectionTitle = shouldTrack2DFrameBounds ? active2DSectionTitle : '';
+    this.current2DFrameSectionTitle = shouldTrack2DFrameBounds
+      ? active2DSectionTitle
+      : '';
     this.current2DFrameBounds = shouldTrack2DFrameBounds
       ? {
-        minX: Number.POSITIVE_INFINITY,
-        maxX: Number.NEGATIVE_INFINITY,
-        minY: Number.POSITIVE_INFINITY,
-        maxY: Number.NEGATIVE_INFINITY,
-        visibleCount: 0
-      }
+          minX: Number.POSITIVE_INFINITY,
+          maxX: Number.NEGATIVE_INFINITY,
+          minY: Number.POSITIVE_INFINITY,
+          maxY: Number.NEGATIVE_INFINITY,
+          visibleCount: 0
+        }
       : null;
     const compactCardAspect =
-      MANIFOLD_CONSTANTS.LAYOUT_GRID.compactCardHeight / MANIFOLD_CONSTANTS.LAYOUT_GRID.compactCardWidth;
-    const compactWidthTarget = twoDGridMetrics?.cardWidth ?? (this.isMobileViewport
-      ? Math.min(this.viewportWidth * 0.42, 220)
-      : Math.min(this.viewportWidth * 0.18, 300));
-    const compactHeightTarget = twoDGridMetrics?.cardHeight ?? compactWidthTarget * compactCardAspect;
+      MANIFOLD_CONSTANTS.LAYOUT_GRID.compactCardHeight /
+      MANIFOLD_CONSTANTS.LAYOUT_GRID.compactCardWidth;
+    const compactWidthTarget =
+      twoDGridMetrics?.cardWidth ??
+      (this.isMobileViewport
+        ? Math.min(this.viewportWidth * 0.42, 220)
+        : Math.min(this.viewportWidth * 0.18, 300));
+    const compactHeightTarget =
+      twoDGridMetrics?.cardHeight ?? compactWidthTarget * compactCardAspect;
     const compactLayoutProgress = clamp(
-      (
-        twoDPresentationProgress -
-        (this.exitingFourDTo2D ? 0.56 : 0.72)
-      ) /
-      (this.exitingFourDTo2D ? 0.24 : 0.28),
+      (twoDPresentationProgress - (this.exitingFourDTo2D ? 0.56 : 0.72)) /
+        (this.exitingFourDTo2D ? 0.24 : 0.28),
       0,
       1
     );
-    const compactWidthPx = Math.round(lerp(
-      MANIFOLD_CONSTANTS.LAYOUT_GRID.compactCardWidth,
-      compactWidthTarget,
-      compactLayoutProgress
-    ));
-    const compactHeightPx = Math.round(lerp(
-      MANIFOLD_CONSTANTS.LAYOUT_GRID.compactCardHeight,
-      compactHeightTarget,
-      compactLayoutProgress
-    ));
+    const compactWidthPx = Math.round(
+      lerp(
+        MANIFOLD_CONSTANTS.LAYOUT_GRID.compactCardWidth,
+        compactWidthTarget,
+        compactLayoutProgress
+      )
+    );
+    const compactHeightPx = Math.round(
+      lerp(
+        MANIFOLD_CONSTANTS.LAYOUT_GRID.compactCardHeight,
+        compactHeightTarget,
+        compactLayoutProgress
+      )
+    );
     const cardRenderLayout: CardRenderLayout = {
       compactWidth: `${compactWidthPx}px`,
       compactHeight: `${compactHeightPx}px`,
@@ -1491,14 +1832,20 @@ export class ManifoldModeController {
       !this.transitionPerformanceMode &&
       !this.expandedCard;
 
-    const gpuCardChromeMotion = Math.max(velocityMagnitude, Math.abs(this.phaseState.targetSpeed));
+    const gpuCardChromeMotion = Math.max(
+      velocityMagnitude,
+      Math.abs(this.phaseState.targetSpeed)
+    );
     const gpuCardChromeRise = clamp((gpuCardChromeMotion - 0.05) / 0.22, 0, 1);
-    const gpuCardChromeFastFade = 1 - clamp((gpuCardChromeMotion - 0.52) / 0.28, 0, 1);
-    const gpuModeFade = 1 - clamp(activeViewModeProgress * 4.0 + visualFourDProgress * 4.0, 0, 1);
+    const gpuCardChromeFastFade =
+      1 - clamp((gpuCardChromeMotion - 0.52) / 0.28, 0, 1);
+    const gpuModeFade =
+      1 - clamp(activeViewModeProgress * 4.0 + visualFourDProgress * 4.0, 0, 1);
 
-    const gpuCardChromeTarget = gpuCardChromeEligible && this.targetViewMode === '3d'
-      ? gpuCardChromeRise * gpuCardChromeFastFade * gpuModeFade
-      : 0;
+    const gpuCardChromeTarget =
+      gpuCardChromeEligible && this.targetViewMode === '3d'
+        ? gpuCardChromeRise * gpuCardChromeFastFade * gpuModeFade
+        : 0;
     const reverseScrollActivationMode =
       !this.expandedCard &&
       this.targetViewMode === '3d' &&
@@ -1509,18 +1856,14 @@ export class ManifoldModeController {
     const suppressHoverChecks =
       this.transitionPerformanceMode ||
       (!this.expandedCard &&
-        (
-          (
-            this.is2DMode() &&
-            (velocityMagnitude > 0.16 || Math.abs(this.phaseState.targetSpeed) > 0.16)
-          ) ||
-          (
-            this.targetViewMode === '3d' &&
+        ((this.is2DMode() &&
+          (velocityMagnitude > 0.16 ||
+            Math.abs(this.phaseState.targetSpeed) > 0.16)) ||
+          (this.targetViewMode === '3d' &&
             activeViewModeProgress < 0.08 &&
             visualFourDProgress < 0.02 &&
-            (velocityMagnitude > 0.10 || Math.abs(this.phaseState.targetSpeed) > 0.10)
-          )
-        ));
+            (velocityMagnitude > 0.1 ||
+              Math.abs(this.phaseState.targetSpeed) > 0.1))));
     const fastTwoDScrollSnapshotMode =
       this.is2DMode() &&
       !this.expandedCard &&
@@ -1528,9 +1871,13 @@ export class ManifoldModeController {
       visualFourDProgress < 0.01 &&
       this.visualStateManager.getTwoDCardFastness() > 0.68 &&
       Math.abs(this.rawScrollVelocity) > 20;
-    const transitionSnapshotsActive = this.transitionPerformanceMode || fastTwoDScrollSnapshotMode;
+    const transitionSnapshotsActive =
+      this.transitionPerformanceMode || fastTwoDScrollSnapshotMode;
     if (transitionSnapshotsActive !== this.lastTransitionSnapshotBodyState) {
-      this.dom.toggleBodyClass('is-transition-snapshots', transitionSnapshotsActive);
+      this.dom.toggleBodyClass(
+        'is-transition-snapshots',
+        transitionSnapshotsActive
+      );
       this.lastTransitionSnapshotBodyState = transitionSnapshotsActive;
     }
     this.lastFastTwoDScrollSnapshotState = fastTwoDScrollSnapshotMode;
@@ -1543,15 +1890,17 @@ export class ManifoldModeController {
       (this.inputService.isPointerDirty() || this.hoveredCard !== null);
     const shouldMaintainCardScreenQuads =
       !this.transitionPerformanceMode &&
-      (
-        (gpuCardChromeTarget > 0.025 && gpuCardChromeEligible) ||
-        (!this.is2DMode() && this.inputService.isPointerActive() && !suppressHoverChecks) ||
-        quiet2DPointerWindow
-      );
+      ((gpuCardChromeTarget > 0.025 && gpuCardChromeEligible) ||
+        (!this.is2DMode() &&
+          this.inputService.isPointerActive() &&
+          !suppressHoverChecks) ||
+        quiet2DPointerWindow);
     const skipFourDVisuals = IS_IOS || this.isAndroidLowEnd;
     const fourDStartedAt = performance.now();
     this.currentFourDScene =
-      !skipFourDVisuals && visualFourDProgress > 0.001 ? this.computeFourDScene(sceneScroll, time, visualFourDProgress) : null;
+      !skipFourDVisuals && visualFourDProgress > 0.001
+        ? this.computeFourDScene(sceneScroll, time, visualFourDProgress)
+        : null;
     this.renderFourDWireframe(this.currentFourDScene, visualFourDProgress);
     this.chromeInstancesActiveCount = 0;
 
@@ -1606,8 +1955,14 @@ export class ManifoldModeController {
       const result = this.physicsRuntime.computeItem(item, physicsContext);
       const reversePrewarmCard = false;
 
-      const isVisible = this.domRenderer.updateItemVisibility(item, result.alpha,
-        result.alpha > 0 || result.skipAlphaCheck || result.isExpandedMorphing || result.isNearCamera);
+      const isVisible = this.domRenderer.updateItemVisibility(
+        item,
+        result.alpha,
+        result.alpha > 0 ||
+          result.skipAlphaCheck ||
+          result.isExpandedMorphing ||
+          result.isNearCamera
+      );
 
       if (!isVisible) continue;
       visibleItems += 1;
@@ -1619,23 +1974,39 @@ export class ManifoldModeController {
 
       this.domRenderer.updateZIndex(
         item,
-        this.expandedCard === item && (this.expandedTarget > 0.01 || this.expandedProgress > 0.01)
+        this.expandedCard === item &&
+          (this.expandedTarget > 0.01 || this.expandedProgress > 0.01)
           ? 'expanded'
           : 'base'
       );
 
       if (item.type === 'text') {
         visibleTexts += 1;
-        this.domRenderer.renderTextItem(item, result.alpha, rendererContext, result.vizZ);
+        this.domRenderer.renderTextItem(
+          item,
+          result.alpha,
+          rendererContext,
+          result.vizZ
+        );
         if (item.el.style.display !== 'none') {
-          this.domRenderer.setRotatedTransform(item, item.x, item.y, result.vizZ, item.rot);
+          this.domRenderer.setRotatedTransform(
+            item,
+            item.x,
+            item.y,
+            result.vizZ,
+            item.rot
+          );
           this.updateTextFx(item, velocityMagnitude, time);
         }
         continue;
       }
 
       visibleCards += 1;
-      if (this.currentAudioSpectrum && this.currentAudioEnergy > 0.001 && item.currentAlpha > 0.01) {
+      if (
+        this.currentAudioSpectrum &&
+        this.currentAudioEnergy > 0.001 &&
+        item.currentAlpha > 0.01
+      ) {
         spectrumCards += 1;
       }
 
@@ -1651,19 +2022,27 @@ export class ManifoldModeController {
         twoDGridMetrics,
         cardRenderLayout,
         this.currentFourDScene,
-        shouldMaintainCardScreenQuads || (this.expandedCard === item) || reversePrewarmCard
+        shouldMaintainCardScreenQuads ||
+          this.expandedCard === item ||
+          reversePrewarmCard
       );
     }
     const itemsMs = performance.now() - itemsStartedAt;
     this.gpuCardChromeMix = lerp(
       this.gpuCardChromeMix,
       gpuCardChromeTarget,
-      computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.cardFastVisualEnvelope)
+      computeDampedLerp(
+        delta,
+        MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.cardFastVisualEnvelope
+      )
     );
     const gpuCardChromeActive = this.gpuCardChromeMix > 0.025;
 
     if (gpuCardChromeActive !== this.lastGpuCardChromeActive) {
-      this.dom.toggleBodyClass('has-gpu-card-chrome-active', gpuCardChromeActive);
+      this.dom.toggleBodyClass(
+        'has-gpu-card-chrome-active',
+        gpuCardChromeActive
+      );
       this.lastGpuCardChromeActive = gpuCardChromeActive;
     }
 
@@ -1704,7 +2083,8 @@ export class ManifoldModeController {
       !suppressHoverChecks &&
       this.inputService.isPointerActive() &&
       (this.inputService.isPointerDirty() ||
-        ((this.hoveredCard === null || Math.abs(this.phaseState.velocity) > 0.35) &&
+        ((this.hoveredCard === null ||
+          Math.abs(this.phaseState.velocity) > 0.35) &&
           this.hoverCheckAccumulator >= 24) ||
         (this.hoveredCard !== null && this.hoverCheckAccumulator >= 80));
 
@@ -1724,7 +2104,14 @@ export class ManifoldModeController {
 
     this.lastRenderTelemetry.preludeMs = Math.max(
       0,
-      performance.now() - renderStartedAt - particlesMs - fourDMs - itemsMs - sectionFrameMs - interactionMs - hudCommitMs
+      performance.now() -
+        renderStartedAt -
+        particlesMs -
+        fourDMs -
+        itemsMs -
+        sectionFrameMs -
+        interactionMs -
+        hudCommitMs
     );
     this.lastRenderTelemetry.particlesMs = particlesMs;
     this.lastRenderTelemetry.fourDMs = fourDMs;
@@ -1743,26 +2130,37 @@ export class ManifoldModeController {
     if (this.is4DMode()) {
       const loopLength = Math.max(1, this.getLoopScrollLength());
       const turnProgress = this.continuousSceneScroll / loopLength;
-      const spin = turnProgress * Math.PI * MANIFOLD_CONSTANTS.TESSERACT_PHYSICS.hyperSpinScalar;
+      const spin =
+        turnProgress *
+        Math.PI *
+        MANIFOLD_CONSTANTS.TESSERACT_PHYSICS.hyperSpinScalar;
       return [
         { axis: 'X', value: this.phaseState.mouseX * 100 },
         { axis: 'Y', value: this.phaseState.mouseY * -100 },
-        { axis: 'Z', value: ((loopCoord / loopLength) * 200) - 100 },
+        { axis: 'Z', value: (loopCoord / loopLength) * 200 - 100 },
         { axis: 'W', value: (spin * 180) / Math.PI }
       ];
     }
 
     if (this.is2DMode()) {
       const metrics = this.get2DGridMetrics();
-      const scrollWorldY = (this.phaseState.scroll - this.introScrollAnchor) * metrics.scrollScale;
+      const scrollWorldY =
+        (this.phaseState.scroll - this.introScrollAnchor) * metrics.scrollScale;
       return [
-        { axis: 'X', value: metrics.spacingX === 0 ? 0 : this.twoDOffsetX / metrics.spacingX },
-        { axis: 'Y', value: metrics.spacingY === 0 ? 0 : scrollWorldY / metrics.spacingY }
+        {
+          axis: 'X',
+          value:
+            metrics.spacingX === 0 ? 0 : this.twoDOffsetX / metrics.spacingX
+        },
+        {
+          axis: 'Y',
+          value: metrics.spacingY === 0 ? 0 : scrollWorldY / metrics.spacingY
+        }
       ];
     }
 
     const loopLength = Math.max(1, this.getLoopScrollLength());
-    const sceneDepth = ((loopCoord / loopLength) * 200) - 100;
+    const sceneDepth = (loopCoord / loopLength) * 200 - 100;
     return [
       { axis: 'X', value: this.phaseState.mouseX * 100 },
       { axis: 'Y', value: this.phaseState.mouseY * -100 },
@@ -1780,7 +2178,10 @@ export class ManifoldModeController {
     this.chromeInstancesActiveCount = 0;
     this.lastGpuCardChromeActive = false;
     this.cardChromeRenderer?.disable();
-    this.dom.removeBodyClass('has-gpu-card-chrome', 'has-gpu-card-chrome-active');
+    this.dom.removeBodyClass(
+      'has-gpu-card-chrome',
+      'has-gpu-card-chrome-active'
+    );
   }
 
   destroy(): void {
@@ -1810,7 +2211,15 @@ export class ManifoldModeController {
     this.lastParticleRenderAt = 0;
     this.lastTransitionSnapshotBodyState = false;
     this.lastFastTwoDScrollSnapshotState = false;
-    this.dom.removeBodyClass('is-2d-fast', 'is-frame-stressed', 'is-view-morphing', 'is-card-morphing', 'is-exiting-2d-mode', 'has-gpu-card-chrome', 'has-gpu-card-chrome-active');
+    this.dom.removeBodyClass(
+      'is-2d-fast',
+      'is-frame-stressed',
+      'is-view-morphing',
+      'is-card-morphing',
+      'is-exiting-2d-mode',
+      'has-gpu-card-chrome',
+      'has-gpu-card-chrome-active'
+    );
     this.dom.removeBodyClass('is-transition-snapshots');
     if (this.topbar) {
       this.topbar.style.removeProperty('--topbar-line-spread');
@@ -1833,20 +2242,46 @@ export class ManifoldModeController {
     this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-alpha');
     this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-accent');
     this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-accent-soft');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-outline-opacity');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-outline-before-opacity');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-outline-after-opacity');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-outline-saturate');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-outline-border-alpha');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-outline-ring-alpha');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-outline-glow-alpha');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-outline-shadow-y');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-outline-shadow-blur');
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-outline-opacity'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-outline-before-opacity'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-outline-after-opacity'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-outline-saturate'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-outline-border-alpha'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-outline-ring-alpha'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-outline-glow-alpha'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-outline-shadow-y'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-outline-shadow-blur'
+    );
     this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-tab-opacity');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-tab-border-alpha');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-tab-glow-alpha');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-tab-shadow-y');
-    this.twoDSectionFrameRoot.style.removeProperty('--two-d-frame-tab-shadow-blur');
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-tab-border-alpha'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-tab-glow-alpha'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-tab-shadow-y'
+    );
+    this.twoDSectionFrameRoot.style.removeProperty(
+      '--two-d-frame-tab-shadow-blur'
+    );
     this.dom.removeBodyClass('is-2d-mode');
     this.dom.removeRootClass('is-2d-mode');
   }
@@ -1859,9 +2294,13 @@ export class ManifoldModeController {
     transitionActive: boolean;
   } {
     const now = this.runtime.now();
-    const introAnimating = !this.introCompleted || Math.abs(this.introTarget - this.introProgress) > 0.01;
+    const introAnimating =
+      !this.introCompleted ||
+      Math.abs(this.introTarget - this.introProgress) > 0.01;
     const expandedAnimating =
-      this.expandedCard !== null || this.expandedProgress > 0.01 || this.expandedTarget > 0;
+      this.expandedCard !== null ||
+      this.expandedProgress > 0.01 ||
+      this.expandedTarget > 0;
     const hudNavigationOpen = document.body.classList.contains('hud-nav-open');
     const lowEndDevice = this.deviceMemory <= 4 || this.hardwareThreads <= 4;
     const lowEndAndroid = this.isAndroidLowEnd;
@@ -1871,32 +2310,52 @@ export class ManifoldModeController {
     const manifoldHeavy = twoDHeavy || fourDHeavy;
     const transitionActive = this.transitionPerformanceMode;
     const highRefreshFrameBudget = 1000 / 120;
-    const frameStress = this.frameTimeEma > highRefreshFrameBudget * 1.16 || this.frameTimeBurst > highRefreshFrameBudget * 1.9;
+    const frameStress =
+      this.frameTimeEma > highRefreshFrameBudget * 1.16 ||
+      this.frameTimeBurst > highRefreshFrameBudget * 1.9;
     const severeFrameStress =
-      this.frameTimeEma > highRefreshFrameBudget * 1.42 || this.frameTimeBurst > highRefreshFrameBudget * 2.35;
+      this.frameTimeEma > highRefreshFrameBudget * 1.42 ||
+      this.frameTimeBurst > highRefreshFrameBudget * 2.35;
     const fullRatePixelScaleBase = twoDHeavy
-      ? (lowEndDevice ? 0.74 : 0.84)
+      ? lowEndDevice
+        ? 0.74
+        : 0.84
       : manifoldHeavy
-        ? (lowEndDevice ? 0.82 : 0.92)
-        : lowEndDevice ? 0.94 : 1;
+        ? lowEndDevice
+          ? 0.82
+          : 0.92
+        : lowEndDevice
+          ? 0.94
+          : 1;
     const fullRateBackgroundScaleBase = twoDHeavy
-      ? (lowEndDevice ? 0.18 : 0.22)
+      ? lowEndDevice
+        ? 0.18
+        : 0.22
       : manifoldHeavy
-        ? (lowEndDevice ? 0.22 : 0.26)
-        : lowEndDevice ? 0.28 : 0.32;
+        ? lowEndDevice
+          ? 0.22
+          : 0.26
+        : lowEndDevice
+          ? 0.28
+          : 0.32;
     const fullRatePixelScale = Math.max(
       lowEndAndroid ? 0.62 : 0.7,
-      fullRatePixelScaleBase - (mobileDevice ? (lowEndAndroid ? 0.12 : lowEndDevice ? 0.04 : 0.06) : 0)
+      fullRatePixelScaleBase -
+        (mobileDevice ? (lowEndAndroid ? 0.12 : lowEndDevice ? 0.04 : 0.06) : 0)
     );
     const fullRateBackgroundScale = Math.max(
       lowEndAndroid ? 0.1 : 0.14,
-      fullRateBackgroundScaleBase - (mobileDevice ? (lowEndAndroid ? 0.1 : lowEndDevice ? 0.04 : 0.05) : 0)
+      fullRateBackgroundScaleBase -
+        (mobileDevice ? (lowEndAndroid ? 0.1 : lowEndDevice ? 0.04 : 0.05) : 0)
     );
 
     if (hudNavigationOpen) {
       this.adaptiveCooldownUntil = now + 2600;
     } else if (this.wasHudNavigationOpen) {
-      this.adaptiveCooldownUntil = Math.max(this.adaptiveCooldownUntil, now + 2600);
+      this.adaptiveCooldownUntil = Math.max(
+        this.adaptiveCooldownUntil,
+        now + 2600
+      );
     }
 
     this.wasHudNavigationOpen = hudNavigationOpen;
@@ -1919,10 +2378,37 @@ export class ManifoldModeController {
       return {
         frameInterval: 0,
         modeLabel: hudNavigationOpen ? 'FOCUS LOCK' : 'FULL RATE',
-        pixelScale: severeFrameStress ? Math.max(0.7, fullRatePixelScale - 0.1) : frameStress ? Math.max(0.72, fullRatePixelScale - 0.05) : fullRatePixelScale,
+        pixelScale: severeFrameStress
+          ? Math.max(0.7, fullRatePixelScale - 0.1)
+          : frameStress
+            ? Math.max(0.72, fullRatePixelScale - 0.05)
+            : fullRatePixelScale,
         transitionActive,
-        backgroundScale:
-          severeFrameStress
+        backgroundScale: severeFrameStress
+          ? Math.max(0.18, fullRateBackgroundScale - 0.08)
+          : frameStress
+            ? Math.max(0.2, fullRateBackgroundScale - 0.04)
+            : fullRateBackgroundScale
+      };
+    }
+
+    if (introAnimating || expandedAnimating || idleMs < 3200) {
+      return {
+        frameInterval: 0,
+        modeLabel: transitionActive
+          ? 'TRANSITION'
+          : frameStress
+            ? 'FULL RATE+'
+            : 'FULL RATE',
+        pixelScale: severeFrameStress
+          ? Math.max(0.7, fullRatePixelScale - 0.1)
+          : frameStress
+            ? Math.max(0.72, fullRatePixelScale - 0.05)
+            : fullRatePixelScale,
+        transitionActive,
+        backgroundScale: transitionActive
+          ? Math.max(0.16, fullRateBackgroundScale - 0.12)
+          : severeFrameStress
             ? Math.max(0.18, fullRateBackgroundScale - 0.08)
             : frameStress
               ? Math.max(0.2, fullRateBackgroundScale - 0.04)
@@ -1930,30 +2416,33 @@ export class ManifoldModeController {
       };
     }
 
-    if (introAnimating || expandedAnimating || idleMs < 3200) {
-      return {
-        frameInterval: 0,
-        modeLabel: transitionActive ? 'TRANSITION' : frameStress ? 'FULL RATE+' : 'FULL RATE',
-        pixelScale: severeFrameStress ? Math.max(0.7, fullRatePixelScale - 0.1) : frameStress ? Math.max(0.72, fullRatePixelScale - 0.05) : fullRatePixelScale,
-        transitionActive,
-        backgroundScale:
-          transitionActive
-            ? Math.max(0.16, fullRateBackgroundScale - 0.12)
-            : severeFrameStress
-              ? Math.max(0.18, fullRateBackgroundScale - 0.08)
-              : frameStress
-                ? Math.max(0.2, fullRateBackgroundScale - 0.04)
-                : fullRateBackgroundScale
-      };
-    }
-
     if (idleMs < 9000) {
       return {
         frameInterval: lowEndAndroid ? 1000 / 48 : 1000 / 60,
         modeLabel: lowEndAndroid ? 'BALANCED ECO' : 'BALANCED',
-        pixelScale: manifoldHeavy ? (lowEndAndroid ? 0.72 : lowEndDevice ? 0.8 : 0.88) : lowEndAndroid ? 0.78 : lowEndDevice ? 0.88 : 0.92,
+        pixelScale: manifoldHeavy
+          ? lowEndAndroid
+            ? 0.72
+            : lowEndDevice
+              ? 0.8
+              : 0.88
+          : lowEndAndroid
+            ? 0.78
+            : lowEndDevice
+              ? 0.88
+              : 0.92,
         transitionActive,
-        backgroundScale: manifoldHeavy ? (lowEndAndroid ? 0.16 : lowEndDevice ? 0.22 : 0.26) : lowEndAndroid ? 0.18 : lowEndDevice ? 0.26 : 0.3
+        backgroundScale: manifoldHeavy
+          ? lowEndAndroid
+            ? 0.16
+            : lowEndDevice
+              ? 0.22
+              : 0.26
+          : lowEndAndroid
+            ? 0.18
+            : lowEndDevice
+              ? 0.26
+              : 0.3
       };
     }
 
@@ -1985,8 +2474,12 @@ export class ManifoldModeController {
       if (isHeading) {
         const text = document.createElement('div');
         text.className = 'big-text';
-        const sectionTitle = MANIFOLD_SECTION_HEADINGS[Math.floor(index / 4) % MANIFOLD_SECTION_HEADINGS.length] ?? 'PROFILE';
-        const localizedSectionTitle = this.getLocalizedSectionTitle(sectionTitle);
+        const sectionTitle =
+          MANIFOLD_SECTION_HEADINGS[
+            Math.floor(index / 4) % MANIFOLD_SECTION_HEADINGS.length
+          ] ?? 'PROFILE';
+        const localizedSectionTitle =
+          this.getLocalizedSectionTitle(sectionTitle);
         text.textContent = localizedSectionTitle;
         text.dataset.text = localizedSectionTitle;
         item.append(text);
@@ -2008,13 +2501,23 @@ export class ManifoldModeController {
         entryGrid.setAttribute('aria-hidden', 'true');
         item.append(entryGrid);
       }
-      const mainCardData = localizedCards[cardSequenceIndex % localizedCards.length] ?? localizedCards[0];
+      const mainCardData =
+        localizedCards[cardSequenceIndex % localizedCards.length] ??
+        localizedCards[0];
       const cardData = isFeatured ? localizedIntroCard : mainCardData;
       const sectionTitle =
-        MANIFOLD_SECTION_HEADINGS[Math.floor(index / 4) % MANIFOLD_SECTION_HEADINGS.length] ?? 'PROFILE';
+        MANIFOLD_SECTION_HEADINGS[
+          Math.floor(index / 4) % MANIFOLD_SECTION_HEADINGS.length
+        ] ?? 'PROFILE';
       const sectionTone = MANIFOLD_SECTION_TONES[sectionTitle];
-      const pixelPreset = CARD_PIXEL_PRESETS[cardSequenceIndex % CARD_PIXEL_PRESETS.length] ?? CARD_PIXEL_PRESETS[0];
-      const iconPath = CARD_ICON_PATHS[cardSequenceIndex % CARD_ICON_PATHS.length] ?? CARD_ICON_PATHS[0];
+      const expandedPanelId = `card-expanded-panel-${index}`;
+      const titleId = `card-title-${index}`;
+      const localizedSectionTitle = this.getLocalizedSectionTitle(sectionTitle);
+      const pixelPreset =
+        CARD_PIXEL_PRESETS[cardSequenceIndex % CARD_PIXEL_PRESETS.length] ??
+        CARD_PIXEL_PRESETS[0];
+      const previewCues = this.renderCardBriefCues(cardData);
+      const previewCta = this.getCardBriefCtaLabel();
       const factsHtml = cardData.facts
         .map(
           (fact) => `
@@ -2027,7 +2530,18 @@ export class ManifoldModeController {
         .join('');
       card.dataset.cardIndex = String(index);
       card.dataset.mobilePage = '0';
-      const titleScale = clamp(1 - Math.max(0, cardData.title.length - 5) * 0.06, 0.64, 1);
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-controls', expandedPanelId);
+      card.setAttribute('aria-expanded', 'false');
+      card.setAttribute(
+        'aria-label',
+        `${cardData.title}. ${localizedSectionTitle}. ${localizedUi.clickCardForDetails}.`
+      );
+      const titleScale = clamp(
+        1 - Math.max(0, cardData.title.length - 5) * 0.06,
+        0.64,
+        1
+      );
       card.innerHTML = `
         <div class="card-header-panel">
           <div class="card-rail">
@@ -2046,6 +2560,7 @@ export class ManifoldModeController {
             </div>
             <h2
               class="card-title"
+              id="${titleId}"
               style="--card-title-scale:${titleScale.toFixed(3)};"
               data-preview-title="${cardData.title}"
               data-expanded-title="${cardData.expandedTitle}"
@@ -2062,25 +2577,32 @@ export class ManifoldModeController {
                 data-colors="${pixelPreset.colors}"
               ></pixel-canvas>
               <div class="card-core-glow"></div>
-              <div class="card-core-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
-                  <path d="${iconPath}"></path>
-                </svg>
-              </div>
-              <span class="card-core-chip">${cardData.chip}</span>
               <div class="card-spectrum" aria-hidden="true">
                 ${Array.from({ length: 16 })
-          .map((_, i) => `<div class="card-spectrum-bar" data-index="${i}"></div>`)
-          .join('')}
+                  .map(
+                    (_, i) =>
+                      `<div class="card-spectrum-bar" data-index="${i}"></div>`
+                  )
+                  .join('')}
               </div>
             </div>
-            <div class="card-id-row">
-              <span class="card-id">${cardData.id}</span>
-              <span class="card-status-dot" style="background:${MANIFOLD_SCENE_CONFIG.colors[index % MANIFOLD_SCENE_CONFIG.colors.length]};"></span>
-            </div>
-            <div class="card-footer">
-              <span>${cardData.previewLeftLabel}: ${cardData.previewLeft}</span>
-              <span>${cardData.previewRightLabel}: ${cardData.previewRight}</span>
+            <div class="card-brief">
+              <div class="card-brief-status">
+                <span class="card-brief-chip">${cardData.chip}</span>
+                <span class="card-id">${cardData.id}</span>
+                <span class="card-status-dot" style="background:${MANIFOLD_SCENE_CONFIG.colors[index % MANIFOLD_SCENE_CONFIG.colors.length]};"></span>
+              </div>
+              <div class="card-brief-headline">
+                <span class="card-brief-kicker">${cardData.surfaceKicker}</span>
+                <strong class="card-brief-value">${cardData.surfaceValue}</strong>
+              </div>
+              <ul class="card-brief-points">
+                ${previewCues}
+              </ul>
+              <div class="card-brief-cta" aria-hidden="true">
+                <span class="card-brief-cta-label">${previewCta}</span>
+                <span class="card-brief-cta-arrow">↗</span>
+              </div>
             </div>
             <div class="card-index">${sideMark}</div>
           </div>
@@ -2101,7 +2623,7 @@ export class ManifoldModeController {
               <span class="card-transition-snapshot__id">${cardData.id}</span>
             </div>
           </div>
-          <div class="card-expanded-panel">
+          <div class="card-expanded-panel" id="${expandedPanelId}" role="region" aria-labelledby="${titleId}" aria-hidden="true">
             <div class="card-expanded-shell">
               <div class="card-expanded-meta" data-reveal-text="${cardData.eyebrow}">${cardData.eyebrow}</div>
               <p class="card-expanded-lead" data-reveal-text="${cardData.lead}">${cardData.lead}</p>
@@ -2125,11 +2647,11 @@ export class ManifoldModeController {
                 <p data-reveal-text="${cardData.surfaceText}">${cardData.surfaceText}</p>
               </div>
             </div>
-            <div class="card-expanded-mobile-nav" aria-label="Card content pages">
-              <span class="card-expanded-mobile-indicator">01 / 02</span>
+            <div class="card-expanded-mobile-nav" aria-label="${this.locale === 'pl' ? 'Strony treści karty' : 'Card content pages'}">
+              <span class="card-expanded-mobile-indicator" aria-live="polite">01 / 02</span>
             </div>
-            <div class="card-expanded-mobile-tap card-expanded-mobile-tap--prev" data-card-page-nav="prev"></div>
-            <div class="card-expanded-mobile-tap card-expanded-mobile-tap--next" data-card-page-nav="next"></div>
+            <button type="button" class="card-expanded-mobile-tap card-expanded-mobile-tap--prev" data-card-page-nav="prev" aria-label="${localizedUi.previousPageAria}" aria-controls="${expandedPanelId}" aria-disabled="true" disabled></button>
+            <button type="button" class="card-expanded-mobile-tap card-expanded-mobile-tap--next" data-card-page-nav="next" aria-label="${localizedUi.nextPageAria}" aria-controls="${expandedPanelId}" aria-disabled="false"></button>
             <div class="card-expanded-mobile-hint card-expanded-mobile-hint--prev" aria-hidden="true"><span>←</span></div>
             <div class="card-expanded-mobile-hint card-expanded-mobile-hint--next" aria-hidden="true"><span>→</span></div>
           </div>
@@ -2141,24 +2663,45 @@ export class ManifoldModeController {
         card.style.setProperty('--card-accent-soft', sectionTone.accentSoft);
         card.style.setProperty('--card-rail-end', sectionTone.railEnd);
       }
-      const mobilePrevTap = card.querySelector<HTMLElement>('.card-expanded-mobile-tap--prev');
-      const mobileNextTap = card.querySelector<HTMLElement>('.card-expanded-mobile-tap--next');
-      const mobilePrevHint = card.querySelector<HTMLElement>('.card-expanded-mobile-hint--prev');
-      const mobileNextHint = card.querySelector<HTMLElement>('.card-expanded-mobile-hint--next');
+      const mobilePrevTap = card.querySelector<HTMLElement>(
+        '.card-expanded-mobile-tap--prev'
+      );
+      const mobileNextTap = card.querySelector<HTMLElement>(
+        '.card-expanded-mobile-tap--next'
+      );
+      const mobilePrevHint = card.querySelector<HTMLElement>(
+        '.card-expanded-mobile-hint--prev'
+      );
+      const mobileNextHint = card.querySelector<HTMLElement>(
+        '.card-expanded-mobile-hint--next'
+      );
 
       const handleMobilePagerPointerDown = (event: PointerEvent) => {
         event.stopPropagation();
       };
-      const handleMobilePagerClick = (direction: -1 | 1) => (event: MouseEvent) => {
-        event.preventDefault();
-        event.stopPropagation();
-        this.setCardMobilePage(state, state.mobilePage + direction);
-      };
+      const handleMobilePagerClick =
+        (direction: -1 | 1) => (event: MouseEvent) => {
+          event.preventDefault();
+          event.stopPropagation();
+          this.setCardMobilePage(state, state.mobilePage + direction);
+        };
 
-      mobilePrevTap?.addEventListener('pointerdown', handleMobilePagerPointerDown);
-      mobileNextTap?.addEventListener('pointerdown', handleMobilePagerPointerDown);
-      mobilePrevHint?.addEventListener('pointerdown', handleMobilePagerPointerDown);
-      mobileNextHint?.addEventListener('pointerdown', handleMobilePagerPointerDown);
+      mobilePrevTap?.addEventListener(
+        'pointerdown',
+        handleMobilePagerPointerDown
+      );
+      mobileNextTap?.addEventListener(
+        'pointerdown',
+        handleMobilePagerPointerDown
+      );
+      mobilePrevHint?.addEventListener(
+        'pointerdown',
+        handleMobilePagerPointerDown
+      );
+      mobileNextHint?.addEventListener(
+        'pointerdown',
+        handleMobilePagerPointerDown
+      );
       item.append(card);
       fragment.append(item);
 
@@ -2175,7 +2718,9 @@ export class ManifoldModeController {
       state.handoffEl = card.querySelector<HTMLElement>('.card-handoff');
       state.pixelCanvasEl = card.querySelector<PixelCanvasHost>('pixel-canvas');
       state.spectrumEl = card.querySelector<HTMLElement>('.card-spectrum');
-      state.expandedPanelEl = card.querySelector<HTMLElement>('.card-expanded-panel');
+      state.expandedPanelEl = card.querySelector<HTMLElement>(
+        '.card-expanded-panel'
+      );
       state.mobilePrevNavEl = mobilePrevTap;
       state.mobileNextNavEl = mobileNextTap;
       state.activeCardProfile = isFeatured ? 'intro' : 'default';
@@ -2258,7 +2803,12 @@ export class ManifoldModeController {
       currentScreenY: 0,
       currentScreenWidth: 0,
       currentScreenHeight: 0,
-      currentScreenQuad: [[0, 0], [0, 0], [0, 0], [0, 0]],
+      currentScreenQuad: [
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0]
+      ],
       hasCurrentScreenQuad: false,
       lastZIndex: '',
       lastOpacity: '',
@@ -2331,24 +2881,24 @@ export class ManifoldModeController {
             : [-1, 0, 1, -1, 1, 0];
         const lane = lanePattern[cardIndex % lanePattern.length] ?? 0;
         const band = Math.floor(cardIndex / lanePattern.length);
-        const laneSpacing = this.viewportWidth * (
-          this.isMobileViewport
-            ? 0.135
-            : isCompactViewport
-              ? 0.165
-              : 0.24
-        );
-        const verticalSpacing = this.viewportHeight * (
-          this.isMobileViewport
-            ? 0.108
-            : isCompactViewport
-              ? 0.118
-              : 0.13
-        );
-        const bandOrigin = this.isMobileViewport ? 0.46 : isCompactViewport ? 0.58 : 1;
-        const baseY = (band - bandOrigin) * verticalSpacing + Math.sin(cardIndex * 0.65) * 18;
+        const laneSpacing =
+          this.viewportWidth *
+          (this.isMobileViewport ? 0.135 : isCompactViewport ? 0.165 : 0.24);
+        const verticalSpacing =
+          this.viewportHeight *
+          (this.isMobileViewport ? 0.108 : isCompactViewport ? 0.118 : 0.13);
+        const bandOrigin = this.isMobileViewport
+          ? 0.46
+          : isCompactViewport
+            ? 0.58
+            : 1;
+        const baseY =
+          (band - bandOrigin) * verticalSpacing +
+          Math.sin(cardIndex * 0.65) * 18;
 
-        item.x = lane * laneSpacing + (lane === 0 ? Math.sin(cardIndex * 0.8) * 18 : 0);
+        item.x =
+          lane * laneSpacing +
+          (lane === 0 ? Math.sin(cardIndex * 0.8) * 18 : 0);
         item.y = baseY;
         item.rot = lane * -4 + (band % 2 === 0 ? -1.8 : 1.8);
         item.gridOrder = cardIndex;
@@ -2364,13 +2914,13 @@ export class ManifoldModeController {
         item.rot = Math.sin(textAngle * 0.8) * 6;
         continue;
       }
-
     }
 
     this.refreshCardItemsCache();
 
     if (this.viewModeTarget > 0.5) {
-      const focusCard = this.expandedCard ?? this.getEffectiveFocusCard() ?? this.featuredItem;
+      const focusCard =
+        this.expandedCard ?? this.getEffectiveFocusCard() ?? this.featuredItem;
       if (focusCard) {
         this.focusCardIn2D(focusCard.cardIndex, true);
       }
@@ -2430,7 +2980,9 @@ export class ManifoldModeController {
     };
   }
 
-  private getFourDSceneScreenRect(scene: FourDSceneState | null): ItemScreenRect | null {
+  private getFourDSceneScreenRect(
+    scene: FourDSceneState | null
+  ): ItemScreenRect | null {
     if (!scene || scene.edgeStates.length === 0) {
       return null;
     }
@@ -2447,7 +2999,12 @@ export class ManifoldModeController {
       bottom = Math.max(bottom, edge.pointA.y, edge.pointB.y);
     }
 
-    if (!Number.isFinite(left) || !Number.isFinite(right) || !Number.isFinite(top) || !Number.isFinite(bottom)) {
+    if (
+      !Number.isFinite(left) ||
+      !Number.isFinite(right) ||
+      !Number.isFinite(top) ||
+      !Number.isFinite(bottom)
+    ) {
       return null;
     }
 
@@ -2627,8 +3184,10 @@ export class ManifoldModeController {
       return;
     }
 
-    const allowCardFocus = input.allowCardFocus && !input.hiddenFromAccessibilityTree;
-    const allowExpandedPanel = input.allowExpandedPanel && !input.hiddenFromAccessibilityTree;
+    const allowCardFocus =
+      input.allowCardFocus && !input.hiddenFromAccessibilityTree;
+    const allowExpandedPanel =
+      input.allowExpandedPanel && !input.hiddenFromAccessibilityTree;
     const allowExpandedControls =
       input.allowExpandedControls && allowExpandedPanel;
 
@@ -2637,7 +3196,19 @@ export class ManifoldModeController {
     }
 
     item.fxEl.tabIndex = allowCardFocus ? 0 : -1;
-    item.fxEl.setAttribute('aria-hidden', input.hiddenFromAccessibilityTree ? 'true' : 'false');
+    item.fxEl.setAttribute(
+      'aria-hidden',
+      input.hiddenFromAccessibilityTree ? 'true' : 'false'
+    );
+    item.fxEl.setAttribute('role', allowExpandedPanel ? 'group' : 'button');
+    if (allowExpandedPanel) {
+      item.fxEl.setAttribute('aria-current', 'true');
+      item.fxEl.removeAttribute('aria-expanded');
+    } else {
+      item.fxEl.removeAttribute('aria-current');
+      item.fxEl.setAttribute('aria-expanded', 'false');
+    }
+    this.updateCardAccessibleName(item, allowExpandedPanel);
     this.setElementInert(item.fxEl, input.hiddenFromAccessibilityTree);
 
     const expandedPanel = item.expandedPanelEl;
@@ -2646,7 +3217,10 @@ export class ManifoldModeController {
         this.blurFocusedDescendant(expandedPanel);
       }
 
-      expandedPanel.setAttribute('aria-hidden', allowExpandedPanel ? 'false' : 'true');
+      expandedPanel.setAttribute(
+        'aria-hidden',
+        allowExpandedPanel ? 'false' : 'true'
+      );
     }
 
     const prevButton = item.mobilePrevNavEl;
@@ -2667,14 +3241,43 @@ export class ManifoldModeController {
     item.lastAccessibilityState = stateMask;
   }
 
-  private updateCardSectionState(item: ItemState, state: 'active' | 'outside' | 'neutral'): void {
+  private updateCardSectionState(
+    item: ItemState,
+    state: 'active' | 'outside' | 'neutral'
+  ): void {
     if (item.lastSectionState === state) {
       return;
     }
 
-    item.fxEl.classList.toggle('is-outside-active-section', state === 'outside');
+    item.fxEl.classList.toggle(
+      'is-outside-active-section',
+      state === 'outside'
+    );
     item.fxEl.classList.toggle('is-active-section', state === 'active');
     item.lastSectionState = state;
+  }
+
+  private updateCardAccessibleName(item: ItemState, expanded: boolean): void {
+    if (item.type !== 'card') {
+      return;
+    }
+
+    const ui = getManifoldLocaleBundle(this.locale).ui;
+    const title = expanded
+      ? item.expandedCardTitle || item.cardTitle
+      : item.cardTitle || item.expandedCardTitle;
+    const section = this.getLocalizedSectionTitle(item.sectionTitle);
+    const expandedHint =
+      this.locale === 'pl'
+        ? 'Karta jest otwarta. Naciśnij Escape lub przewiń, aby ją zamknąć.'
+        : 'Card is open. Press Escape or scroll to close it.';
+    const action = expanded ? expandedHint : ui.clickCardForDetails;
+    const normalizedAction = action.endsWith('.') ? action : `${action}.`;
+
+    item.fxEl.setAttribute(
+      'aria-label',
+      `${title}. ${section}. ${normalizedAction}`
+    );
   }
 
   private computeFeaturedPose(time: number, cameraZ: number): FeaturedPose {
@@ -2705,7 +3308,9 @@ export class ManifoldModeController {
       return featuredPose;
     }
 
-    let settledZ = ((featured.baseZ + cameraZ) % this.loopSize + this.loopSize) % this.loopSize;
+    let settledZ =
+      (((featured.baseZ + cameraZ) % this.loopSize) + this.loopSize) %
+      this.loopSize;
     if (settledZ > 500) {
       settledZ -= this.loopSize;
     }
@@ -2750,9 +3355,13 @@ export class ManifoldModeController {
     let tiltZ: number;
     let shiftZ: number;
 
-    const isExpandedMorphing = this.expandedCard === item && (this.expandedTarget > 0.01 || this.expandedProgress > 0.01);
+    const isExpandedMorphing =
+      this.expandedCard === item &&
+      (this.expandedTarget > 0.01 || this.expandedProgress > 0.01);
 
-    const useFeaturedPose = item.isFeatured && (!this.introCompleted || this.introTarget < 1 || this.exitReturnActive);
+    const useFeaturedPose =
+      item.isFeatured &&
+      (!this.introCompleted || this.introTarget < 1 || this.exitReturnActive);
 
     if (useFeaturedPose) {
       tx = featuredPose.x;
@@ -2775,17 +3384,17 @@ export class ManifoldModeController {
     const twoDPose = twoDGridMetrics
       ? this.twoDController.compute2DCardPose(item, sceneScroll, time)
       : {
-        alpha: item.currentAlpha,
-        scale: 1,
-        shiftZ: 0,
-        tiltX: 0,
-        tiltY: 0,
-        tiltZ: item.rot,
-        x: item.x,
-        y: item.y,
-        z: vizZ,
-        textScale: 1
-      };
+          alpha: item.currentAlpha,
+          scale: 1,
+          shiftZ: 0,
+          tiltX: 0,
+          tiltY: 0,
+          tiltZ: item.rot,
+          x: item.x,
+          y: item.y,
+          z: vizZ,
+          textScale: 1
+        };
 
     const fourDPose = {
       accentInverted: false,
@@ -2801,15 +3410,20 @@ export class ManifoldModeController {
       textScale: 1
     };
 
-    ({ shiftZ, tiltX, tiltY, tiltZ, tx, ty, tz } = this.physicsRuntime.blendCardPose(
-      { shiftZ, tiltX, tiltY, tiltZ, tx, ty, tz },
-      twoDPose,
-      fourDPose,
-      viewModeProgress,
-      fourDProgress
-    ));
+    ({ shiftZ, tiltX, tiltY, tiltZ, tx, ty, tz } =
+      this.physicsRuntime.blendCardPose(
+        { shiftZ, tiltX, tiltY, tiltZ, tx, ty, tz },
+        twoDPose,
+        fourDPose,
+        viewModeProgress,
+        fourDProgress
+      ));
 
-    if (this.shouldBypassIntro && viewModeProgress > 0.9 && fourDProgress < 0.01) {
+    if (
+      this.shouldBypassIntro &&
+      viewModeProgress > 0.9 &&
+      fourDProgress < 0.01
+    ) {
       shiftZ = 0;
       tiltX = 0;
       tiltY = 0;
@@ -2817,9 +3431,14 @@ export class ManifoldModeController {
     }
 
     const introCardMix = item.isFeatured ? 1 - this.introProgress : 0;
-    const introCardScale = item.isFeatured && !this.introCompleted
-      ? lerp(MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.featuredIntroScale, 1, 1 - introCardMix)
-      : 1;
+    const introCardScale =
+      item.isFeatured && !this.introCompleted
+        ? lerp(
+            MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.featuredIntroScale,
+            1,
+            1 - introCardMix
+          )
+        : 1;
 
     const twoDScale = lerp(1, twoDPose.scale, viewModeProgress);
     const twoDTextScale = lerp(1, twoDPose.textScale, viewModeProgress);
@@ -2827,36 +3446,51 @@ export class ManifoldModeController {
     const cardScaleValueBase = introCardScale * twoDScale * fourDScale;
     const textScaleValueBase = introCardScale * twoDTextScale * fourDScale;
 
-    const cardScaleValue = this.expandedCard === item
-      ? lerp(cardScaleValueBase, 1.0, this.expandedProgress)
-      : cardScaleValueBase;
+    const cardScaleValue =
+      this.expandedCard === item
+        ? lerp(cardScaleValueBase, 1.0, this.expandedProgress)
+        : cardScaleValueBase;
 
-    const textScaleValue = this.expandedCard === item
-      ? lerp(textScaleValueBase, 1.0, this.expandedProgress)
-      : textScaleValueBase;
+    const textScaleValue =
+      this.expandedCard === item
+        ? lerp(textScaleValueBase, 1.0, this.expandedProgress)
+        : textScaleValueBase;
 
     this.resetFourDCardFace(item);
 
     if (item.isFeatured && !this.introCompleted) {
-      const introFloat = Math.sin(time * MANIFOLD_CONSTANTS.CARD_MOTION.introFloatTimeScalar) *
+      const introFloat =
+        Math.sin(time * MANIFOLD_CONSTANTS.CARD_MOTION.introFloatTimeScalar) *
         MANIFOLD_CONSTANTS.CARD_MOTION.introFloatAmplitude *
         introCardMix;
       ty += introFloat;
       shiftZ += MANIFOLD_CONSTANTS.CARD_MOTION.introShiftZ * introCardMix;
     }
 
-    if (this.expandedCard && this.expandedCard !== item && viewModeProgress > 0.01) {
+    if (
+      this.expandedCard &&
+      this.expandedCard !== item &&
+      viewModeProgress > 0.01
+    ) {
       const expandedRepulsionRadius = 1280;
       const repelDistance = Math.max(80, Math.hypot(tx, ty));
-      const repelEnvelope = clamp(1 - repelDistance / expandedRepulsionRadius, 0, 1);
-      const repelStrength = this.expandedProgress * 96 * viewModeProgress * repelEnvelope;
+      const repelEnvelope = clamp(
+        1 - repelDistance / expandedRepulsionRadius,
+        0,
+        1
+      );
+      const repelStrength =
+        this.expandedProgress * 96 * viewModeProgress * repelEnvelope;
       tx += (tx / repelDistance) * repelStrength;
       ty += (ty / repelDistance) * repelStrength * 0.78;
       tz -= repelStrength * 1.35 + this.expandedProgress * 180 * repelEnvelope;
     }
 
     this.domRenderer.setCardScale(item, cardScaleValue, textScaleValue);
-    this.domRenderer.setEntryGridAlpha(item, item.isFeatured ? clamp(introCardMix * 1.08 + 0.12, 0, 1) : 0);
+    this.domRenderer.setEntryGridAlpha(
+      item,
+      item.isFeatured ? clamp(introCardMix * 1.08 + 0.12, 0, 1) : 0
+    );
 
     if (this.expandedCard === item) {
       const expandMix = this.expandedProgress;
@@ -2883,7 +3517,11 @@ export class ManifoldModeController {
         shellFade: Math.round(shellFade * 100) / 100
       });
 
-      const shouldShowExpandedClass = item.fxEl.classList.contains('is-expanded') ? expandMix > 0.08 : expandMix > 0.74;
+      const shouldShowExpandedClass = item.fxEl.classList.contains(
+        'is-expanded'
+      )
+        ? expandMix > 0.08
+        : expandMix > 0.74;
       item.fxEl.classList.toggle('is-expanded', shouldShowExpandedClass);
     } else {
       this.domRenderer.updateCardLayout(item, false, cardRenderLayout);
@@ -2901,33 +3539,85 @@ export class ManifoldModeController {
     );
 
     if (fourDScene && fourDProgress > 0.001 && !isExpandedMorphing) {
-      const sourceVisibility = this.fourDTarget > 0.5
-        ? 1 - easeInOutCubic(clamp((fourDProgress - MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.fourDSourceFadeOffset) / MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.fourDSourceFadeSpan, 0, 1))
-        : 1 - easeInOutCubic(clamp((fourDProgress - MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.fourDSourceRestoreOffset) / MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.fourDSourceRestoreSpan, 0, 1));
+      const sourceVisibility =
+        this.fourDTarget > 0.5
+          ? 1 -
+            easeInOutCubic(
+              clamp(
+                (fourDProgress -
+                  MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.fourDSourceFadeOffset) /
+                  MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.fourDSourceFadeSpan,
+                0,
+                1
+              )
+            )
+          : 1 -
+            easeInOutCubic(
+              clamp(
+                (fourDProgress -
+                  MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY
+                    .fourDSourceRestoreOffset) /
+                  MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.fourDSourceRestoreSpan,
+                0,
+                1
+              )
+            );
       computedOpacity *= sourceVisibility;
     }
 
-    computedOpacity = Math.max(computedOpacity, this.getCollapsedExpandedHandoffOpacity(item));
-    if (isExpandedMorphing) computedOpacity = Math.max(computedOpacity, this.expandedProgress);
+    computedOpacity = Math.max(
+      computedOpacity,
+      this.getCollapsedExpandedHandoffOpacity(item)
+    );
+    if (isExpandedMorphing)
+      computedOpacity = Math.max(computedOpacity, this.expandedProgress);
 
-    if (this.expandedCard && this.expandedCard !== item && viewModeProgress < 0.22) {
+    if (
+      this.expandedCard &&
+      this.expandedCard !== item &&
+      viewModeProgress < 0.22
+    ) {
       computedOpacity *= lerp(1, 0.12, this.expandedProgress);
     }
 
     if (maintainScreenQuad) {
       const baseCardWidth = cardRenderLayout.compactWidthPx || 220;
       const baseCardHeight = cardRenderLayout.compactHeightPx || 220;
-      this.updateCardScreenQuad(item, baseCardWidth, baseCardHeight, tx, ty, tz, shiftZ, tiltX, tiltY, tiltZ, cardScaleValue);
+      this.updateCardScreenQuad(
+        item,
+        baseCardWidth,
+        baseCardHeight,
+        tx,
+        ty,
+        tz,
+        shiftZ,
+        tiltX,
+        tiltY,
+        tiltZ,
+        cardScaleValue
+      );
     } else {
       item.hasCurrentScreenQuad = false;
     }
 
-    const isSectionFocused2D = viewModeProgress > 0.5 && active2DSectionTitle.length > 0;
-    const isOutsideActiveSection = isSectionFocused2D && item.sectionTitle !== active2DSectionTitle;
-    const useTransitionSnapshot = (this.transitionPerformanceMode || (this.lastFastTwoDScrollSnapshotState && isOutsideActiveSection && viewModeProgress > 0.7)) && !isExpandedMorphing && this.expandedCard !== item && fourDProgress < 0.01 && computedOpacity > 0.08;
+    const isSectionFocused2D =
+      viewModeProgress > 0.5 && active2DSectionTitle.length > 0;
+    const isOutsideActiveSection =
+      isSectionFocused2D && item.sectionTitle !== active2DSectionTitle;
+    const useTransitionSnapshot =
+      (this.transitionPerformanceMode ||
+        (this.lastFastTwoDScrollSnapshotState &&
+          isOutsideActiveSection &&
+          viewModeProgress > 0.7)) &&
+      !isExpandedMorphing &&
+      this.expandedCard !== item &&
+      fourDProgress < 0.01 &&
+      computedOpacity > 0.08;
 
-    item.currentScreenWidth = (cardRenderLayout.compactWidthPx || 220) * cardScaleValue;
-    item.currentScreenHeight = (cardRenderLayout.compactHeightPx || 220) * cardScaleValue;
+    item.currentScreenWidth =
+      (cardRenderLayout.compactWidthPx || 220) * cardScaleValue;
+    item.currentScreenHeight =
+      (cardRenderLayout.compactHeightPx || 220) * cardScaleValue;
 
     const targetVisible = this.domRenderer.renderCardVisibility(
       item,
@@ -2946,13 +3636,19 @@ export class ManifoldModeController {
     this.updateCardSectionState(
       item,
       isSectionFocused2D
-        ? (isOutsideActiveSection ? 'outside' : 'active')
+        ? isOutsideActiveSection
+          ? 'outside'
+          : 'active'
         : 'neutral'
     );
 
-    const mobiusState = fourDProgress > 0.35 && fourDPose.accentInverted ? 'inverted' : 'normal';
+    const mobiusState =
+      fourDProgress > 0.35 && fourDPose.accentInverted ? 'inverted' : 'normal';
     if (item.lastMobiusState !== mobiusState) {
-      item.fxEl.classList.toggle('is-mobius-inverted', mobiusState === 'inverted');
+      item.fxEl.classList.toggle(
+        'is-mobius-inverted',
+        mobiusState === 'inverted'
+      );
       item.lastMobiusState = mobiusState;
     }
 
@@ -2967,7 +3663,18 @@ export class ManifoldModeController {
       );
     }
 
-    const allowCardFocus = isExpandedMorphing || (item.isFeatured && (!this.introCompleted || this.introTarget < 1 || this.exitReturnActive) && computedOpacity > 0.18) || (this.targetViewMode === '2d' && viewModeProgress > 0.5 && fourDProgress < 0.01 && computedOpacity > 0.12 && !isOutsideActiveSection);
+    const allowCardFocus =
+      isExpandedMorphing ||
+      (item.isFeatured &&
+        (!this.introCompleted ||
+          this.introTarget < 1 ||
+          this.exitReturnActive) &&
+        computedOpacity > 0.18) ||
+      (this.targetViewMode === '2d' &&
+        viewModeProgress > 0.5 &&
+        fourDProgress < 0.01 &&
+        computedOpacity > 0.12 &&
+        !isOutsideActiveSection);
     this.updateCardAccessibility(item, {
       allowCardFocus,
       allowExpandedPanel: isExpandedMorphing,
@@ -2975,19 +3682,40 @@ export class ManifoldModeController {
       hiddenFromAccessibilityTree: computedOpacity <= 0.08
     });
 
-    if (this.current2DFrameBounds && item.sectionTitle === this.current2DFrameSectionTitle && computedOpacity > 0.08) {
+    if (
+      this.current2DFrameBounds &&
+      item.sectionTitle === this.current2DFrameSectionTitle &&
+      computedOpacity > 0.08
+    ) {
       const width = (cardRenderLayout.compactWidthPx || 220) * cardScaleValue;
       const height = (cardRenderLayout.compactHeightPx || 220) * cardScaleValue;
       const centerX = this.viewportWidth * 0.5 + tx;
       const centerY = this.viewportHeight * 0.5 + ty;
       this.current2DFrameBounds.visibleCount += 1;
-      this.current2DFrameBounds.minX = Math.min(this.current2DFrameBounds.minX, centerX - width * 0.5);
-      this.current2DFrameBounds.maxX = Math.max(this.current2DFrameBounds.maxX, centerX + width * 0.5);
-      this.current2DFrameBounds.minY = Math.min(this.current2DFrameBounds.minY, centerY - height * 0.5);
-      this.current2DFrameBounds.maxY = Math.max(this.current2DFrameBounds.maxY, centerY + height * 0.5);
+      this.current2DFrameBounds.minX = Math.min(
+        this.current2DFrameBounds.minX,
+        centerX - width * 0.5
+      );
+      this.current2DFrameBounds.maxX = Math.max(
+        this.current2DFrameBounds.maxX,
+        centerX + width * 0.5
+      );
+      this.current2DFrameBounds.minY = Math.min(
+        this.current2DFrameBounds.minY,
+        centerY - height * 0.5
+      );
+      this.current2DFrameBounds.maxY = Math.max(
+        this.current2DFrameBounds.maxY,
+        centerY + height * 0.5
+      );
     }
 
-    this.collectCardChromeInstance(item, computedOpacity, fourDProgress, this.gpuCardChromeMix);
+    this.collectCardChromeInstance(
+      item,
+      computedOpacity,
+      fourDProgress,
+      this.gpuCardChromeMix
+    );
     this.domRenderer.updateCardFx(item, shiftZ, tiltX, tiltY, tiltZ);
     this.domRenderer.setTranslatedTransform(item, tx, ty, Math.min(tz, 750));
   }
@@ -3000,7 +3728,10 @@ export class ManifoldModeController {
     return clamp(this.collapsedExpandedFade, 0, 1);
   }
 
-  private readonly _itemAccentCache = new WeakMap<ItemState, [number, number, number]>();
+  private readonly _itemAccentCache = new WeakMap<
+    ItemState,
+    [number, number, number]
+  >();
   private readonly lastRenderTelemetry: ManifoldRenderTelemetry = {
     fourDMs: 0,
     hudCommitMs: 0,
@@ -3061,13 +3792,18 @@ export class ManifoldModeController {
     this.chromeInstancesActiveCount += 1;
   }
 
-  private resolveSectionAccentRgb(sectionTitle: string): [number, number, number] {
+  private resolveSectionAccentRgb(
+    sectionTitle: string
+  ): [number, number, number] {
     const cached = this.sectionAccentRgbCache.get(sectionTitle);
     if (cached) {
       return cached;
     }
 
-    const tone = MANIFOLD_SECTION_TONES[sectionTitle as keyof typeof MANIFOLD_SECTION_TONES] ?? MANIFOLD_SECTION_TONES.PROFILE;
+    const tone =
+      MANIFOLD_SECTION_TONES[
+        sectionTitle as keyof typeof MANIFOLD_SECTION_TONES
+      ] ?? MANIFOLD_SECTION_TONES.PROFILE;
     const accent = hexToRgb01(tone.accent);
     this.sectionAccentRgbCache.set(sectionTitle, accent);
     return accent;
@@ -3089,7 +3825,11 @@ export class ManifoldModeController {
 
     for (let index = 0; index < this.cardItemsCache.length; index += 1) {
       const item = this.cardItemsCache[index];
-      if (!item || item.currentAlpha <= 0.04 || (!includeFeatured && item.isFeatured)) {
+      if (
+        !item ||
+        item.currentAlpha <= 0.04 ||
+        (!includeFeatured && item.isFeatured)
+      ) {
         continue;
       }
 
@@ -3109,24 +3849,40 @@ export class ManifoldModeController {
     this.twoDController.update2DSectionFrame(viewModeProgress, delta);
   }
 
-  private updateTextFx(item: ItemState, velocityMagnitude: number, time: number): void {
+  private updateTextFx(
+    item: ItemState,
+    velocityMagnitude: number,
+    time: number
+  ): void {
     const signedVelocity = Math.sign(this.phaseState.velocity) || 1;
     const isScrollHeavy = velocityMagnitude > 0.95;
-    const targetShift = velocityMagnitude > 1.15 ? clamp(velocityMagnitude * 1.2, 0, 12) * signedVelocity : 0;
-    const targetTrail = velocityMagnitude > 1.25 ? clamp(velocityMagnitude * 0.18, 0, 2.2) : 0;
+    const targetShift =
+      velocityMagnitude > 1.15
+        ? clamp(velocityMagnitude * 1.2, 0, 12) * signedVelocity
+        : 0;
+    const targetTrail =
+      velocityMagnitude > 1.25 ? clamp(velocityMagnitude * 0.18, 0, 2.2) : 0;
     const audioStrength = this.audioActive
-      ? clamp((this.audioPulse * 2.2 + this.audioEnergy * 0.38) * (isScrollHeavy ? 0.58 : 1), 0, 1)
+      ? clamp(
+          (this.audioPulse * 2.2 + this.audioEnergy * 0.38) *
+            (isScrollHeavy ? 0.58 : 1),
+          0,
+          1
+        )
       : 0;
     const audioReactive = MANIFOLD_CONSTANTS.AUDIO_REACTIVE;
     const audioWave = Math.sin(
-      time * audioReactive.waveFrequency + item.variance * audioReactive.waveVariancePhase
+      time * audioReactive.waveFrequency +
+        item.variance * audioReactive.waveVariancePhase
     );
     const audioOffsetTarget =
       audioStrength > 0.01
         ? audioWave *
-        (isScrollHeavy
-          ? audioReactive.scrollHeavyBaseOffset + audioStrength * audioReactive.scrollHeavyStrengthMultiplier
-          : audioReactive.baseOffset + audioStrength * audioReactive.strengthMultiplier)
+          (isScrollHeavy
+            ? audioReactive.scrollHeavyBaseOffset +
+              audioStrength * audioReactive.scrollHeavyStrengthMultiplier
+            : audioReactive.baseOffset +
+              audioStrength * audioReactive.strengthMultiplier)
         : 0;
 
     item.shift = lerp(item.shift, targetShift, 0.24);
@@ -3135,41 +3891,73 @@ export class ManifoldModeController {
     item.audioShift = lerp(
       item.audioShift,
       audioOffsetTarget,
-      audioStrength > item.audioChroma ? audioReactive.shiftRiseLerp : audioReactive.shiftFallLerp
+      audioStrength > item.audioChroma
+        ? audioReactive.shiftRiseLerp
+        : audioReactive.shiftFallLerp
     );
     item.audioChroma = lerp(
       item.audioChroma,
       audioStrength,
-      audioStrength > item.audioChroma ? audioReactive.chromaRiseLerp : audioReactive.chromaFallLerp
+      audioStrength > item.audioChroma
+        ? audioReactive.chromaRiseLerp
+        : audioReactive.chromaFallLerp
     );
 
     const brightAlpha = clamp(0.12 + item.chroma * 0.28, 0.12, 0.42);
-    const musicBrightAlpha = clamp(0.08 + item.audioChroma * (isScrollHeavy ? 0.78 : 1.18), 0.08, isScrollHeavy ? 0.72 : 0.96);
-    const musicSoftAlpha = clamp(0.03 + item.audioChroma * (isScrollHeavy ? 0.2 : 0.5), 0.03, isScrollHeavy ? 0.22 : 0.54);
+    const musicBrightAlpha = clamp(
+      0.08 + item.audioChroma * (isScrollHeavy ? 0.78 : 1.18),
+      0.08,
+      isScrollHeavy ? 0.72 : 0.96
+    );
+    const musicSoftAlpha = clamp(
+      0.03 + item.audioChroma * (isScrollHeavy ? 0.2 : 0.5),
+      0.03,
+      isScrollHeavy ? 0.22 : 0.54
+    );
     const musicBlur = isScrollHeavy ? 0 : 0.12 + item.audioChroma * 0.54;
     const quantizedAudioShift = Math.round(item.audioShift * 4) / 4;
     const quantizedMusicBrightAlpha = Math.round(musicBrightAlpha * 50) / 50;
     const quantizedMusicSoftAlpha = Math.round(musicSoftAlpha * 50) / 50;
     const quantizedMusicBlur = Math.round(musicBlur * 10) / 10;
     const shiftQ = Math.round(item.shift);
-    const textShadow = item.chroma > 0.035 && Math.abs(shiftQ) > 0
-      ? `${shiftQ}px 0 0 rgba(255, 255, 255, ${brightAlpha.toFixed(2)}), ` +
-      `${-shiftQ}px 0 0 rgba(255, 255, 255, ${brightAlpha.toFixed(2)})`
-      : 'none';
+    const textShadow =
+      item.chroma > 0.035 && Math.abs(shiftQ) > 0
+        ? `${shiftQ}px 0 0 rgba(255, 255, 255, ${brightAlpha.toFixed(2)}), ` +
+          `${-shiftQ}px 0 0 rgba(255, 255, 255, ${brightAlpha.toFixed(2)})`
+        : 'none';
 
     const filter = 'none';
     const musicFx = `${quantizedAudioShift.toFixed(2)}|${quantizedMusicBrightAlpha.toFixed(2)}|${quantizedMusicSoftAlpha.toFixed(2)}|${quantizedMusicBlur.toFixed(1)}`;
 
     if (musicFx !== item.lastFxTransform) {
-      StyleAdapter.setNumericProperty(item.fxEl, '--music-shift', quantizedAudioShift, 'px');
-      StyleAdapter.setNumericProperty(item.fxEl, '--music-alpha', quantizedMusicBrightAlpha);
-      StyleAdapter.setNumericProperty(item.fxEl, '--music-glow-alpha', quantizedMusicSoftAlpha);
-      StyleAdapter.setNumericProperty(item.fxEl, '--music-blur', quantizedMusicBlur, 'px');
+      StyleAdapter.setNumericProperty(
+        item.fxEl,
+        '--music-shift',
+        quantizedAudioShift,
+        'px'
+      );
+      StyleAdapter.setNumericProperty(
+        item.fxEl,
+        '--music-alpha',
+        quantizedMusicBrightAlpha
+      );
+      StyleAdapter.setNumericProperty(
+        item.fxEl,
+        '--music-glow-alpha',
+        quantizedMusicSoftAlpha
+      );
+      StyleAdapter.setNumericProperty(
+        item.fxEl,
+        '--music-blur',
+        quantizedMusicBlur,
+        'px'
+      );
       item.lastFxTransform = musicFx;
     }
 
     // Keep the inline transform stable unless we truly need to clear a leftover face-mode override.
-    const nextInlineFxTransform = item.lastFaceMode === 'stretched' ? 'none' : '';
+    const nextInlineFxTransform =
+      item.lastFaceMode === 'stretched' ? 'none' : '';
     if (nextInlineFxTransform !== item.lastInlineFxTransform) {
       item.fxEl.style.transform = nextInlineFxTransform;
       item.lastInlineFxTransform = nextInlineFxTransform;
@@ -3198,7 +3986,8 @@ export class ManifoldModeController {
       return;
     }
 
-    const nextDpr = clamp(window.devicePixelRatio || 1, 1, 1.4);
+    const maxDpr = IS_ANDROID ? 1.0 : 1.4;
+    const nextDpr = clamp(window.devicePixelRatio || 1, 1, maxDpr);
     const nextWidth = Math.max(1, Math.round(this.viewportWidth * nextDpr));
     const nextHeight = Math.max(1, Math.round(this.viewportHeight * nextDpr));
 
@@ -3245,7 +4034,9 @@ export class ManifoldModeController {
   }
 
   private getScrollAnchorForItemIndex(itemIndex: number): number {
-    return (itemIndex * this.config.zGap + this.loopSize) / this.config.camSpeed;
+    return (
+      (itemIndex * this.config.zGap + this.loopSize) / this.config.camSpeed
+    );
   }
 
   private getAnchorForCard(item: ItemState): number {
@@ -3269,7 +4060,9 @@ export class ManifoldModeController {
   }
 
   private isStacked2DMobileLayout(): boolean {
-    return this.isMobileViewport && this.viewportHeight > this.viewportWidth * 1.08;
+    return (
+      this.isMobileViewport && this.viewportHeight > this.viewportWidth * 1.08
+    );
   }
 
   private get2DGridMetrics(): TwoDGridMetrics {
@@ -3279,10 +4072,16 @@ export class ManifoldModeController {
   private get2DScrollAnchorForCard(item: ItemState): number {
     const metrics = this.get2DGridMetrics();
     const row = Math.floor(item.gridOrder / metrics.columns);
-    return this.introScrollAnchor + (row * metrics.spacingY) / metrics.scrollScale;
+    return (
+      this.introScrollAnchor + (row * metrics.spacingY) / metrics.scrollScale
+    );
   }
 
-  private computeFourDScene(_sceneScroll: number, time: number, fourDProgress: number): FourDSceneState {
+  private computeFourDScene(
+    _sceneScroll: number,
+    time: number,
+    fourDProgress: number
+  ): FourDSceneState {
     const loopLength = Math.max(1, this.loopSize / this.config.camSpeed);
 
     const projectionInput = {
@@ -3333,7 +4132,10 @@ export class ManifoldModeController {
     return overlay;
   }
 
-  private activateFourDFaceOverlay(overlay: HTMLElement, sourceItem: ItemState): void {
+  private activateFourDFaceOverlay(
+    overlay: HTMLElement,
+    sourceItem: ItemState
+  ): void {
     if (!overlay.isConnected) {
       this.elements.viewport.appendChild(overlay);
     }
@@ -3360,7 +4162,10 @@ export class ManifoldModeController {
     overlay.setAttribute('aria-hidden', 'true');
   }
 
-  private syncFourDFaceOverlayElement(overlay: HTMLElement, sourceItem: ItemState): void {
+  private syncFourDFaceOverlayElement(
+    overlay: HTMLElement,
+    sourceItem: ItemState
+  ): void {
     const sourceVersion = String(sourceItem.cardContentVersion);
     const sourceCardIndex = String(sourceItem.cardIndex);
 
@@ -3398,7 +4203,13 @@ export class ManifoldModeController {
       element.setAttribute('tabindex', '-1');
       element.setAttribute('aria-hidden', 'true');
       if ('disabled' in element) {
-        (element as HTMLButtonElement | HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement).disabled = true;
+        (
+          element as
+            | HTMLButtonElement
+            | HTMLInputElement
+            | HTMLSelectElement
+            | HTMLTextAreaElement
+        ).disabled = true;
       }
     }
   }
@@ -3413,8 +4224,12 @@ export class ManifoldModeController {
       return;
     }
 
-    for (let faceIdx = 0; faceIdx < this.fourDFaceOverlays.length; faceIdx += 1) {
-      if ((faceIdx % this.cardItemsCache.length) !== cardIndex) {
+    for (
+      let faceIdx = 0;
+      faceIdx < this.fourDFaceOverlays.length;
+      faceIdx += 1
+    ) {
+      if (faceIdx % this.cardItemsCache.length !== cardIndex) {
         continue;
       }
 
@@ -3461,7 +4276,8 @@ export class ManifoldModeController {
         continue;
       }
 
-      this.fourDFaceOverlays[faceIdx] = this.fourDFaceOverlayPool.acquire(sourceItem);
+      this.fourDFaceOverlays[faceIdx] =
+        this.fourDFaceOverlayPool.acquire(sourceItem);
     }
   }
 
@@ -3474,7 +4290,10 @@ export class ManifoldModeController {
     this.fourDFaceOverlaysActive = false;
   }
 
-  private renderFourDFaceOverlays(scene: FourDSceneState, fourDProgress: number): void {
+  private renderFourDFaceOverlays(
+    scene: FourDSceneState,
+    fourDProgress: number
+  ): void {
     this.ensureFourDFaceOverlays(scene.faceStates.length);
 
     // Four layers of transition logic:
@@ -3482,18 +4301,24 @@ export class ManifoldModeController {
     // 2. Holds proximity to the 3D world briefly
     // 3. Deeper immersion into 4D geometry begins
     // 4. Symmetrical unwind during exit
-    const overlayPresence = easeInOutCubic(clamp(
-      (fourDProgress - MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.overlayPresenceOffset) /
-      MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.overlayPresenceSpan,
-      0,
-      1
-    ));
-    const geometryEase = easeInOutCubic(clamp(
-      (fourDProgress - MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.overlayGeometryOffset) /
-      MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.overlayGeometrySpan,
-      0,
-      1
-    ));
+    const overlayPresence = easeInOutCubic(
+      clamp(
+        (fourDProgress -
+          MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.overlayPresenceOffset) /
+          MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.overlayPresenceSpan,
+        0,
+        1
+      )
+    );
+    const geometryEase = easeInOutCubic(
+      clamp(
+        (fourDProgress -
+          MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.overlayGeometryOffset) /
+          MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.overlayGeometrySpan,
+        0,
+        1
+      )
+    );
 
     for (let faceIdx = 0; faceIdx < scene.faceStates.length; faceIdx += 1) {
       const overlay = this.fourDFaceOverlays[faceIdx];
@@ -3534,7 +4359,11 @@ export class ManifoldModeController {
       // This keeps the transition readable even though the destination is a fully projective warp.
       if (!sourceItem) {
         overlay.style.transform = faceState.matrix;
-        overlay.style.opacity = clamp(faceState.alpha * overlayPresence, 0, 1).toFixed(3);
+        overlay.style.opacity = clamp(
+          faceState.alpha * overlayPresence,
+          0,
+          1
+        ).toFixed(3);
         continue;
       }
 
@@ -3551,7 +4380,10 @@ export class ManifoldModeController {
       // World square corners (flat, without deformation)
       const worldTL: readonly [number, number] = [cardLeft, cardTop];
       const worldTR: readonly [number, number] = [cardLeft + worldW, cardTop];
-      const worldBR: readonly [number, number] = [cardLeft + worldW, cardTop + worldH];
+      const worldBR: readonly [number, number] = [
+        cardLeft + worldW,
+        cardTop + worldH
+      ];
       const worldBL: readonly [number, number] = [cardLeft, cardTop + worldH];
 
       // 4D matrix corners (parsed from matrix3d or computed from projected vertices)
@@ -3569,7 +4401,11 @@ export class ManifoldModeController {
 
       if (!m || m.length !== 16) {
         overlay.style.transform = faceState.matrix;
-        overlay.style.opacity = clamp(faceState.alpha * overlayPresence, 0, 1).toFixed(3);
+        overlay.style.opacity = clamp(
+          faceState.alpha * overlayPresence,
+          0,
+          1
+        ).toFixed(3);
         continue;
       }
 
@@ -3596,7 +4432,10 @@ export class ManifoldModeController {
         faceBL = projectMatrix3dPoint(m, 0, H);
         this._overlayCornerCache[faceIdx] = {
           matrix: faceState.matrix,
-          tl: faceTL, tr: faceTR, br: faceBR, bl: faceBL
+          tl: faceTL,
+          tr: faceTR,
+          br: faceBR,
+          bl: faceBL
         };
       }
 
@@ -3622,7 +4461,10 @@ export class ManifoldModeController {
       const interpolatedMatrix = computeCardProjectionMatrix(
         MANIFOLD_FOUR_D_CARD_SIZE,
         MANIFOLD_FOUR_D_CARD_SIZE,
-        iTL, iTR, iBR, iBL
+        iTL,
+        iTR,
+        iBR,
+        iBL
       );
 
       if (!interpolatedMatrix) {
@@ -3633,14 +4475,19 @@ export class ManifoldModeController {
       overlay.style.transform = interpolatedMatrix;
       overlay.style.zIndex = String(faceState.zIndex - 1000);
       overlay.style.opacity = clamp(
-        faceState.alpha * overlayPresence * (sourceItem.currentAlpha > 0.01 ? 1 : overlayPresence),
+        faceState.alpha *
+          overlayPresence *
+          (sourceItem.currentAlpha > 0.01 ? 1 : overlayPresence),
         0,
         1
       ).toFixed(3);
     }
   }
 
-  private renderFourDWireframe(scene: FourDSceneState | null, fourDProgress: number): void {
+  private renderFourDWireframe(
+    scene: FourDSceneState | null,
+    fourDProgress: number
+  ): void {
     const ctx = this.fourDWireframeContext;
 
     if (!ctx) {
@@ -3648,19 +4495,31 @@ export class ManifoldModeController {
     }
 
     if (!scene || fourDProgress <= 0.001) {
-      ctx.clearRect(0, 0, this.fourDCanvasWidth || this.viewportWidth, this.fourDCanvasHeight || this.viewportHeight);
+      ctx.clearRect(
+        0,
+        0,
+        this.fourDCanvasWidth || this.viewportWidth,
+        this.fourDCanvasHeight || this.viewportHeight
+      );
       return;
     }
 
     this.ensureFourDCanvasSize();
     ctx.clearRect(0, 0, this.viewportWidth, this.viewportHeight);
-    const wireframePresence = easeInOutCubic(clamp(
-      (fourDProgress - MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.wireframePresenceOffset) /
-      MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.wireframePresenceSpan,
-      0,
+    const wireframePresence = easeInOutCubic(
+      clamp(
+        (fourDProgress -
+          MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.wireframePresenceOffset) /
+          MANIFOLD_CONSTANTS.SPATIAL_TOPOLOGY.wireframePresenceSpan,
+        0,
+        1
+      )
+    );
+    const edgeAlphaScale = clamp(
+      (1 - this.expandedProgress * 0.74) * wireframePresence,
+      0.08,
       1
-    ));
-    const edgeAlphaScale = clamp((1 - this.expandedProgress * 0.74) * wireframePresence, 0.08, 1);
+    );
     const isInsideVariant = scene.variant === 'inside';
 
     for (let index = 0; index < scene.edgeStates.length; index += 1) {
@@ -3700,7 +4559,8 @@ export class ManifoldModeController {
     this.lastCentered2DCard = null;
     this.cardItemsBySectionCache.clear();
     for (const item of this.cardItemsCache) {
-      const sectionItems = this.cardItemsBySectionCache.get(item.sectionTitle) ?? [];
+      const sectionItems =
+        this.cardItemsBySectionCache.get(item.sectionTitle) ?? [];
       sectionItems.push(item);
       this.cardItemsBySectionCache.set(item.sectionTitle, sectionItems);
     }
@@ -3772,7 +4632,13 @@ export class ManifoldModeController {
     // When starting in 2D (mobile), preserve the 2D state to avoid wasted 3D layout work.
     if (this.initialViewMode === '3d') {
       this.transitionManager.forceResetTo3D();
-      this.dom.removeBodyClass('is-2d-mode', 'is-4d-mode', 'has-4d-presence', 'is-frame-stressed', 'is-transition-snapshots');
+      this.dom.removeBodyClass(
+        'is-2d-mode',
+        'is-4d-mode',
+        'has-4d-presence',
+        'is-frame-stressed',
+        'is-transition-snapshots'
+      );
       this.dom.removeRootClass('is-2d-mode', 'is-4d-mode', 'has-4d-presence');
     }
     this.exitingFourDTo2D = false;
@@ -3803,7 +4669,8 @@ export class ManifoldModeController {
     this.resetIncomingScrollContinuity(this.phaseState.scroll);
     this.setFeaturedCardProfile('default', false);
 
-    const initialFocusCard = this.featuredItem?.cardIndex ?? this.config.featuredIndex;
+    const initialFocusCard =
+      this.featuredItem?.cardIndex ?? this.config.featuredIndex;
     this.focusCardIn2D(initialFocusCard, true);
   }
 
@@ -3814,7 +4681,12 @@ export class ManifoldModeController {
 
     this.closeExpandedCard();
     this.setFeaturedCardProfile('intro', true);
-    if (this.is2DMode() || this.is4DMode() || this.viewModeProgress > 0.01 || this.fourDProgress > 0.01) {
+    if (
+      this.is2DMode() ||
+      this.is4DMode() ||
+      this.viewModeProgress > 0.01 ||
+      this.fourDProgress > 0.01
+    ) {
       this.setViewMode('3d');
       this.pendingIntroExit = true;
       return;
@@ -3826,8 +4698,15 @@ export class ManifoldModeController {
     this.setHoveredCard(null);
   }
 
-  private isEntryTarget(target: EventTarget | null, x: number, y: number): boolean {
-    if (target instanceof HTMLElement && target.closest('[data-entry-card="true"]')) {
+  private isEntryTarget(
+    target: EventTarget | null,
+    x: number,
+    y: number
+  ): boolean {
+    if (
+      target instanceof HTMLElement &&
+      target.closest('[data-entry-card="true"]')
+    ) {
       return true;
     }
 
@@ -3836,7 +4715,9 @@ export class ManifoldModeController {
       return false;
     }
 
-    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    return (
+      x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+    );
   }
 
   private setAccessibilityState(enabled: boolean): void {
@@ -3869,13 +4750,18 @@ export class ManifoldModeController {
       return;
     }
 
-    const hitItem = this.findCardAtPoint(this.inputService.getPointerX(), this.inputService.getPointerY());
+    const hitItem = this.findCardAtPoint(
+      this.inputService.getPointerX(),
+      this.inputService.getPointerY()
+    );
     if (hitItem) {
       this.setHoveredCard(hitItem);
       return;
     }
 
-    const directItem = this.resolveDirectCardTarget(this.inputService.getPointerTarget());
+    const directItem = this.resolveDirectCardTarget(
+      this.inputService.getPointerTarget()
+    );
     if (directItem && directItem.currentAlpha > 0.02) {
       this.setHoveredCard(directItem);
       return;
@@ -3910,7 +4796,11 @@ export class ManifoldModeController {
     return bestMatch;
   }
 
-  private resolveCardTarget(target: EventTarget | null, x: number, y: number): ItemState | null {
+  private resolveCardTarget(
+    target: EventTarget | null,
+    x: number,
+    y: number
+  ): ItemState | null {
     const hitItem = this.findCardAtPoint(x, y);
     if (hitItem) {
       return hitItem;
@@ -3921,7 +4811,11 @@ export class ManifoldModeController {
       return directItem;
     }
 
-    if (this.hoveredCard && this.hoveredCard.currentAlpha > 0.001 && this.isPointerInsideCard(this.hoveredCard, 42)) {
+    if (
+      this.hoveredCard &&
+      this.hoveredCard.currentAlpha > 0.001 &&
+      this.isPointerInsideCard(this.hoveredCard, 42)
+    ) {
       return this.hoveredCard;
     }
 
@@ -3929,7 +4823,10 @@ export class ManifoldModeController {
   }
 
   private getCardItemByElement(cardElement: HTMLElement): ItemState | null {
-    const cardIndex = Number.parseInt(cardElement.dataset.cardIndex ?? '-1', 10);
+    const cardIndex = Number.parseInt(
+      cardElement.dataset.cardIndex ?? '-1',
+      10
+    );
 
     if (Number.isNaN(cardIndex) || cardIndex < 0) {
       return null;
@@ -3946,7 +4843,9 @@ export class ManifoldModeController {
     return null;
   }
 
-  private resolveDirectCardTarget(target: EventTarget | null): ItemState | null {
+  private resolveDirectCardTarget(
+    target: EventTarget | null
+  ): ItemState | null {
     if (!(target instanceof HTMLElement)) {
       return null;
     }
@@ -3973,13 +4872,23 @@ export class ManifoldModeController {
     );
   }
 
-  private isPointInsideItemHitArea(item: ItemState, x: number, y: number): boolean {
+  private isPointInsideItemHitArea(
+    item: ItemState,
+    x: number,
+    y: number
+  ): boolean {
     if (item.hasCurrentScreenQuad) {
       return isPointInsideQuad(item.currentScreenQuad, x, y);
     }
 
     const rect = this.getItemScreenRect(item);
-    return rect !== null && x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    return (
+      rect !== null &&
+      x >= rect.left &&
+      x <= rect.right &&
+      y >= rect.top &&
+      y <= rect.bottom
+    );
   }
 
   private setHoveredCard(item: ItemState | null): void {
@@ -4000,15 +4909,19 @@ export class ManifoldModeController {
     }
   }
 
-  private setFeaturedCardProfile(profile: 'default' | 'intro', scramble: boolean): void {
+  private setFeaturedCardProfile(
+    profile: 'default' | 'intro',
+    scramble: boolean
+  ): void {
     const item = this.featuredItem;
     if (!item || item.activeCardProfile === profile) {
       return;
     }
 
-    const cardContent = profile === 'intro'
-      ? item.introCardContent ?? item.defaultCardContent
-      : item.defaultCardContent ?? item.introCardContent;
+    const cardContent =
+      profile === 'intro'
+        ? (item.introCardContent ?? item.defaultCardContent)
+        : (item.defaultCardContent ?? item.introCardContent);
 
     if (!cardContent) {
       return;
@@ -4018,7 +4931,34 @@ export class ManifoldModeController {
     this.applyCardContent(item, cardContent, scramble);
   }
 
-  private applyCardContent(item: ItemState, cardContent: CvCardContent, scramble: boolean): void {
+  private getCardBriefCtaLabel(): string {
+    return this.locale === 'pl' ? 'Zobacz szczegóły' : 'Explore details';
+  }
+
+  private renderCardBriefCues(cardContent: CvCardContent): string {
+    return [
+      { label: cardContent.previewLeftLabel, value: cardContent.previewLeft },
+      { label: cardContent.previewRightLabel, value: cardContent.previewRight }
+    ]
+      .filter(
+        (cue) => cue.label.trim().length > 0 && cue.value.trim().length > 0
+      )
+      .map(
+        (cue) => `
+          <li>
+            <em>${cue.label}</em>
+            <span>${cue.value}</span>
+          </li>
+        `
+      )
+      .join('');
+  }
+
+  private applyCardContent(
+    item: ItemState,
+    cardContent: CvCardContent,
+    scramble: boolean
+  ): void {
     item.cardContentVersion += 1;
     item.cardTitle = cardContent.title;
     item.expandedCardTitle = cardContent.expandedTitle;
@@ -4028,7 +4968,11 @@ export class ManifoldModeController {
     if (titleEl) {
       titleEl.dataset.previewTitle = cardContent.title;
       titleEl.dataset.expandedTitle = cardContent.expandedTitle;
-      const titleScale = clamp(1 - Math.max(0, cardContent.title.length - 5) * 0.06, 0.64, 1);
+      const titleScale = clamp(
+        1 - Math.max(0, cardContent.title.length - 5) * 0.06,
+        0.64,
+        1
+      );
       titleEl.style.setProperty('--card-title-scale', titleScale.toFixed(3));
       this.textEffectManager.animateCardTitle(item, false);
     }
@@ -4040,39 +4984,76 @@ export class ManifoldModeController {
       this.textEffectManager.animateCardHandoff(item, false);
     }
 
-    this.textEffectManager.setTextContent(item.fxEl.querySelector<HTMLElement>('.card-signal'), cardContent.signal, scramble);
-    this.textEffectManager.setTextContent(item.fxEl.querySelector<HTMLElement>('.card-mode'), cardContent.mode, scramble);
-    this.textEffectManager.setTextContent(item.fxEl.querySelector<HTMLElement>('.card-core-chip'), cardContent.chip, scramble);
-    this.textEffectManager.setTextContent(item.fxEl.querySelector<HTMLElement>('.card-id'), cardContent.id, scramble);
     this.textEffectManager.setTextContent(
-      item.fxEl.querySelector<HTMLElement>('.card-footer span:first-child'),
-      `${cardContent.previewLeftLabel}: ${cardContent.previewLeft}`,
+      item.fxEl.querySelector<HTMLElement>('.card-signal'),
+      cardContent.signal,
       scramble
     );
     this.textEffectManager.setTextContent(
-      item.fxEl.querySelector<HTMLElement>('.card-footer span:last-child'),
-      `${cardContent.previewRightLabel}: ${cardContent.previewRight}`,
+      item.fxEl.querySelector<HTMLElement>('.card-mode'),
+      cardContent.mode,
+      scramble
+    );
+    this.textEffectManager.setTextContent(
+      item.fxEl.querySelector<HTMLElement>('.card-brief-chip'),
+      cardContent.chip,
+      scramble
+    );
+    this.textEffectManager.setTextContent(
+      item.fxEl.querySelector<HTMLElement>('.card-id'),
+      cardContent.id,
+      scramble
+    );
+    this.textEffectManager.setTextContent(
+      item.fxEl.querySelector<HTMLElement>('.card-brief-kicker'),
+      cardContent.surfaceKicker,
+      scramble
+    );
+    this.textEffectManager.setTextContent(
+      item.fxEl.querySelector<HTMLElement>('.card-brief-value'),
+      cardContent.surfaceValue,
+      scramble
+    );
+    this.textEffectManager.setTextContent(
+      item.fxEl.querySelector<HTMLElement>('.card-brief-cta-label'),
+      this.getCardBriefCtaLabel(),
       scramble
     );
 
-    const expandedMeta = item.fxEl.querySelector<HTMLElement>('.card-expanded-meta');
+    const previewCues =
+      item.fxEl.querySelector<HTMLElement>('.card-brief-points');
+    if (previewCues) {
+      previewCues.innerHTML = this.renderCardBriefCues(cardContent);
+    }
+
+    const expandedMeta = item.fxEl.querySelector<HTMLElement>(
+      '.card-expanded-meta'
+    );
     if (expandedMeta) {
       expandedMeta.dataset.revealText = cardContent.eyebrow;
       expandedMeta.textContent = cardContent.eyebrow;
     }
 
-    const expandedLead = item.fxEl.querySelector<HTMLElement>('.card-expanded-lead');
+    const expandedLead = item.fxEl.querySelector<HTMLElement>(
+      '.card-expanded-lead'
+    );
     if (expandedLead) {
       expandedLead.dataset.revealText = cardContent.lead;
       expandedLead.textContent = cardContent.lead;
     }
 
-    const highlightsList = item.fxEl.querySelector<HTMLElement>('.card-expanded-block--highlights .card-expanded-list');
+    const highlightsList = item.fxEl.querySelector<HTMLElement>(
+      '.card-expanded-block--highlights .card-expanded-list'
+    );
     if (highlightsList) {
-      highlightsList.innerHTML = cardContent.highlights.map((point) => `<li data-reveal-text="${point}">${point}</li>`).join('');
+      highlightsList.innerHTML = cardContent.highlights
+        .map((point) => `<li data-reveal-text="${point}">${point}</li>`)
+        .join('');
     }
 
-    const factsList = item.fxEl.querySelector<HTMLElement>('.card-expanded-list--facts');
+    const factsList = item.fxEl.querySelector<HTMLElement>(
+      '.card-expanded-list--facts'
+    );
     if (factsList) {
       factsList.innerHTML = cardContent.facts
         .map(
@@ -4086,7 +5067,9 @@ export class ManifoldModeController {
         .join('');
     }
 
-    const surfaceNodes = item.fxEl.querySelectorAll<HTMLElement>('.card-expanded-surface > span, .card-expanded-surface > strong, .card-expanded-surface > p');
+    const surfaceNodes = item.fxEl.querySelectorAll<HTMLElement>(
+      '.card-expanded-surface > span, .card-expanded-surface > strong, .card-expanded-surface > p'
+    );
     const [surfaceKicker, surfaceValue, surfaceText] = surfaceNodes;
     if (surfaceKicker) {
       surfaceKicker.dataset.revealText = cardContent.surfaceKicker;
@@ -4102,6 +5085,10 @@ export class ManifoldModeController {
     }
 
     this.applyLocalizedCardChrome(item);
+    this.updateCardAccessibleName(
+      item,
+      this.expandedCard === item && this.expandedTarget > 0.01
+    );
     this.resetExpandedContent(item);
 
     if (this.expandedCard === item && this.expandedTarget > 0) {
@@ -4114,22 +5101,47 @@ export class ManifoldModeController {
   }
 
   private syncCardTransitionSnapshot(item: ItemState): void {
-    const snapshot = item.fxEl.querySelector<HTMLElement>('.card-transition-snapshot');
-    if (!snapshot || item.lastTransitionSnapshotVersion === item.cardContentVersion) {
+    const snapshot = item.fxEl.querySelector<HTMLElement>(
+      '.card-transition-snapshot'
+    );
+    if (
+      !snapshot ||
+      item.lastTransitionSnapshotVersion === item.cardContentVersion
+    ) {
       return;
     }
 
-    const signal = item.fxEl.querySelector<HTMLElement>('.card-signal')?.textContent?.trim() ?? '';
-    const mode = item.fxEl.querySelector<HTMLElement>('.card-mode')?.textContent?.trim() ?? '';
+    const signal =
+      item.fxEl
+        .querySelector<HTMLElement>('.card-signal')
+        ?.textContent?.trim() ?? '';
+    const mode =
+      item.fxEl.querySelector<HTMLElement>('.card-mode')?.textContent?.trim() ??
+      '';
     const title = item.titleEl?.textContent?.trim() ?? item.cardTitle;
-    const chip = item.fxEl.querySelector<HTMLElement>('.card-core-chip')?.textContent?.trim() ?? '';
-    const id = item.fxEl.querySelector<HTMLElement>('.card-id')?.textContent?.trim() ?? '';
+    const chip =
+      item.fxEl
+        .querySelector<HTMLElement>('.card-brief-chip')
+        ?.textContent?.trim() ?? '';
+    const id =
+      item.fxEl.querySelector<HTMLElement>('.card-id')?.textContent?.trim() ??
+      '';
 
-    const signalEl = snapshot.querySelector<HTMLElement>('.card-transition-snapshot__signal');
-    const modeEl = snapshot.querySelector<HTMLElement>('.card-transition-snapshot__mode');
-    const titleEl = snapshot.querySelector<HTMLElement>('.card-transition-snapshot__title');
-    const chipEl = snapshot.querySelector<HTMLElement>('.card-transition-snapshot__chip');
-    const idEl = snapshot.querySelector<HTMLElement>('.card-transition-snapshot__id');
+    const signalEl = snapshot.querySelector<HTMLElement>(
+      '.card-transition-snapshot__signal'
+    );
+    const modeEl = snapshot.querySelector<HTMLElement>(
+      '.card-transition-snapshot__mode'
+    );
+    const titleEl = snapshot.querySelector<HTMLElement>(
+      '.card-transition-snapshot__title'
+    );
+    const chipEl = snapshot.querySelector<HTMLElement>(
+      '.card-transition-snapshot__chip'
+    );
+    const idEl = snapshot.querySelector<HTMLElement>(
+      '.card-transition-snapshot__id'
+    );
 
     if (signalEl) signalEl.textContent = signal;
     if (modeEl) modeEl.textContent = mode;
@@ -4167,7 +5179,9 @@ export class ManifoldModeController {
 
   private applyLocalizedCardChrome(item: ItemState): void {
     const ui = getManifoldLocaleBundle(this.locale).ui;
-    const expandedLabels = item.fxEl.querySelectorAll<HTMLElement>('.card-expanded-label');
+    const expandedLabels = item.fxEl.querySelectorAll<HTMLElement>(
+      '.card-expanded-label'
+    );
     const highlightsLabel = expandedLabels[0];
     const snapshotLabel = expandedLabels[1];
 
@@ -4183,8 +5197,8 @@ export class ManifoldModeController {
 
     const mobilePrevButton = item.mobilePrevNavEl;
     const mobileNextButton = item.mobileNextNavEl;
-    mobilePrevButton?.setAttribute('aria-label', ui.nextCardSectionAria);
-    mobileNextButton?.setAttribute('aria-label', ui.nextCardSectionAria);
+    mobilePrevButton?.setAttribute('aria-label', ui.previousPageAria);
+    mobileNextButton?.setAttribute('aria-label', ui.nextPageAria);
   }
 
   private refreshLocalizedPresentation(): void {
@@ -4198,13 +5212,17 @@ export class ManifoldModeController {
       }
 
       if (item.type === 'text') {
-        const localizedSectionTitle = this.getLocalizedSectionTitle(item.sectionTitle);
+        const localizedSectionTitle = this.getLocalizedSectionTitle(
+          item.sectionTitle
+        );
         item.fxEl.textContent = localizedSectionTitle;
         item.fxEl.dataset.text = localizedSectionTitle;
         continue;
       }
 
-      const localizedCard = localizedCards[item.gridOrder % localizedCards.length] ?? localizedCards[0];
+      const localizedCard =
+        localizedCards[item.gridOrder % localizedCards.length] ??
+        localizedCards[0];
       if (localizedCard) {
         item.defaultCardContent = localizedCard;
       }
@@ -4215,8 +5233,8 @@ export class ManifoldModeController {
       this.applyLocalizedCardChrome(item);
       const nextCardContent =
         item.activeCardProfile === 'intro'
-          ? item.introCardContent ?? item.defaultCardContent
-          : item.defaultCardContent ?? item.introCardContent;
+          ? (item.introCardContent ?? item.defaultCardContent)
+          : (item.defaultCardContent ?? item.introCardContent);
       if (nextCardContent) {
         this.applyCardContent(item, nextCardContent, false);
       }
@@ -4237,7 +5255,11 @@ export class ManifoldModeController {
 
   private setCardMobilePage(item: ItemState, page: number): void {
     const nextPage = clamp(page, 0, 1);
-    const indicator = item.fxEl.querySelector<HTMLElement>('.card-expanded-mobile-indicator');
+    const indicator = item.fxEl.querySelector<HTMLElement>(
+      '.card-expanded-mobile-indicator'
+    );
+    const prevButton = item.mobilePrevNavEl as HTMLButtonElement | null;
+    const nextButton = item.mobileNextNavEl as HTMLButtonElement | null;
 
     if (item.mobilePage !== nextPage) {
       item.mobilePage = nextPage;
@@ -4252,6 +5274,11 @@ export class ManifoldModeController {
         indicator.textContent = nextPage === 0 ? '01 / 02' : '02 / 02';
       }
     }
+
+    prevButton?.toggleAttribute('disabled', nextPage <= 0);
+    prevButton?.setAttribute('aria-disabled', nextPage <= 0 ? 'true' : 'false');
+    nextButton?.toggleAttribute('disabled', nextPage >= 1);
+    nextButton?.setAttribute('aria-disabled', nextPage >= 1 ? 'true' : 'false');
   }
 
   private findCardState(cardEl: HTMLElement): ItemState | null {
@@ -4274,7 +5301,6 @@ export class ManifoldModeController {
     }
   }
 
-
   private closeExpandedCard(): void {
     this.cardExpandController.closeExpandedCard();
   }
@@ -4290,7 +5316,8 @@ export class ManifoldModeController {
   private formatHudFps(): string {
     const fps = Math.round(this.fpsDisplay);
     const cap = Math.round(this.estimatedRefreshCap);
-    const isNearCap = cap >= 50 && Math.abs(fps - cap) <= Math.max(1, cap >= 120 ? 3 : 2);
+    const isNearCap =
+      cap >= 50 && Math.abs(fps - cap) <= Math.max(1, cap >= 120 ? 3 : 2);
     return isNearCap ? `${fps} CAP` : String(fps);
   }
 }
@@ -4385,9 +5412,13 @@ function writeProjectedQuadPoint(
 
 function hexToRgb01(hex: string): [number, number, number] {
   const normalized = hex.trim().replace('#', '');
-  const expanded = normalized.length === 3
-    ? normalized.split('').map((char) => `${char}${char}`).join('')
-    : normalized.padEnd(6, '0').slice(0, 6);
+  const expanded =
+    normalized.length === 3
+      ? normalized
+          .split('')
+          .map((char) => `${char}${char}`)
+          .join('')
+      : normalized.padEnd(6, '0').slice(0, 6);
   const value = Number.parseInt(expanded, 16);
 
   return [
@@ -4398,12 +5429,19 @@ function hexToRgb01(hex: string): [number, number, number] {
 }
 
 function isPointInsideQuad(
-  quad: readonly [readonly [number, number], readonly [number, number], readonly [number, number], readonly [number, number]],
+  quad: readonly [
+    readonly [number, number],
+    readonly [number, number],
+    readonly [number, number],
+    readonly [number, number]
+  ],
   x: number,
   y: number
 ): boolean {
   const [a, b, c, d] = quad;
-  return isPointInsideTriangle(a, b, c, x, y) || isPointInsideTriangle(a, c, d, x, y);
+  return (
+    isPointInsideTriangle(a, b, c, x, y) || isPointInsideTriangle(a, c, d, x, y)
+  );
 }
 
 function isPointInsideTriangle(
@@ -4413,8 +5451,11 @@ function isPointInsideTriangle(
   x: number,
   y: number
 ): boolean {
-  const area = (p1: readonly [number, number], p2: readonly [number, number], p3: readonly [number, number]) =>
-    (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1]);
+  const area = (
+    p1: readonly [number, number],
+    p2: readonly [number, number],
+    p3: readonly [number, number]
+  ) => (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1]);
 
   const point: readonly [number, number] = [x, y];
   const d1 = area(point, a, b);

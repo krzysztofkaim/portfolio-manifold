@@ -148,11 +148,16 @@ const FEATURED_INTRO_CARD_BUNDLES: Record<ManifoldLocale, CvCardContent> = {
   pl: PL_FEATURED_INTRO_CARD
 };
 
-export function getManifoldLocaleBundle(locale: ManifoldLocale): ManifoldLocaleBundle {
+export function getManifoldLocaleBundle(
+  locale: ManifoldLocale
+): ManifoldLocaleBundle {
   return BUNDLES[locale];
 }
 
-export function getLocalePerfModeLabel(locale: ManifoldLocale, modeLabel: string): string {
+export function getLocalePerfModeLabel(
+  locale: ManifoldLocale,
+  modeLabel: string
+): string {
   const ui = getManifoldLocaleBundle(locale).ui;
   switch (modeLabel) {
     case 'BALANCED':
@@ -172,7 +177,9 @@ export function getLocalePerfModeLabel(locale: ManifoldLocale, modeLabel: string
   }
 }
 
-export function getLocalizedFeaturedIntroCard(locale: ManifoldLocale): CvCardContent {
+export function getLocalizedFeaturedIntroCard(
+  locale: ManifoldLocale
+): CvCardContent {
   return FEATURED_INTRO_CARD_BUNDLES[locale];
 }
 
@@ -180,12 +187,19 @@ export function getNextManifoldLocale(locale: ManifoldLocale): ManifoldLocale {
   return locale === 'en' ? 'pl' : 'en';
 }
 
-export function localizeSectionTitle(sectionTitle: string, locale: ManifoldLocale): string {
+export function localizeSectionTitle(
+  sectionTitle: string,
+  locale: ManifoldLocale
+): string {
   const bundle = getManifoldLocaleBundle(locale);
-  return bundle.sectionLabels[sectionTitle as ManifoldSectionKey] ?? sectionTitle;
+  return (
+    bundle.sectionLabels[sectionTitle as ManifoldSectionKey] ?? sectionTitle
+  );
 }
 
-export function getLocalizedCvCards(locale: ManifoldLocale): readonly CvCardContent[] {
+export function getLocalizedCvCards(
+  locale: ManifoldLocale
+): readonly CvCardContent[] {
   return locale === 'pl' ? PL_CV_CARDS : EN_CV_CARDS;
 }
 
@@ -211,7 +225,8 @@ export function resolveManifoldLocaleFromEnvironment(): ManifoldLocale {
     }
   }
 
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone?.toLowerCase() ?? '';
+  const timezone =
+    Intl.DateTimeFormat().resolvedOptions().timeZone?.toLowerCase() ?? '';
   if (timezone === 'europe/warsaw') {
     return 'pl';
   }

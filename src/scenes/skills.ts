@@ -53,7 +53,7 @@ export default function createSkillsScene(): SceneModule {
       }
 
       root = new Group();
-      
+
       coreGeometry = new IcosahedronGeometry(1, 1);
       coreMaterial = new MeshStandardMaterial({
         color: new Color('#3eb7ff'),
@@ -74,7 +74,10 @@ export default function createSkillsScene(): SceneModule {
       wireframe = new LineSegments(wireframeLines, wireframeMaterial);
 
       orbitGeometry = new BufferGeometry();
-      orbitGeometry.setAttribute('position', new BufferAttribute(orbitPositions, 3));
+      orbitGeometry.setAttribute(
+        'position',
+        new BufferAttribute(orbitPositions, 3)
+      );
       orbitMaterial = new PointsMaterial({
         color: 0xc7fff1,
         size: 0.05,

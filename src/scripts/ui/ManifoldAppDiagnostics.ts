@@ -1,4 +1,8 @@
-import { DebugOverlay, type DebugOverlayMetric, type DebugOverlaySource } from '../../debug/DebugOverlay';
+import {
+  DebugOverlay,
+  type DebugOverlayMetric,
+  type DebugOverlaySource
+} from '../../debug/DebugOverlay';
 import type { ManifoldModeController } from '../../experience/ManifoldModeController';
 import type { ManifoldLocale } from '../../i18n/manifoldLocale';
 
@@ -54,7 +58,7 @@ export class ManifoldAppDiagnostics {
 
   setup(): void {
     if (!this.elements.button || !this.elements.root) {
-      console.warn("Diagnostics elements missing, skipping setup.");
+      console.warn('Diagnostics elements missing, skipping setup.');
       return;
     }
     if (!this.debugEnabled) {
@@ -102,8 +106,14 @@ export class ManifoldAppDiagnostics {
     this.lastLoopTelemetryRenderAt = 0;
 
     this.elements.root.dataset.open = nextOpen ? 'true' : 'false';
-    this.elements.button.setAttribute('aria-expanded', nextOpen ? 'true' : 'false');
-    this.elements.popover.setAttribute('aria-hidden', nextOpen ? 'false' : 'true');
+    this.elements.button.setAttribute(
+      'aria-expanded',
+      nextOpen ? 'true' : 'false'
+    );
+    this.elements.popover.setAttribute(
+      'aria-hidden',
+      nextOpen ? 'false' : 'true'
+    );
 
     if (nextOpen) {
       this.debugOverlay?.destroy();
@@ -183,39 +193,55 @@ export class ManifoldAppDiagnostics {
       getExtraDebugRows: () => {
         const locale = this.getLocale();
         const t = this.telemetry;
-        
+
         const getLabel = (key: string) => {
           if (locale !== 'pl') {
-            return {
-              logical: 'Logical',
-              loopCtrl: 'Loop ctrl',
-              loopFourD: 'Loop 4D',
-              loopFrame: 'Loop frame',
-              loopItems: 'Loop cards',
-              loopUi: 'Loop UI',
-              mode: 'Mode',
-              rebase: 'Rebase'
-            }[key] || key;
+            return (
+              {
+                logical: 'Logical',
+                loopCtrl: 'Loop ctrl',
+                loopFourD: 'Loop 4D',
+                loopFrame: 'Loop frame',
+                loopItems: 'Loop cards',
+                loopUi: 'Loop UI',
+                mode: 'Mode',
+                rebase: 'Rebase'
+              }[key] || key
+            );
           }
-          return {
-            logical: 'Logika',
-            loopCtrl: 'Pętla ctrl',
-            loopFourD: 'Pętla 4D',
-            loopFrame: 'Klatka pętli',
-            loopItems: 'Pętla kart',
-            loopUi: 'Pętla UI',
-            mode: 'Tryb',
-            rebase: 'Rebase'
-          }[key] || key;
+          return (
+            {
+              logical: 'Logika',
+              loopCtrl: 'Pętla ctrl',
+              loopFourD: 'Pętla 4D',
+              loopFrame: 'Klatka pętli',
+              loopItems: 'Pętla kart',
+              loopUi: 'Pętla UI',
+              mode: 'Tryb',
+              rebase: 'Rebase'
+            }[key] || key
+          );
         };
 
         const metrics: DebugOverlayMetric[] = [
           { label: getLabel('loopFrame'), value: `${t.frameMs.toFixed(2)} ms` },
-          { label: getLabel('loopCtrl'), value: `${t.controllerMs.toFixed(2)} ms` },
-          { label: getLabel('loopItems'), value: `${t.controllerItemsMs.toFixed(2)} ms` },
-          { label: getLabel('loopFourD'), value: `${t.controllerFourDMs.toFixed(2)} ms` },
+          {
+            label: getLabel('loopCtrl'),
+            value: `${t.controllerMs.toFixed(2)} ms`
+          },
+          {
+            label: getLabel('loopItems'),
+            value: `${t.controllerItemsMs.toFixed(2)} ms`
+          },
+          {
+            label: getLabel('loopFourD'),
+            value: `${t.controllerFourDMs.toFixed(2)} ms`
+          },
           { label: getLabel('loopUi'), value: `${t.uiMs.toFixed(2)} ms` },
-          { label: getLabel('rebase'), value: `${t.rebaseCount} / ${t.rebaseMs.toFixed(2)} ms` },
+          {
+            label: getLabel('rebase'),
+            value: `${t.rebaseCount} / ${t.rebaseMs.toFixed(2)} ms`
+          },
           { label: getLabel('logical'), value: t.logicalScroll.toFixed(0) }
         ];
 

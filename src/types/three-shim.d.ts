@@ -74,7 +74,10 @@ declare module 'three' {
     dispose(): void;
   }
 
-  export class Mesh<TGeometry = BufferGeometry, TMaterial = Material | Material[]> extends Object3D {
+  export class Mesh<
+    TGeometry = BufferGeometry,
+    TMaterial = Material | Material[]
+  > extends Object3D {
     static prototype: Mesh;
     geometry: TGeometry;
     material: TMaterial;
@@ -83,7 +86,10 @@ declare module 'three' {
     constructor(geometry?: TGeometry, material?: TMaterial);
   }
 
-  export class InstancedMesh<TGeometry = BufferGeometry, TMaterial = Material | Material[]> extends Mesh<TGeometry, TMaterial> {
+  export class InstancedMesh<
+    TGeometry = BufferGeometry,
+    TMaterial = Material | Material[]
+  > extends Mesh<TGeometry, TMaterial> {
     instanceMatrix: { needsUpdate: boolean; setUsage(usage: unknown): void };
     instanceColor: { needsUpdate: boolean } | null;
     constructor(geometry?: TGeometry, material?: TMaterial, count?: number);
@@ -91,11 +97,17 @@ declare module 'three' {
     setColorAt(index: number, color: Color): void;
   }
 
-  export class Points<TGeometry = BufferGeometry, TMaterial = Material> extends Object3D {
+  export class Points<
+    TGeometry = BufferGeometry,
+    TMaterial = Material
+  > extends Object3D {
     constructor(geometry?: TGeometry, material?: TMaterial);
   }
 
-  export class LineSegments<TGeometry = BufferGeometry, TMaterial = Material> extends Object3D {
+  export class LineSegments<
+    TGeometry = BufferGeometry,
+    TMaterial = Material
+  > extends Object3D {
     constructor(geometry?: TGeometry, material?: TMaterial);
   }
 
@@ -106,10 +118,18 @@ declare module 'three' {
     constructor(color?: ColorRepresentation, intensity?: number);
   }
   export class PointLight extends Object3D {
-    constructor(color?: ColorRepresentation, intensity?: number, distance?: number);
+    constructor(
+      color?: ColorRepresentation,
+      intensity?: number,
+      distance?: number
+    );
   }
   export class HemisphereLight extends Object3D {
-    constructor(skyColor?: ColorRepresentation, groundColor?: ColorRepresentation, intensity?: number);
+    constructor(
+      skyColor?: ColorRepresentation,
+      groundColor?: ColorRepresentation,
+      intensity?: number
+    );
   }
 
   export class MeshPhysicalMaterial extends Material {
@@ -144,10 +164,19 @@ declare module 'three' {
     constructor(radius?: number, detail?: number);
   }
   export class SphereGeometry extends BufferGeometry {
-    constructor(radius?: number, widthSegments?: number, heightSegments?: number);
+    constructor(
+      radius?: number,
+      widthSegments?: number,
+      heightSegments?: number
+    );
   }
   export class TorusKnotGeometry extends BufferGeometry {
-    constructor(radius?: number, tube?: number, tubularSegments?: number, radialSegments?: number);
+    constructor(
+      radius?: number,
+      tube?: number,
+      tubularSegments?: number,
+      radialSegments?: number
+    );
   }
   export class WireframeGeometry extends BufferGeometry {
     constructor(geometry?: BufferGeometry);

@@ -1,6 +1,9 @@
 import { TITLE_SCRAMBLE_CHARS } from '../../config/manifold/ManifoldSceneConfig';
 import type { ItemState } from './ManifoldTypes';
-import { scheduleCardTitleMarqueeSync, setCardTitleText } from './CardTitleMarquee';
+import {
+  scheduleCardTitleMarqueeSync,
+  setCardTitleText
+} from './CardTitleMarquee';
 import { IS_IOS } from '../../utils/browserDetection';
 
 export class ManifoldTextEffectManager {
@@ -15,7 +18,12 @@ export class ManifoldTextEffectManager {
     }
   >();
 
-  public setTextContent(element: HTMLElement | null, target: string, scramble: boolean, force = false): void {
+  public setTextContent(
+    element: HTMLElement | null,
+    target: string,
+    scramble: boolean,
+    force = false
+  ): void {
     if (!element) {
       return;
     }
@@ -36,7 +44,11 @@ export class ManifoldTextEffectManager {
     element.textContent = target;
   }
 
-  private animateTextSwap(element: HTMLElement, target: string, force = false): void {
+  private animateTextSwap(
+    element: HTMLElement,
+    target: string,
+    force = false
+  ): void {
     if (IS_IOS) {
       this.textScrambleTargets.set(element, target);
       element.classList.remove('is-title-scrambling');
@@ -76,7 +88,9 @@ export class ManifoldTextEffectManager {
         next +=
           index < revealCount
             ? char
-            : TITLE_SCRAMBLE_CHARS[Math.floor(Math.random() * TITLE_SCRAMBLE_CHARS.length)] ?? char;
+            : (TITLE_SCRAMBLE_CHARS[
+                Math.floor(Math.random() * TITLE_SCRAMBLE_CHARS.length)
+              ] ?? char);
       }
 
       element.textContent = next;
@@ -103,7 +117,9 @@ export class ManifoldTextEffectManager {
       return;
     }
 
-    const target = expanded ? item.expandedCardTitle || item.cardTitle : item.cardTitle;
+    const target = expanded
+      ? item.expandedCardTitle || item.cardTitle
+      : item.cardTitle;
     setCardTitleText(titleEl, titleEl.textContent ?? target);
 
     if (IS_IOS) {
@@ -147,7 +163,9 @@ export class ManifoldTextEffectManager {
         next +=
           index < revealCount
             ? char
-            : TITLE_SCRAMBLE_CHARS[Math.floor(Math.random() * TITLE_SCRAMBLE_CHARS.length)] ?? char;
+            : (TITLE_SCRAMBLE_CHARS[
+                Math.floor(Math.random() * TITLE_SCRAMBLE_CHARS.length)
+              ] ?? char);
       }
 
       setCardTitleText(titleEl, next);
@@ -173,7 +191,8 @@ export class ManifoldTextEffectManager {
       return;
     }
 
-    const preview = handoffEl.dataset.previewHandoff ?? handoffEl.textContent ?? '';
+    const preview =
+      handoffEl.dataset.previewHandoff ?? handoffEl.textContent ?? '';
     const target = expanded ? item.expandedHandoff || preview : preview;
 
     if (IS_IOS) {
@@ -183,7 +202,10 @@ export class ManifoldTextEffectManager {
       return;
     }
 
-    if (item.handoffScrambleTarget === target && handoffEl.textContent === target) {
+    if (
+      item.handoffScrambleTarget === target &&
+      handoffEl.textContent === target
+    ) {
       return;
     }
 
@@ -215,7 +237,9 @@ export class ManifoldTextEffectManager {
         next +=
           index < revealCount
             ? char
-            : TITLE_SCRAMBLE_CHARS[Math.floor(Math.random() * TITLE_SCRAMBLE_CHARS.length)] ?? char;
+            : (TITLE_SCRAMBLE_CHARS[
+                Math.floor(Math.random() * TITLE_SCRAMBLE_CHARS.length)
+              ] ?? char);
       }
 
       handoffEl.textContent = next;

@@ -8,11 +8,11 @@ import type {
   TesseractFaceProjection,
   TesseractProjectionInput
 } from './ManifoldTypes';
-import { 
-  TESSERACT_VERTICES, 
-  TESSERACT_EDGES, 
+import {
+  TESSERACT_VERTICES,
+  TESSERACT_EDGES,
   TESSERACT_FACES,
-  rotateTesseractVertex 
+  rotateTesseractVertex
 } from './TesseractProjector';
 
 const INSIDE_TESSERACT = {
@@ -56,11 +56,14 @@ export class InsideTesseractProjector {
     const zwAngle = turnPhase * INSIDE_TESSERACT.zwSpinScalar;
     const xyAngle = turnPhase * INSIDE_TESSERACT.xyScrollScalar;
     const sceneKey =
-      (((Math.round(xwAngle * 580) & 0x3FFF) << 18) |
-       ((Math.round(yzAngle * 580) & 0x3FFF) << 4) |
-       ((Math.round((zwAngle + insideBlend * 4 + insideTravel * 4) * 96) & 0xF)));
+      ((Math.round(xwAngle * 580) & 0x3fff) << 18) |
+      ((Math.round(yzAngle * 580) & 0x3fff) << 4) |
+      (Math.round((zwAngle + insideBlend * 4 + insideTravel * 4) * 96) & 0xf);
 
-    if (sceneKey === InsideTesseractProjector.lastSceneKey && InsideTesseractProjector.lastScene) {
+    if (
+      sceneKey === InsideTesseractProjector.lastSceneKey &&
+      InsideTesseractProjector.lastScene
+    ) {
       return InsideTesseractProjector.lastScene;
     }
 
@@ -68,17 +71,41 @@ export class InsideTesseractProjector {
 
     const centerX = input.viewportSize.width * 0.5;
     const centerY = input.viewportSize.height * 0.5;
-    const scale = Math.min(input.viewportSize.width, input.viewportSize.height) *
-      lerp(INSIDE_TESSERACT.scaleFactor, INSIDE_TESSERACT.scaleFactor * 1.08, insideBlend * 0.6);
+    const scale =
+      Math.min(input.viewportSize.width, input.viewportSize.height) *
+      lerp(
+        INSIDE_TESSERACT.scaleFactor,
+        INSIDE_TESSERACT.scaleFactor * 1.08,
+        insideBlend * 0.6
+      );
     const camera = {
-      x: Math.sin(insideTravel * Math.PI * 2) * INSIDE_TESSERACT.insideTravelXAmplitude * insideBlend,
-      y: Math.sin(insideTravel * Math.PI) * INSIDE_TESSERACT.insideTravelYAmplitude * insideBlend,
+      x:
+        Math.sin(insideTravel * Math.PI * 2) *
+        INSIDE_TESSERACT.insideTravelXAmplitude *
+        insideBlend,
+      y:
+        Math.sin(insideTravel * Math.PI) *
+        INSIDE_TESSERACT.insideTravelYAmplitude *
+        insideBlend,
       z:
-        lerp(INSIDE_TESSERACT.outsideCameraZ, INSIDE_TESSERACT.surfaceCameraZ, approachBlend) +
-        Math.sin(insideTravel * Math.PI * 2) * INSIDE_TESSERACT.insideTravelZAmplitude * insideBlend,
+        lerp(
+          INSIDE_TESSERACT.outsideCameraZ,
+          INSIDE_TESSERACT.surfaceCameraZ,
+          approachBlend
+        ) +
+        Math.sin(insideTravel * Math.PI * 2) *
+          INSIDE_TESSERACT.insideTravelZAmplitude *
+          insideBlend,
       w:
-        lerp(INSIDE_TESSERACT.outsideCameraW, INSIDE_TESSERACT.surfaceCameraW, approachBlend) +
-        (-0.12 + Math.sin(insideTravel * Math.PI) * INSIDE_TESSERACT.insideTravelWAmplitude) * insideBlend
+        lerp(
+          INSIDE_TESSERACT.outsideCameraW,
+          INSIDE_TESSERACT.surfaceCameraW,
+          approachBlend
+        ) +
+        (-0.12 +
+          Math.sin(insideTravel * Math.PI) *
+            INSIDE_TESSERACT.insideTravelWAmplitude) *
+          insideBlend
     };
 
     const projectedVertices = INSIDE_TESSERACT_VERTICES.map((vertex) =>
@@ -92,54 +119,63 @@ export class InsideTesseractProjector {
         input.time
       )
     );
-    const rawFaceStates: TesseractFaceProjection[] = INSIDE_TESSERACT_FACES.map((face) => {
-      const pointA = projectedVertices[face.verts[0]]!;
-      const pointB = projectedVertices[face.verts[1]]!;
-      const pointC = projectedVertices[face.verts[2]]!;
-      const pointD = projectedVertices[face.verts[3]]!;
+    const rawFaceStates: TesseractFaceProjection[] = INSIDE_TESSERACT_FACES.map(
+      (face) => {
+        const pointA = projectedVertices[face.verts[0]]!;
+        const pointB = projectedVertices[face.verts[1]]!;
+        const pointC = projectedVertices[face.verts[2]]!;
+        const pointD = projectedVertices[face.verts[3]]!;
 
-      const centerFaceX = (pointA.x + pointB.x + pointC.x + pointD.x) * 0.25;
-      const centerFaceY = (pointA.y + pointB.y + pointC.y + pointD.y) * 0.25;
-      const avgDepth = (pointA.portalDepth + pointB.portalDepth + pointC.portalDepth + pointD.portalDepth) * 0.25;
-      const avgFacing = (pointA.facing + pointB.facing + pointC.facing + pointD.facing) * 0.25;
-      const avgW = (pointA.w4 + pointB.w4 + pointC.w4 + pointD.w4) * 0.25;
-      const diagonal = Math.hypot(pointC.x - pointA.x, pointC.y - pointA.y);
-      const cross =
-        (pointB.x - pointA.x) * (pointD.y - pointA.y) -
-        (pointB.y - pointA.y) * (pointD.x - pointA.x);
-      const matrix =
-        Math.abs(cross) > 0.01 && diagonal >= 18
-          ? computeCardProjectionMatrix(
-              INSIDE_TESSERACT.faceCardExtent,
-              INSIDE_TESSERACT.faceCardExtent,
-              [pointA.x, pointA.y],
-              [pointB.x, pointB.y],
-              [pointC.x, pointC.y],
-              [pointD.x, pointD.y]
-            )
-          : null;
-      const alpha = clamp(
-        (0.14 + avgDepth * 0.92) *
-          (0.62 + avgFacing * 0.38) *
-          (0.76 + (1 - Math.min(1, Math.abs(avgW) * 0.4)) * 0.24) *
-          input.fourDProgress,
-        0.08,
-        0.98
-      );
+        const centerFaceX = (pointA.x + pointB.x + pointC.x + pointD.x) * 0.25;
+        const centerFaceY = (pointA.y + pointB.y + pointC.y + pointD.y) * 0.25;
+        const avgDepth =
+          (pointA.portalDepth +
+            pointB.portalDepth +
+            pointC.portalDepth +
+            pointD.portalDepth) *
+          0.25;
+        const avgFacing =
+          (pointA.facing + pointB.facing + pointC.facing + pointD.facing) *
+          0.25;
+        const avgW = (pointA.w4 + pointB.w4 + pointC.w4 + pointD.w4) * 0.25;
+        const diagonal = Math.hypot(pointC.x - pointA.x, pointC.y - pointA.y);
+        const cross =
+          (pointB.x - pointA.x) * (pointD.y - pointA.y) -
+          (pointB.y - pointA.y) * (pointD.x - pointA.x);
+        const matrix =
+          Math.abs(cross) > 0.01 && diagonal >= 18
+            ? computeCardProjectionMatrix(
+                INSIDE_TESSERACT.faceCardExtent,
+                INSIDE_TESSERACT.faceCardExtent,
+                [pointA.x, pointA.y],
+                [pointB.x, pointB.y],
+                [pointC.x, pointC.y],
+                [pointD.x, pointD.y]
+              )
+            : null;
+        const alpha = clamp(
+          (0.14 + avgDepth * 0.92) *
+            (0.62 + avgFacing * 0.38) *
+            (0.76 + (1 - Math.min(1, Math.abs(avgW) * 0.4)) * 0.24) *
+            input.fourDProgress,
+          0.08,
+          0.98
+        );
 
-      return {
-        accentInverted: avgW > 0.08 || avgFacing < 0.48,
-        alpha,
-        avgZ: avgDepth,
-        centerX: centerFaceX - centerX,
-        centerY: centerFaceY - centerY,
-        diag: diagonal,
-        matrix,
-        matrixParsed: matrix ? parseMatrix3d(matrix) : null,
-        visible: matrix !== null,
-        zIndex: 0
-      };
-    });
+        return {
+          accentInverted: avgW > 0.08 || avgFacing < 0.48,
+          alpha,
+          avgZ: avgDepth,
+          centerX: centerFaceX - centerX,
+          centerY: centerFaceY - centerY,
+          diag: diagonal,
+          matrix,
+          matrixParsed: matrix ? parseMatrix3d(matrix) : null,
+          visible: matrix !== null,
+          zIndex: 0
+        };
+      }
+    );
 
     const sortedByDepth = rawFaceStates
       .map((state, index) => ({ index, depth: state.avgZ }))
@@ -149,17 +185,21 @@ export class InsideTesseractProjector {
       rawFaceStates[sortedByDepth[order]!.index]!.zIndex = order + 20;
     }
 
-    const edgeStates: TesseractEdgeProjection[] = INSIDE_TESSERACT_EDGES.map((edge) => {
-      const pointA = projectedVertices[edge[0]]!;
-      const pointB = projectedVertices[edge[1]]!;
+    const edgeStates: TesseractEdgeProjection[] = INSIDE_TESSERACT_EDGES.map(
+      (edge) => {
+        const pointA = projectedVertices[edge[0]]!;
+        const pointB = projectedVertices[edge[1]]!;
 
-      return {
-        pointA,
-        pointB,
-        wEdge: INSIDE_TESSERACT_VERTICES[edge[0]]![3] !== INSIDE_TESSERACT_VERTICES[edge[1]]![3],
-        z: (pointA.portalDepth + pointB.portalDepth) * 0.5
-      };
-    }).sort((left, right) => left.z - right.z);
+        return {
+          pointA,
+          pointB,
+          wEdge:
+            INSIDE_TESSERACT_VERTICES[edge[0]]![3] !==
+            INSIDE_TESSERACT_VERTICES[edge[1]]![3],
+          z: (pointA.portalDepth + pointB.portalDepth) * 0.5
+        };
+      }
+    ).sort((left, right) => left.z - right.z);
 
     const scene: FourDSceneState = {
       edgeStates,
@@ -206,7 +246,8 @@ function projectInsideVertex(
   x = xWarped;
   y = yWarped;
 
-  const dynamicOrigin = INSIDE_TESSERACT.wLensOrigin - Math.min(1.0, warpPower * 0.5);
+  const dynamicOrigin =
+    INSIDE_TESSERACT.wLensOrigin - Math.min(1.0, warpPower * 0.5);
   const wLens = 1 / Math.max(0.2, dynamicOrigin - w);
 
   const x3 = x * wLens;

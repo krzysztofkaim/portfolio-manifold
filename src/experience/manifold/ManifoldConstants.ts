@@ -1,4 +1,3 @@
-
 export const MANIFOLD_CONSTANTS = {
   ANIMATION_DYNAMICS: {
     expandedEnvelope: 7.2,

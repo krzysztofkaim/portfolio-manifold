@@ -90,10 +90,11 @@ const SCHEME_ONE_BLOBS: readonly BlobConfig[] = [
   }
 ] as const;
 
-const SCHEME_ONE_BLOB_RUNTIME: readonly BlobRuntimeConfig[] = SCHEME_ONE_BLOBS.map((blob) => ({
-  ...blob,
-  rgb: hexToRgb(blob.color)
-}));
+const SCHEME_ONE_BLOB_RUNTIME: readonly BlobRuntimeConfig[] =
+  SCHEME_ONE_BLOBS.map((blob) => ({
+    ...blob,
+    rgb: hexToRgb(blob.color)
+  }));
 
 export class LiquidGradientKernel {
   private readonly pointer = { x: 0.5, y: 0.5 };
@@ -106,9 +107,7 @@ export class LiquidGradientKernel {
   private vignetteGradient: CanvasGradient | null = null;
 
   constructor(
-    private readonly canvas:
-      | HTMLCanvasElement
-      | OffscreenCanvas,
+    private readonly canvas: HTMLCanvasElement | OffscreenCanvas,
     private readonly context:
       | CanvasRenderingContext2D
       | OffscreenCanvasRenderingContext2D,
@@ -154,7 +153,11 @@ export class LiquidGradientKernel {
     this.context.fillStyle = this.getBaseGradient();
     this.context.fillRect(0, 0, this.width, this.height);
 
-    for (let index = 0; index < Math.min(SCHEME_ONE_BLOB_RUNTIME.length, this.maxBlobs); index += 1) {
+    for (
+      let index = 0;
+      index < Math.min(SCHEME_ONE_BLOB_RUNTIME.length, this.maxBlobs);
+      index += 1
+    ) {
       const blob = SCHEME_ONE_BLOB_RUNTIME[index];
       if (!blob) {
         continue;
@@ -172,7 +175,9 @@ export class LiquidGradientKernel {
       this.drawBlob(
         clamp(nx, -0.15, 1.15) * this.width,
         clamp(ny, -0.15, 1.15) * this.height,
-        blob.radius * Math.min(this.width, this.height) * (1 + velocityInfluence * 0.04),
+        blob.radius *
+          Math.min(this.width, this.height) *
+          (1 + velocityInfluence * 0.04),
         blob.rgb,
         blob.alpha,
         blob.composite
@@ -184,7 +189,12 @@ export class LiquidGradientKernel {
 
   private getBaseGradient(): CanvasGradient {
     if (!this.baseGradient) {
-      const gradient = this.context.createLinearGradient(0, 0, this.width, this.height);
+      const gradient = this.context.createLinearGradient(
+        0,
+        0,
+        this.width,
+        this.height
+      );
       gradient.addColorStop(0, '#081125');
       gradient.addColorStop(0.38, '#0a0e27');
       gradient.addColorStop(0.7, '#0d1431');
@@ -203,11 +213,30 @@ export class LiquidGradientKernel {
     alpha: number,
     composite: GlobalCompositeOperation
   ): void {
-    const gradient = this.context.createRadialGradient(x, y, radius * 0.06, x, y, radius);
-    gradient.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha * 0.72})`);
-    gradient.addColorStop(0.18, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha * 0.48})`);
-    gradient.addColorStop(0.52, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha * 0.18})`);
-    gradient.addColorStop(0.82, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha * 0.04})`);
+    const gradient = this.context.createRadialGradient(
+      x,
+      y,
+      radius * 0.06,
+      x,
+      y,
+      radius
+    );
+    gradient.addColorStop(
+      0,
+      `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha * 0.72})`
+    );
+    gradient.addColorStop(
+      0.18,
+      `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha * 0.48})`
+    );
+    gradient.addColorStop(
+      0.52,
+      `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha * 0.18})`
+    );
+    gradient.addColorStop(
+      0.82,
+      `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha * 0.04})`
+    );
     gradient.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
 
     this.context.globalCompositeOperation = composite;
@@ -243,7 +272,13 @@ function clamp(value: number, min: number, max: number): number {
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
   const value = hex.replace('#', '');
-  const normalized = value.length === 3 ? value.split('').map((char) => `${char}${char}`).join('') : value;
+  const normalized =
+    value.length === 3
+      ? value
+          .split('')
+          .map((char) => `${char}${char}`)
+          .join('')
+      : value;
   const parsed = Number.parseInt(normalized, 16);
 
   return {

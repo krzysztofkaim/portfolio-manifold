@@ -45,15 +45,18 @@ export function updateCanvasParticleActivity(
   input: CanvasParticleActivityInput
 ): number {
   const ambientFloor = input.introCompleted
-    ? (input.targetViewMode === '3d' ? 0.12 : 0)
+    ? input.targetViewMode === '3d'
+      ? 0.12
+      : 0
     : 0.18;
   const velocityBoost = input.introCompleted
     ? clamp((input.velocityMagnitude - 0.02) / 1.45, 0, 0.34)
     : clamp((input.velocityMagnitude - 0.01) / 1.15, 0, 0.38);
   const targetActivity = Math.max(ambientFloor, velocityBoost);
-  const easing = targetActivity > currentActivity
-    ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.particleRiseLerp * 0.86
-    : MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.particleFallLerp * 0.8;
+  const easing =
+    targetActivity > currentActivity
+      ? MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.particleRiseLerp * 0.86
+      : MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.particleFallLerp * 0.8;
 
   return lerp(currentActivity, targetActivity, easing);
 }
@@ -71,9 +74,10 @@ export class ManifoldCanvasParticleField {
   constructor(canvas: HTMLCanvasElement, count = DEFAULT_PARTICLE_COUNT) {
     this.canvas = canvas;
     const particleCount = Math.max(0, Math.floor(count));
-    this.context = particleCount > 0
-      ? canvas.getContext('2d', { alpha: true, desynchronized: true })
-      : null;
+    this.context =
+      particleCount > 0
+        ? canvas.getContext('2d', { alpha: true, desynchronized: true })
+        : null;
     this.particles = Array.from({ length: particleCount }, (_, index) => ({
       alpha: 0.2 + this.seed(index + 301) * 0.8,
       baseX: 0,
@@ -100,7 +104,11 @@ export class ManifoldCanvasParticleField {
     this.context?.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
   }
 
-  layout(loopSize: number, viewportWidth: number, viewportHeight: number): void {
+  layout(
+    loopSize: number,
+    viewportWidth: number,
+    viewportHeight: number
+  ): void {
     const spreadX = viewportWidth * 0.86;
     const spreadY = viewportHeight * 0.88;
     const safeLoop = Math.max(1, loopSize);
@@ -108,8 +116,12 @@ export class ManifoldCanvasParticleField {
 
     for (let index = 0; index < this.particles.length; index += 1) {
       const particle = this.particles[index];
-      const u = this.fract(index * GOLDEN_RATIO + this.seed(index + 101) * 0.17);
-      const v = this.fract(index * SILVER_RATIO + this.seed(index + 201) * 0.19);
+      const u = this.fract(
+        index * GOLDEN_RATIO + this.seed(index + 101) * 0.17
+      );
+      const v = this.fract(
+        index * SILVER_RATIO + this.seed(index + 201) * 0.19
+      );
       const z = (index + this.seed(index + 501) * 0.75) / count;
       particle.baseX = (u - 0.5) * spreadX;
       particle.baseY = (v - 0.5) * spreadY;
@@ -158,7 +170,8 @@ export class ManifoldCanvasParticleField {
       if (particle.alpha > visibleDensity) {
         continue;
       }
-      let vizZ = ((particle.baseZ + input.cameraZ) % loopSize + loopSize) % loopSize;
+      let vizZ =
+        (((particle.baseZ + input.cameraZ) % loopSize) + loopSize) % loopSize;
 
       if (vizZ > perspective * 0.14) {
         vizZ -= loopSize;
@@ -172,13 +185,18 @@ export class ManifoldCanvasParticleField {
       const screenX = input.viewportWidth * 0.5 + particle.baseX * scale;
       const screenY = input.viewportHeight * 0.5 + particle.baseY * scale;
 
-      if (screenX < -24 || screenX > input.viewportWidth + 24 || screenY < -24 || screenY > input.viewportHeight + 24) {
+      if (
+        screenX < -24 ||
+        screenX > input.viewportWidth + 24 ||
+        screenY < -24 ||
+        screenY > input.viewportHeight + 24
+      ) {
         continue;
       }
 
       const depthFade = clamp(1 - Math.abs(vizZ) / (loopSize * 0.62), 0.12, 1);
       const alpha = alphaBase * particle.alpha * depthFade;
-      
+
       if (alpha <= 0.015) {
         continue;
       }
@@ -200,7 +218,11 @@ export class ManifoldCanvasParticleField {
       return;
     }
 
-    for (let bucketIndex = 0; bucketIndex < this.batches.length; bucketIndex += 1) {
+    for (
+      let bucketIndex = 0;
+      bucketIndex < this.batches.length;
+      bucketIndex += 1
+    ) {
       const positions = this.batches[bucketIndex]!.positions;
       if (positions.length === 0) {
         continue;

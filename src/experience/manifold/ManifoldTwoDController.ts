@@ -3,12 +3,20 @@ import { MANIFOLD_SECTION_TONES } from '../../config/manifold/ManifoldSceneConfi
 import { MANIFOLD_CONSTANTS } from './ManifoldConstants';
 import { computeDampedLerp } from './HyperMath';
 import { IS_IOS, IS_SAFARI } from '../../utils/browserDetection';
-import type { ItemState, SectionFrameBounds, TwoDCardPose, TwoDGridMetrics } from './ManifoldTypes';
+import type {
+  ItemState,
+  SectionFrameBounds,
+  TwoDCardPose,
+  TwoDGridMetrics
+} from './ManifoldTypes';
 
 export interface ManifoldTwoDControllerContext {
   getCardItems(): readonly ItemState[];
   getCentered2DCard(): ItemState | null;
-  getCurrent2DFrame(): { bounds: SectionFrameBounds | null; sectionTitle: string };
+  getCurrent2DFrame(): {
+    bounds: SectionFrameBounds | null;
+    sectionTitle: string;
+  };
   getEffectiveFocusCard(): ItemState | null;
   getFrameSamplingState(): {
     frameTimeBurst: number;
@@ -41,24 +49,32 @@ export interface ManifoldTwoDControllerContext {
   getLocalizedSectionTitle(sectionTitle: string): string;
   getSectionFrameElements(): { label: HTMLElement; root: HTMLElement };
   getViewportSize(): { height: number; width: number };
-  getWorldState(): { exitReturnActive: boolean; expandedCard: ItemState | null; expandedProgress: number };
-  setFrameSamplingState(next: Partial<{
-    lastFrameState: string;
-    lastFrameVisualState: string;
-    lastLabel: string;
-    stillness: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }>): void;
-  setLayoutState(next: Partial<{
-    lastCentered2DCard: ItemState | null;
-    targetCardIndex: number;
-    transitionOrderMix: number;
-    twoDOffsetX: number;
-    twoDOffsetXTarget: number;
-  }>): void;
+  getWorldState(): {
+    exitReturnActive: boolean;
+    expandedCard: ItemState | null;
+    expandedProgress: number;
+  };
+  setFrameSamplingState(
+    next: Partial<{
+      lastFrameState: string;
+      lastFrameVisualState: string;
+      lastLabel: string;
+      stillness: number;
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }>
+  ): void;
+  setLayoutState(
+    next: Partial<{
+      lastCentered2DCard: ItemState | null;
+      targetCardIndex: number;
+      transitionOrderMix: number;
+      twoDOffsetX: number;
+      twoDOffsetXTarget: number;
+    }>
+  ): void;
   updateActivity(now: number): void;
 }
 
@@ -70,7 +86,7 @@ export class ManifoldTwoDController {
   private lastSectionAccentSoft = '';
   private edgeCardCloneCache = new Map<string, HTMLElement>();
 
-  constructor(private readonly context: ManifoldTwoDControllerContext) { }
+  constructor(private readonly context: ManifoldTwoDControllerContext) {}
 
   private get2DResponsiveScale(): number {
     const layoutState = this.context.getLayoutState();
@@ -142,7 +158,11 @@ export class ManifoldTwoDController {
       interactiveElement.setAttribute('aria-hidden', 'true');
       if ('disabled' in interactiveElement) {
         (
-          interactiveElement as HTMLButtonElement | HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+          interactiveElement as
+            | HTMLButtonElement
+            | HTMLInputElement
+            | HTMLSelectElement
+            | HTMLTextAreaElement
         ).disabled = true;
       }
     }
@@ -161,7 +181,11 @@ export class ManifoldTwoDController {
   }
 
   private setEdgeCardVisibility(visibleCount: number): void {
-    for (let index = visibleCount; index < this.edgeCardPool.length; index += 1) {
+    for (
+      let index = visibleCount;
+      index < this.edgeCardPool.length;
+      index += 1
+    ) {
       const element = this.edgeCardPool[index];
       if (!element || element.dataset.edgeVisualState === 'hidden') {
         continue;
@@ -171,10 +195,14 @@ export class ManifoldTwoDController {
     }
   }
 
-  private getEdgeCardClone(item: ItemState, baseWidth: number, baseHeight: number): HTMLElement {
+  private getEdgeCardClone(
+    item: ItemState,
+    baseWidth: number,
+    baseHeight: number
+  ): HTMLElement {
     const key = `${item.cardIndex}:${item.cardContentVersion}`;
     const cached = this.edgeCardCloneCache.get(key);
-    
+
     if (cached) {
       return cached.cloneNode(true) as HTMLElement;
     }
@@ -212,7 +240,7 @@ export class ManifoldTwoDController {
 
     this.sanitizeEdgeCardClone(template);
     this.edgeCardCloneCache.set(key, template);
-    
+
     return template.cloneNode(true) as HTMLElement;
   }
 
@@ -233,10 +261,18 @@ export class ManifoldTwoDController {
     /* USER_REQUEST: SCALE_ALIGNMENT - Shared scale constant to match cards at z: -65 */
     const PERSPECTIVE_SCALE = 0.939;
     const metrics = this.get2DGridMetrics();
-    const structuralWidth = item?.lastCardWidth ? Number.parseFloat(item.lastCardWidth) : Number.NaN;
-    const structuralHeight = item?.lastCardHeight ? Number.parseFloat(item.lastCardHeight) : Number.NaN;
-    const baseWidth = Number.isFinite(structuralWidth) ? structuralWidth : metrics.cardWidth;
-    const baseHeight = Number.isFinite(structuralHeight) ? structuralHeight : metrics.cardHeight;
+    const structuralWidth = item?.lastCardWidth
+      ? Number.parseFloat(item.lastCardWidth)
+      : Number.NaN;
+    const structuralHeight = item?.lastCardHeight
+      ? Number.parseFloat(item.lastCardHeight)
+      : Number.NaN;
+    const baseWidth = Number.isFinite(structuralWidth)
+      ? structuralWidth
+      : metrics.cardWidth;
+    const baseHeight = Number.isFinite(structuralHeight)
+      ? structuralHeight
+      : metrics.cardHeight;
 
     const perceivedWidth = baseWidth * PERSPECTIVE_SCALE;
     const perceivedHeight = baseHeight * PERSPECTIVE_SCALE;
@@ -251,8 +287,14 @@ export class ManifoldTwoDController {
         element.replaceChildren();
       }
 
-      element.classList.toggle('two-d-section-frame__edge-card--left', side === 'left');
-      element.classList.toggle('two-d-section-frame__edge-card--right', side === 'right');
+      element.classList.toggle(
+        'two-d-section-frame__edge-card--left',
+        side === 'left'
+      );
+      element.classList.toggle(
+        'two-d-section-frame__edge-card--right',
+        side === 'right'
+      );
       element.dataset.edgeContentState = nextContentState;
     }
 
@@ -273,7 +315,10 @@ export class ManifoldTwoDController {
   }
 
   focusCardIn2D(cardIndex: number, immediate = false): void {
-    const item = this.context.getCardItems().find((candidate) => candidate.cardIndex === cardIndex) ?? null;
+    const item =
+      this.context
+        .getCardItems()
+        .find((candidate) => candidate.cardIndex === cardIndex) ?? null;
     if (!item) {
       return;
     }
@@ -315,9 +360,9 @@ export class ManifoldTwoDController {
     const widthScale = this.get2DResponsiveScale();
     const heightScale = this.get2DResponsiveHeightScale(widthScale);
 
-
-
-    const stackedMobile = layoutState.isMobileViewport && layoutState.viewportHeight > layoutState.viewportWidth * 1.08;
+    const stackedMobile =
+      layoutState.isMobileViewport &&
+      layoutState.viewportHeight > layoutState.viewportWidth * 1.08;
     const columns = stackedMobile ? 1 : layoutState.isMobileViewport ? 2 : 3;
 
     // Compress width harder than height so the grid still fits while body content stays readable.
@@ -337,7 +382,11 @@ export class ManifoldTwoDController {
     const spacingX = cardWidth + gapX;
 
     // Vertical spacing: (Visual height at scale 1.0 + Gap at scale 1.0) * overall scale
-    const baseGapY = stackedMobile ? 48 : layoutState.isMobileViewport ? 64 : 110;
+    const baseGapY = stackedMobile
+      ? 48
+      : layoutState.isMobileViewport
+        ? 64
+        : 110;
     const gapY = baseGapY * clamp(spacingCompression + 0.08, 0.62, 1);
 
     const spacingY = cardHeight + gapY;
@@ -357,7 +406,11 @@ export class ManifoldTwoDController {
       rows,
       stackedMobile,
       scrollLoop: tileHeight * 3,
-      scrollScale: stackedMobile ? 1.02 : layoutState.isMobileViewport ? 1.08 : 1.12,
+      scrollScale: stackedMobile
+        ? 1.02
+        : layoutState.isMobileViewport
+          ? 1.08
+          : 1.12,
       spacingX,
       spacingY,
       tileHeight,
@@ -367,30 +420,90 @@ export class ManifoldTwoDController {
     return this.twoDGridMetricsCache;
   }
 
-
-  compute2DCardPose(item: ItemState, sceneScroll: number, time: number): TwoDCardPose {
+  compute2DCardPose(
+    item: ItemState,
+    sceneScroll: number,
+    time: number
+  ): TwoDCardPose {
     const metrics = this.get2DGridMetrics();
     const layoutState = this.context.getLayoutState();
-    const canonicalPose = this.compute2DCardPoseForGridOrder(item, item.gridOrder, sceneScroll, time, metrics);
-    const transitionGridOrder = layoutState.transitionGridOrder.get(item.cardIndex);
+    const canonicalPose = this.compute2DCardPoseForGridOrder(
+      item,
+      item.gridOrder,
+      sceneScroll,
+      time,
+      metrics
+    );
+    const transitionGridOrder = layoutState.transitionGridOrder.get(
+      item.cardIndex
+    );
 
-    if (transitionGridOrder === undefined || layoutState.transitionOrderMix >= 0.999) {
+    if (
+      transitionGridOrder === undefined ||
+      layoutState.transitionOrderMix >= 0.999
+    ) {
       return canonicalPose;
     }
 
-    const transitionPose = this.compute2DCardPoseForGridOrder(item, transitionGridOrder, sceneScroll, time, metrics);
+    const transitionPose = this.compute2DCardPoseForGridOrder(
+      item,
+      transitionGridOrder,
+      sceneScroll,
+      time,
+      metrics
+    );
 
     return {
-      alpha: lerp(transitionPose.alpha, canonicalPose.alpha, layoutState.transitionOrderMix),
-      scale: lerp(transitionPose.scale, canonicalPose.scale, layoutState.transitionOrderMix),
-      shiftZ: lerp(transitionPose.shiftZ, canonicalPose.shiftZ, layoutState.transitionOrderMix),
-      tiltX: lerp(transitionPose.tiltX, canonicalPose.tiltX, layoutState.transitionOrderMix),
-      tiltY: lerp(transitionPose.tiltY, canonicalPose.tiltY, layoutState.transitionOrderMix),
-      tiltZ: lerp(transitionPose.tiltZ, canonicalPose.tiltZ, layoutState.transitionOrderMix),
-      x: lerp(transitionPose.x, canonicalPose.x, layoutState.transitionOrderMix),
-      y: lerp(transitionPose.y, canonicalPose.y, layoutState.transitionOrderMix),
-      z: lerp(transitionPose.z, canonicalPose.z, layoutState.transitionOrderMix),
-      textScale: lerp(transitionPose.textScale, canonicalPose.textScale, layoutState.transitionOrderMix)
+      alpha: lerp(
+        transitionPose.alpha,
+        canonicalPose.alpha,
+        layoutState.transitionOrderMix
+      ),
+      scale: lerp(
+        transitionPose.scale,
+        canonicalPose.scale,
+        layoutState.transitionOrderMix
+      ),
+      shiftZ: lerp(
+        transitionPose.shiftZ,
+        canonicalPose.shiftZ,
+        layoutState.transitionOrderMix
+      ),
+      tiltX: lerp(
+        transitionPose.tiltX,
+        canonicalPose.tiltX,
+        layoutState.transitionOrderMix
+      ),
+      tiltY: lerp(
+        transitionPose.tiltY,
+        canonicalPose.tiltY,
+        layoutState.transitionOrderMix
+      ),
+      tiltZ: lerp(
+        transitionPose.tiltZ,
+        canonicalPose.tiltZ,
+        layoutState.transitionOrderMix
+      ),
+      x: lerp(
+        transitionPose.x,
+        canonicalPose.x,
+        layoutState.transitionOrderMix
+      ),
+      y: lerp(
+        transitionPose.y,
+        canonicalPose.y,
+        layoutState.transitionOrderMix
+      ),
+      z: lerp(
+        transitionPose.z,
+        canonicalPose.z,
+        layoutState.transitionOrderMix
+      ),
+      textScale: lerp(
+        transitionPose.textScale,
+        canonicalPose.textScale,
+        layoutState.transitionOrderMix
+      )
     };
   }
 
@@ -405,38 +518,59 @@ export class ManifoldTwoDController {
       !worldState.expandedCard &&
       worldState.expandedProgress < 0.01 &&
       viewModeProgress > 0.16 &&
-      (
-        layoutState.viewModeTarget > 0.5 ||
-        (viewModeProgress > (exitingTwoD ? 0.32 : 0.5))
-      );
+      (layoutState.viewModeTarget > 0.5 ||
+        viewModeProgress > (exitingTwoD ? 0.32 : 0.5));
 
     const frameState = this.context.getFrameSamplingState();
     const sectionFrameVisualEase = computeDampedLerp(
       delta,
       MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.sectionFrameVisualEnvelope
     );
-    const fastVelocityFloor = MANIFOLD_CONSTANTS.INTERACTION_SENSITIVITY.fastTwoDVelocity;
+    const fastVelocityFloor =
+      MANIFOLD_CONSTANTS.INTERACTION_SENSITIVITY.fastTwoDVelocity;
     const phaseVelocity = this.context.getPhaseVelocity();
-    const velocityPressure = clamp(Math.abs(phaseVelocity.velocity) / (fastVelocityFloor * 1.15), 0, 1);
-    const targetSpeedPressure = clamp(Math.abs(phaseVelocity.targetSpeed) / (fastVelocityFloor * 1.15), 0, 1);
-    const highRefreshFrameBudget = 1000 / 120;
-    const frameStressThreshold =
-      highRefreshFrameBudget * MANIFOLD_CONSTANTS.PERFORMANCE_THRESHOLDS.frameStressEmaMultiplier;
-    const frameStressSpan = Math.max(1, frameStressThreshold - highRefreshFrameBudget);
-    const framePressure = clamp(
-      (Math.max(frameState.frameTimeEma, frameState.frameTimeBurst) - highRefreshFrameBudget) / frameStressSpan,
+    const velocityPressure = clamp(
+      Math.abs(phaseVelocity.velocity) / (fastVelocityFloor * 1.15),
       0,
       1
     );
-    const motionPressure = Math.max(velocityPressure, targetSpeedPressure * 0.92, framePressure * 0.88);
+    const targetSpeedPressure = clamp(
+      Math.abs(phaseVelocity.targetSpeed) / (fastVelocityFloor * 1.15),
+      0,
+      1
+    );
+    const highRefreshFrameBudget = 1000 / 120;
+    const frameStressThreshold =
+      highRefreshFrameBudget *
+      MANIFOLD_CONSTANTS.PERFORMANCE_THRESHOLDS.frameStressEmaMultiplier;
+    const frameStressSpan = Math.max(
+      1,
+      frameStressThreshold - highRefreshFrameBudget
+    );
+    const framePressure = clamp(
+      (Math.max(frameState.frameTimeEma, frameState.frameTimeBurst) -
+        highRefreshFrameBudget) /
+        frameStressSpan,
+      0,
+      1
+    );
+    const motionPressure = Math.max(
+      velocityPressure,
+      targetSpeedPressure * 0.92,
+      framePressure * 0.88
+    );
     const targetStillness = shouldShow ? 1 - motionPressure : 0;
-    const stillnessValue = lerp(frameState.stillness, targetStillness, sectionFrameVisualEase);
+    const stillnessValue = lerp(
+      frameState.stillness,
+      targetStillness,
+      sectionFrameVisualEase
+    );
     this.context.setFrameSamplingState({ stillness: stillnessValue });
 
     const stillness = clamp(stillnessValue, 0, 1);
     const root = this.context.getSectionFrameElements().root;
-    
-    // Instead of allocating strings for values, compute purely numeric floats for CSS Typed OM 
+
+    // Instead of allocating strings for values, compute purely numeric floats for CSS Typed OM
     const outlineOpacityV = lerp(0.62, 1, stillness);
     const outlineBeforeOpacityV = lerp(0.38, 0.7, stillness);
     const outlineAfterOpacityV = lerp(0.08, 0.15, stillness);
@@ -458,22 +592,66 @@ export class ManifoldTwoDController {
     const frameVisualState = String(Math.round(stillness * quantizationSteps));
 
     if (frameVisualState !== frameState.lastFrameVisualState) {
-      root.style.setProperty('--two-d-frame-outline-opacity', outlineOpacityV.toFixed(3));
-      root.style.setProperty('--two-d-frame-outline-before-opacity', outlineBeforeOpacityV.toFixed(3));
-      root.style.setProperty('--two-d-frame-outline-after-opacity', outlineAfterOpacityV.toFixed(3));
-      root.style.setProperty('--two-d-frame-outline-saturate', outlineSaturateV.toFixed(3));
-      root.style.setProperty('--two-d-frame-outline-border-alpha', `${outlineBorderAlphaV.toFixed(2)}%`);
-      root.style.setProperty('--two-d-frame-outline-ring-alpha', `${outlineRingAlphaV.toFixed(2)}%`);
-      root.style.setProperty('--two-d-frame-outline-glow-alpha', `${outlineGlowAlphaV.toFixed(2)}%`);
-      root.style.setProperty('--two-d-frame-outline-shadow-y', `${outlineShadowYV.toFixed(2)}px`);
-      root.style.setProperty('--two-d-frame-outline-shadow-blur', `${outlineShadowBlurV.toFixed(2)}px`);
-      root.style.setProperty('--two-d-frame-tab-opacity', tabOpacityV.toFixed(3));
-      root.style.setProperty('--two-d-frame-tab-border-alpha', `${tabBorderAlphaV.toFixed(2)}%`);
-      root.style.setProperty('--two-d-frame-tab-glow-alpha', `${tabGlowAlphaV.toFixed(2)}%`);
-      root.style.setProperty('--two-d-frame-tab-shadow-y', `${tabShadowYV.toFixed(2)}px`);
-      root.style.setProperty('--two-d-frame-tab-shadow-blur', `${tabShadowBlurV.toFixed(2)}px`);
-      
-      this.context.setFrameSamplingState({ lastFrameVisualState: frameVisualState });
+      root.style.setProperty(
+        '--two-d-frame-outline-opacity',
+        outlineOpacityV.toFixed(3)
+      );
+      root.style.setProperty(
+        '--two-d-frame-outline-before-opacity',
+        outlineBeforeOpacityV.toFixed(3)
+      );
+      root.style.setProperty(
+        '--two-d-frame-outline-after-opacity',
+        outlineAfterOpacityV.toFixed(3)
+      );
+      root.style.setProperty(
+        '--two-d-frame-outline-saturate',
+        outlineSaturateV.toFixed(3)
+      );
+      root.style.setProperty(
+        '--two-d-frame-outline-border-alpha',
+        `${outlineBorderAlphaV.toFixed(2)}%`
+      );
+      root.style.setProperty(
+        '--two-d-frame-outline-ring-alpha',
+        `${outlineRingAlphaV.toFixed(2)}%`
+      );
+      root.style.setProperty(
+        '--two-d-frame-outline-glow-alpha',
+        `${outlineGlowAlphaV.toFixed(2)}%`
+      );
+      root.style.setProperty(
+        '--two-d-frame-outline-shadow-y',
+        `${outlineShadowYV.toFixed(2)}px`
+      );
+      root.style.setProperty(
+        '--two-d-frame-outline-shadow-blur',
+        `${outlineShadowBlurV.toFixed(2)}px`
+      );
+      root.style.setProperty(
+        '--two-d-frame-tab-opacity',
+        tabOpacityV.toFixed(3)
+      );
+      root.style.setProperty(
+        '--two-d-frame-tab-border-alpha',
+        `${tabBorderAlphaV.toFixed(2)}%`
+      );
+      root.style.setProperty(
+        '--two-d-frame-tab-glow-alpha',
+        `${tabGlowAlphaV.toFixed(2)}%`
+      );
+      root.style.setProperty(
+        '--two-d-frame-tab-shadow-y',
+        `${tabShadowYV.toFixed(2)}px`
+      );
+      root.style.setProperty(
+        '--two-d-frame-tab-shadow-blur',
+        `${tabShadowBlurV.toFixed(2)}px`
+      );
+
+      this.context.setFrameSamplingState({
+        lastFrameVisualState: frameVisualState
+      });
     }
 
     if (!shouldShow) {
@@ -485,7 +663,10 @@ export class ManifoldTwoDController {
       return;
     }
 
-    const focusCard = layoutState.lastCentered2DCard ?? this.context.getCentered2DCard() ?? this.context.getEffectiveFocusCard();
+    const focusCard =
+      layoutState.lastCentered2DCard ??
+      this.context.getCentered2DCard() ??
+      this.context.getEffectiveFocusCard();
     if (!focusCard) {
       this.setEdgeCardVisibility(0);
       return;
@@ -494,8 +675,8 @@ export class ManifoldTwoDController {
     const currentFrame = this.context.getCurrent2DFrame();
     const frameBounds =
       currentFrame.bounds &&
-        currentFrame.sectionTitle === focusCard.sectionTitle &&
-        currentFrame.bounds.visibleCount > 0
+      currentFrame.sectionTitle === focusCard.sectionTitle &&
+      currentFrame.bounds.visibleCount > 0
         ? currentFrame.bounds
         : null;
 
@@ -505,34 +686,74 @@ export class ManifoldTwoDController {
     }
 
     const responsiveScale = this.get2DResponsiveScale();
-    const stackedMobile = layoutState.isMobileViewport && layoutState.viewportHeight > layoutState.viewportWidth * 1.08;
+    const stackedMobile =
+      layoutState.isMobileViewport &&
+      layoutState.viewportHeight > layoutState.viewportWidth * 1.08;
 
     // USER_REQUEST: ENLARGED_FRAME - Symmetrical padding for better vertical balance
     // Use a tight 1.1x multiplier to ensure the frame feels tailored to the cards.
     const padFactor = 1.1;
-    const padX = (stackedMobile ? 16 : layoutState.isMobileViewport ? 36 : 86) * responsiveScale * padFactor;
-    const padTop = (stackedMobile ? 38 : layoutState.isMobileViewport ? 56 : 80) * responsiveScale * padFactor;
-    const padBottom = (stackedMobile ? 38 : layoutState.isMobileViewport ? 56 : 80) * responsiveScale * padFactor;
+    const padX =
+      (stackedMobile ? 16 : layoutState.isMobileViewport ? 36 : 86) *
+      responsiveScale *
+      padFactor;
+    const padTop =
+      (stackedMobile ? 38 : layoutState.isMobileViewport ? 56 : 80) *
+      responsiveScale *
+      padFactor;
+    const padBottom =
+      (stackedMobile ? 38 : layoutState.isMobileViewport ? 56 : 80) *
+      responsiveScale *
+      padFactor;
 
-    const targetX = clamp(frameBounds.minX - padX, 0, layoutState.viewportWidth - 120);
+    const targetX = clamp(
+      frameBounds.minX - padX,
+      0,
+      layoutState.viewportWidth - 120
+    );
 
     // USER_REQUEST: ACCURATE_DEPENDENCY - Relaxed targetY/height clamping.
     // The frame must follow the cards even if they go off-screen, or else they "leak" outside the border.
-    const targetY = clamp(frameBounds.minY - padTop, -2000, layoutState.viewportHeight - 120);
-    const targetWidth = clamp(frameBounds.maxX - frameBounds.minX + padX * 2, 180, layoutState.viewportWidth - targetX);
-    const targetHeight = clamp(frameBounds.maxY - frameBounds.minY + padTop + padBottom, 140, 5000);
+    const targetY = clamp(
+      frameBounds.minY - padTop,
+      -2000,
+      layoutState.viewportHeight - 120
+    );
+    const targetWidth = clamp(
+      frameBounds.maxX - frameBounds.minX + padX * 2,
+      180,
+      layoutState.viewportWidth - targetX
+    );
+    const targetHeight = clamp(
+      frameBounds.maxY - frameBounds.minY + padTop + padBottom,
+      140,
+      5000
+    );
 
-    const frameEase = computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.sectionFrameEnvelope);
+    const frameEase = computeDampedLerp(
+      delta,
+      MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.sectionFrameEnvelope
+    );
     const x = lerp(frameState.x || targetX, targetX, frameEase);
     const y = lerp(frameState.y || targetY, targetY, frameEase);
     const width = lerp(frameState.width || targetWidth, targetWidth, frameEase);
-    const height = lerp(frameState.height || targetHeight, targetHeight, frameEase);
+    const height = lerp(
+      frameState.height || targetHeight,
+      targetHeight,
+      frameEase
+    );
     const alphaV = exitingTwoD
-        ? clamp((viewModeProgress - 0.18) / 0.16, 0, 1)
-        : clamp((viewModeProgress - 0.12) / 0.34, 0, 1);
-    
+      ? clamp((viewModeProgress - 0.18) / 0.16, 0, 1)
+      : clamp((viewModeProgress - 0.12) / 0.34, 0, 1);
+
     // Maintain String format purely for cache checking to avoid diffs, but use Typed OM for actual injection
-    const nextFrameState = [x.toFixed(2), y.toFixed(2), width.toFixed(2), height.toFixed(2), alphaV.toFixed(3)].join('|');
+    const nextFrameState = [
+      x.toFixed(2),
+      y.toFixed(2),
+      width.toFixed(2),
+      height.toFixed(2),
+      alphaV.toFixed(3)
+    ].join('|');
 
     this.context.setFrameSamplingState({ x, y, width, height });
 
@@ -546,20 +767,28 @@ export class ManifoldTwoDController {
       this.context.setFrameSamplingState({ lastFrameState: nextFrameState });
     }
 
-    const sectionTone = MANIFOLD_SECTION_TONES[focusCard.sectionTitle as keyof typeof MANIFOLD_SECTION_TONES] ?? MANIFOLD_SECTION_TONES.PROFILE;
-    
+    const sectionTone =
+      MANIFOLD_SECTION_TONES[
+        focusCard.sectionTitle as keyof typeof MANIFOLD_SECTION_TONES
+      ] ?? MANIFOLD_SECTION_TONES.PROFILE;
+
     if (this.lastSectionAccent !== sectionTone.accent) {
       root.style.setProperty('--two-d-frame-accent', sectionTone.accent);
       this.lastSectionAccent = sectionTone.accent;
     }
-    
+
     if (this.lastSectionAccentSoft !== sectionTone.accentSoft) {
-      root.style.setProperty('--two-d-frame-accent-soft', sectionTone.accentSoft);
+      root.style.setProperty(
+        '--two-d-frame-accent-soft',
+        sectionTone.accentSoft
+      );
       this.lastSectionAccentSoft = sectionTone.accentSoft;
     }
 
     const label = this.context.getSectionFrameElements().label;
-    const localizedSectionTitle = this.context.getLocalizedSectionTitle(focusCard.sectionTitle);
+    const localizedSectionTitle = this.context.getLocalizedSectionTitle(
+      focusCard.sectionTitle
+    );
     if (frameState.lastLabel !== localizedSectionTitle) {
       label.textContent = localizedSectionTitle;
       this.context.setFrameSamplingState({ lastLabel: localizedSectionTitle });
@@ -592,7 +821,7 @@ export class ManifoldTwoDController {
      *    This shift is ALSO perspective-projected.
      * ────────────────────────────────────────────────────────────────────── */
     const PERSPECTIVE_DEPTH = 65; // grid cards at z: -65
-    const PERSPECTIVE = 1000;     // .viewport { perspective: 1000px }
+    const PERSPECTIVE = 1000; // .viewport { perspective: 1000px }
     const PERSPECTIVE_FACTOR = PERSPECTIVE / (PERSPECTIVE + PERSPECTIVE_DEPTH); // ≈ 0.939
 
     const baseHeight = 460;
@@ -616,7 +845,12 @@ export class ManifoldTwoDController {
     const viewportCenterY = layoutState.viewportHeight * 0.5;
 
     for (const item of this.context.getCardItems()) {
-      if (item.sectionTitle === '' || item.currentAlpha <= 0.02 || item.currentScreenWidth <= 0 || item.currentScreenHeight <= 0) {
+      if (
+        item.sectionTitle === '' ||
+        item.currentAlpha <= 0.02 ||
+        item.currentScreenWidth <= 0 ||
+        item.currentScreenHeight <= 0
+      ) {
         continue;
       }
 
@@ -624,7 +858,8 @@ export class ManifoldTwoDController {
       const cardScale = item.currentCardScale || 1;
       const originShiftY = (CARD_CENTER_Y - CARD_ORIGIN_Y) * (1 - cardScale);
 
-      const visualScreenY = (item.currentScreenY - originShiftY) * PERSPECTIVE_FACTOR;
+      const visualScreenY =
+        (item.currentScreenY - originShiftY) * PERSPECTIVE_FACTOR;
       const visualScreenH = item.currentScreenHeight * PERSPECTIVE_FACTOR;
       const visualScreenX = item.currentScreenX * PERSPECTIVE_FACTOR;
       const visualScreenW = item.currentScreenWidth * PERSPECTIVE_FACTOR;
@@ -640,7 +875,7 @@ export class ManifoldTwoDController {
       const centerX = layoutState.viewportWidth * 0.5 + visualScreenX;
       const left = centerX - visualScreenW * 0.5;
       const right = centerX + visualScreenW * 0.5;
-      
+
       const rowIndex = Math.floor(item.gridOrder / metrics.columns);
       const existing = edgePreviewRows.get(rowIndex);
 
@@ -669,7 +904,9 @@ export class ManifoldTwoDController {
     let poolIndex = 0;
 
     for (const row of previewRows) {
-      const sectionCards = [...row.items].sort((left, right) => left.currentScreenX - right.currentScreenX);
+      const sectionCards = [...row.items].sort(
+        (left, right) => left.currentScreenX - right.currentScreenX
+      );
       if (sectionCards.length === 0) {
         continue;
       }
@@ -677,11 +914,15 @@ export class ManifoldTwoDController {
       /* Edge preview cards should visually continue the exact same grid:
          same card width, same gap, same baseline, only faded and clipped. */
       const perceivedWidth = metrics.cardWidth * PERSPECTIVE_FACTOR;
-      const visualGapX = Math.max(0, metrics.spacingX * PERSPECTIVE_FACTOR - perceivedWidth);
+      const visualGapX = Math.max(
+        0,
+        metrics.spacingX * PERSPECTIVE_FACTOR - perceivedWidth
+      );
       const visualTop = row.minY;
       const compensationX = metrics.cardWidth * (1 - PERSPECTIVE_FACTOR) * 0.5;
       const compensationY = metrics.cardHeight * (1 - PERSPECTIVE_FACTOR) * 0.5;
-      const leftCardLeft = row.minX - visualGapX - perceivedWidth - compensationX;
+      const leftCardLeft =
+        row.minX - visualGapX - perceivedWidth - compensationX;
       const rightCardLeft = row.maxX + visualGapX - compensationX;
 
       /* USER_REQUEST: CONSISTENT_DIMMING - Align with official section fade logic from orchestrator.
@@ -694,10 +935,16 @@ export class ManifoldTwoDController {
       }
 
       const rowCenterY = (row.minY + row.maxY) / 2;
-      const rowDistance = clamp(Math.abs(rowCenterY - viewportCenterY) / Math.max(1, layoutState.viewportHeight * 0.46), 0, 1);
-      
+      const rowDistance = clamp(
+        Math.abs(rowCenterY - viewportCenterY) /
+          Math.max(1, layoutState.viewportHeight * 0.46),
+        0,
+        1
+      );
+
       /* Applying consistent dimming that respects both section focus and viewport distance */
-      const baseAlpha = viewModeProgress * (0.32 + stillness * 0.44) * (1 - rowDistance * 0.42);
+      const baseAlpha =
+        viewModeProgress * (0.32 + stillness * 0.44) * (1 - rowDistance * 0.42);
       const rowAlpha = clamp(baseAlpha * dimFactor, 0, 0.52);
 
       /* The edge card DOM is baseWidth × baseHeight (320×460), scaled by combinedScale
@@ -738,11 +985,13 @@ export class ManifoldTwoDController {
     metrics: TwoDGridMetrics
   ): TwoDCardPose {
     const layoutState = this.context.getLayoutState();
-    const column = ((gridOrder % metrics.columns) + metrics.columns) % metrics.columns;
+    const column =
+      ((gridOrder % metrics.columns) + metrics.columns) % metrics.columns;
     const row = Math.floor(gridOrder / metrics.columns);
-    const twoDWorldY = (sceneScroll - this.context.getIntroScrollAnchor()) * metrics.scrollScale;
+    const twoDWorldY =
+      (sceneScroll - this.context.getIntroScrollAnchor()) * metrics.scrollScale;
 
-    // USER_REQUEST: GRID_CENTERING - First column is no longer at 0. 
+    // USER_REQUEST: GRID_CENTERING - First column is no longer at 0.
     // We shift the whole grid so its horizontal midpoint is at 0.
     const centerXOffset = (metrics.columns - 1) * 0.5 * metrics.spacingX;
 
@@ -750,14 +999,20 @@ export class ManifoldTwoDController {
     const responsiveScale = this.get2DResponsiveScale();
     const verticalGridOffset = 20 * clamp(responsiveScale + 0.08, 0.86, 1);
 
-    const rawX = metrics.stackedMobile ? 0 : column * metrics.spacingX - centerXOffset - layoutState.twoDOffsetX;
+    const rawX = metrics.stackedMobile
+      ? 0
+      : column * metrics.spacingX - centerXOffset - layoutState.twoDOffsetX;
     const rawY = row * metrics.spacingY - twoDWorldY + verticalGridOffset;
-    const wrappedX = metrics.stackedMobile ? 0 : wrapSigned(rawX, metrics.tileWidth);
+    const wrappedX = metrics.stackedMobile
+      ? 0
+      : wrapSigned(rawX, metrics.tileWidth);
     const wrappedY = wrapSigned(rawY, metrics.tileHeight);
 
     // Codex change: keep a subtle horizontal sway, but lock vertical row alignment in 2D
     // so cards outside the active section sit on the same baseline as the cards inside it.
-    const sway = Math.sin(time * 0.0007 + item.variance * 8.4) * (metrics.stackedMobile ? 1.2 : 4);
+    const sway =
+      Math.sin(time * 0.0007 + item.variance * 8.4) *
+      (metrics.stackedMobile ? 1.2 : 4);
     const yDrift = 0;
 
     // Zapobiegamy ucinaniu kart na bokach ekranu
@@ -768,19 +1023,33 @@ export class ManifoldTwoDController {
 
     const edgeFadeX = metrics.stackedMobile
       ? 1
-      : clamp(1 - Math.max(0, Math.abs(wrappedX) - lateralFadeStart) / Math.max(1, lateralFadeSpan), 0, 1);
+      : clamp(
+          1 -
+            Math.max(0, Math.abs(wrappedX) - lateralFadeStart) /
+              Math.max(1, lateralFadeSpan),
+          0,
+          1
+        );
 
-    const edgeFadeY = clamp(1 - Math.max(0, Math.abs(wrappedY) - verticalFadeStart) / Math.max(1, verticalFadeSpan), 0, 1);
+    const edgeFadeY = clamp(
+      1 -
+        Math.max(0, Math.abs(wrappedY) - verticalFadeStart) /
+          Math.max(1, verticalFadeSpan),
+      0,
+      1
+    );
 
     const sidePresenceFloor = metrics.stackedMobile ? 0.12 : 0.08;
-    const alpha = clamp(lerp(sidePresenceFloor, 1, edgeFadeX) * edgeFadeY, sidePresenceFloor, 1);
+    const alpha = clamp(
+      lerp(sidePresenceFloor, 1, edgeFadeX) * edgeFadeY,
+      sidePresenceFloor,
+      1
+    );
 
     // Structural width/height already carry the responsive compression in 2D.
     const scale = 1;
     const yDistance = Math.abs(wrappedY);
-    const zPush = metrics.stackedMobile
-      ? yDistance * 0.03
-      : yDistance * 0.04;
+    const zPush = metrics.stackedMobile ? yDistance * 0.03 : yDistance * 0.04;
 
     return {
       alpha,

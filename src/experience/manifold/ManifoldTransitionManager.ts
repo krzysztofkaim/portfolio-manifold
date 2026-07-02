@@ -35,7 +35,10 @@ export class ManifoldTransitionManager {
     pendingIntroViewMode: null
   };
 
-  constructor(private readonly context: ManifoldTransitionManagerContext, initialViewMode?: ViewMode) {
+  constructor(
+    private readonly context: ManifoldTransitionManagerContext,
+    initialViewMode?: ViewMode
+  ) {
     if (initialViewMode && initialViewMode !== '3d') {
       this.state.targetViewMode = initialViewMode;
       if (initialViewMode === '2d') {
@@ -94,24 +97,35 @@ export class ManifoldTransitionManager {
     this.state.viewModeProgress = lerp(
       this.state.viewModeProgress,
       this.state.viewModeTarget,
-      computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.manifoldMode2D)
+      computeDampedLerp(
+        delta,
+        MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.manifoldMode2D
+      )
     );
 
     this.state.fourDProgress = lerp(
       this.state.fourDProgress,
       this.state.fourDTarget,
-      computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.manifoldMode4D)
+      computeDampedLerp(
+        delta,
+        MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.manifoldMode4D
+      )
     );
 
     this.state.fourDTransitionProgress = lerp(
       this.state.fourDTransitionProgress,
       introCompleted ? this.state.fourDTarget : 0,
-      computeDampedLerp(delta, MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.hyperspaceMorph)
+      computeDampedLerp(
+        delta,
+        MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.hyperspaceMorph
+      )
     );
 
     if (
       this.state.exitingFourDTo2D &&
-      (this.state.targetViewMode !== '2d' || (this.state.fourDTransitionProgress < 0.025 && this.state.viewModeProgress > 0.985))
+      (this.state.targetViewMode !== '2d' ||
+        (this.state.fourDTransitionProgress < 0.025 &&
+          this.state.viewModeProgress > 0.985))
     ) {
       this.state.exitingFourDTo2D = false;
     }
@@ -152,7 +166,9 @@ export class ManifoldTransitionManager {
 
     if (mode === '2d') {
       this.state.exitingFourDTo2D =
-        previousMode === '4d' || this.state.fourDProgress > 0.08 || this.state.fourDTransitionProgress > 0.08;
+        previousMode === '4d' ||
+        this.state.fourDProgress > 0.08 ||
+        this.state.fourDTransitionProgress > 0.08;
 
       if (this.state.exitingFourDTo2D) {
         this.context.captureTwoDTransitionGridOrder();

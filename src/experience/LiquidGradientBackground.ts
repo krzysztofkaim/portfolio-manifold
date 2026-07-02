@@ -126,13 +126,20 @@ export class LiquidGradientBackground {
   }
 
   private createMainThreadKernel(): LiquidGradientKernel {
-    const context = this.canvas.getContext('2d', { alpha: false, desynchronized: true });
+    const context = this.canvas.getContext('2d', {
+      alpha: false,
+      desynchronized: true
+    });
 
     if (!context) {
       throw new Error('2D canvas is not supported in this environment.');
     }
 
-    const kernel = new LiquidGradientKernel(this.canvas, context, this.maxBlobs);
+    const kernel = new LiquidGradientKernel(
+      this.canvas,
+      context,
+      this.maxBlobs
+    );
     // Enforce safety quality for main-thread fallback to prevent hangs
     kernel.setQuality(Math.min(this.quality, 0.15));
     return kernel;
@@ -144,9 +151,12 @@ export class LiquidGradientBackground {
     }
 
     try {
-      const worker = new Worker(new URL('./LiquidGradientBackground.worker.ts', import.meta.url), {
-        type: 'module'
-      });
+      const worker = new Worker(
+        new URL('./LiquidGradientBackground.worker.ts', import.meta.url),
+        {
+          type: 'module'
+        }
+      );
       const offscreenCanvas = this.canvas.transferControlToOffscreen();
       const initMessage: GradientWorkerMessage = {
         type: 'init',
@@ -159,7 +169,10 @@ export class LiquidGradientBackground {
       worker.postMessage(initMessage, [offscreenCanvas]);
       return worker;
     } catch (error) {
-      console.warn('Offscreen liquid gradient worker unavailable. Falling back to main thread.', error);
+      console.warn(
+        'Offscreen liquid gradient worker unavailable. Falling back to main thread.',
+        error
+      );
       return null;
     }
   }
@@ -182,6 +195,11 @@ export class LiquidGradientBackground {
   }
 }
 
-function isTransferableCanvas(canvas: HTMLCanvasElement): canvas is TransferableCanvasElement {
-  return typeof (canvas as TransferableCanvasElement).transferControlToOffscreen === 'function';
+function isTransferableCanvas(
+  canvas: HTMLCanvasElement
+): canvas is TransferableCanvasElement {
+  return (
+    typeof (canvas as TransferableCanvasElement).transferControlToOffscreen ===
+    'function'
+  );
 }
