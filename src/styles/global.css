@@ -390,6 +390,11 @@ html.is-ios body {
   -webkit-overflow-scrolling: auto;
 }
 
+html.is-android,
+html.is-android body {
+  overscroll-behavior: none;
+}
+
 html.lenis,
 html.lenis body {
   height: auto;
@@ -862,14 +867,20 @@ html.is-safari body.is-scrolling .hud-side-readout,
 html.is-ios body.is-scrolling .card-shell,
 html.is-ios body.is-scrolling .card-core,
 html.is-ios body.is-scrolling .card-core-glow,
-html.is-ios body.is-scrolling .topbar {
+html.is-ios body.is-scrolling .topbar,
+html.is-android body.is-scrolling .card-shell,
+html.is-android body.is-scrolling .card-core,
+html.is-android body.is-scrolling .card-core-glow,
+html.is-android body.is-scrolling .topbar {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: none !important;
 }
 
 html.is-ios body.is-scrolling .card,
-html.is-ios body.is-scrolling .item {
+html.is-ios body.is-scrolling .item,
+html.is-android body.is-scrolling .card,
+html.is-android body.is-scrolling .item {
   filter: none !important;
 }
 

@@ -1256,15 +1256,16 @@ export class ManifoldModeController {
       0,
       1
     );
-    const iosScrollPressureThreshold = IS_IOS ? 0.34 : 0.55;
+    const strictMobileRuntime = IS_IOS || IS_ANDROID;
+    const mobileScrollPressureThreshold = IS_IOS ? 0.34 : IS_ANDROID ? 0.4 : 0.55;
     this.transitionPerformanceMode =
       this.introCompleted &&
       !this.expandedCard &&
-      (transitionMorphPressure > (IS_IOS ? 0.035 : 0.045) ||
+      (transitionMorphPressure > (strictMobileRuntime ? (IS_IOS ? 0.035 : 0.04) : 0.045) ||
         (transitionMorphPressure > 0.015 &&
-          (framePressure > (IS_IOS ? 0.12 : 0.18) ||
-            velocityMagnitude > iosScrollPressureThreshold ||
-            Math.abs(this.phaseState.targetSpeed) > iosScrollPressureThreshold)));
+          (framePressure > (strictMobileRuntime ? (IS_IOS ? 0.12 : 0.14) : 0.18) ||
+            velocityMagnitude > mobileScrollPressureThreshold ||
+            Math.abs(this.phaseState.targetSpeed) > mobileScrollPressureThreshold)));
 
     if (this.expandedTarget === 0 && this.expandedProgress < 0.01 && this.expandedCard) {
       this.collapsedExpandedCard =
@@ -1528,11 +1529,11 @@ export class ManifoldModeController {
       activeViewModeProgress > 0.72 &&
       visualFourDProgress < 0.01 &&
       (
-        IS_IOS
+        IS_IOS || IS_ANDROID
           ? (
-            this.visualStateManager.getTwoDCardFastness() > 0.42 ||
-            velocityMagnitude > 0.07 ||
-            Math.abs(this.rawScrollVelocity) > 6
+            this.visualStateManager.getTwoDCardFastness() > (IS_IOS ? 0.42 : 0.5) ||
+            velocityMagnitude > (IS_IOS ? 0.07 : 0.09) ||
+            Math.abs(this.rawScrollVelocity) > (IS_IOS ? 6 : 9)
           )
           : (
             this.visualStateManager.getTwoDCardFastness() > 0.68 &&

@@ -8,16 +8,20 @@ import {
 import { createLenisRebaseAdapter } from '../LenisRebaseAdapter';
 import type { LoopTelemetry } from './ManifoldAppDiagnostics';
 import { computeDampedLerp } from '../../experience/manifold/HyperMath';
-import { IS_IOS, IS_SAFARI } from '../../utils/browserDetection';
+import { IS_ANDROID, IS_IOS, IS_SAFARI } from '../../utils/browserDetection';
 
 const IOS_NATIVE_LOOP_MULTIPLIER = 14;
 const IOS_LOOP_REBASE_MARGIN_LOOPS = 2;
 const IOS_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS = 0.75;
 const IOS_LOOP_REBASE_DEFER_VELOCITY = 1.8;
-const IOS_NATIVE_SETTLE_VELOCITY = 2.4;
-const IOS_TOUCH_END_GRACE_MS = 200;
-const IOS_REBASE_COOLDOWN_MS = 360;
-const IOS_REBASE_SUPPRESS_MS = 64;
+const ANDROID_NATIVE_LOOP_MULTIPLIER = 32;
+const ANDROID_LOOP_REBASE_MARGIN_LOOPS = 4;
+const ANDROID_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS = 1.1;
+const ANDROID_LOOP_REBASE_DEFER_VELOCITY = 1.35;
+const MOBILE_NATIVE_SETTLE_VELOCITY = IS_ANDROID ? 2.8 : 2.4;
+const MOBILE_TOUCH_END_GRACE_MS = IS_ANDROID ? 140 : 200;
+const MOBILE_REBASE_COOLDOWN_MS = IS_ANDROID ? 280 : 360;
+const MOBILE_REBASE_SUPPRESS_MS = IS_ANDROID ? 48 : 64;
 
 export interface ScrollController {
   getInitialScrollAnchor(): number;
@@ -44,7 +48,7 @@ export class ManifoldAppScroll {
   private touchRefreshGuardArmed = false;
   private resizeSyncRaf = 0;
   private readonly shouldBlockPullToRefresh = IS_IOS && IS_SAFARI;
-  private readonly useDirectNativeScroll = IS_IOS;
+  private readonly useDirectNativeScroll = IS_IOS || IS_ANDROID;
   private lastProxyHeightPx = -1;
 
   private isNativeTouchActive = false;
@@ -294,7 +298,7 @@ export class ManifoldAppScroll {
 
   private handleNativeTouchEnd = () => {
     this.isNativeTouchActive = false;
-    this.nativeTouchGraceUntil = performance.now() + IOS_TOUCH_END_GRACE_MS;
+    this.nativeTouchGraceUntil = performance.now() + MOBILE_TOUCH_END_GRACE_MS;
   };
 
   private handleNativeScrollEnd = () => {
@@ -381,11 +385,11 @@ export class ManifoldAppScroll {
       return true;
     }
 
-    if (Math.abs(this.nativeScrollVelocity) > IOS_NATIVE_SETTLE_VELOCITY) {
+    if (Math.abs(this.nativeScrollVelocity) > MOBILE_NATIVE_SETTLE_VELOCITY) {
       return true;
     }
 
-    if (now - this.lastRebaseAt < IOS_REBASE_COOLDOWN_MS) {
+    if (now - this.lastRebaseAt < MOBILE_REBASE_COOLDOWN_MS) {
       return true;
     }
 
@@ -418,7 +422,7 @@ export class ManifoldAppScroll {
       return;
     }
 
-    this.suppressNativeScrollUntil = performance.now() + IOS_REBASE_SUPPRESS_MS;
+    this.suppressNativeScrollUntil = performance.now() + MOBILE_REBASE_SUPPRESS_MS;
     this.lastNativeScrollTop = scroll;
     this.nativeScrollVelocity = 0;
 
@@ -509,11 +513,21 @@ export class ManifoldAppScroll {
 
     const totalSpan = this.getLoopPhysicalSpan();
     const center = totalSpan * 0.5;
-    const edgeMarginLoops = IS_IOS ? IOS_LOOP_REBASE_MARGIN_LOOPS : MANIFOLD_LOOP_REBASE_MARGIN_LOOPS;
+    const edgeMarginLoops = IS_IOS
+      ? IOS_LOOP_REBASE_MARGIN_LOOPS
+      : IS_ANDROID
+        ? ANDROID_LOOP_REBASE_MARGIN_LOOPS
+        : MANIFOLD_LOOP_REBASE_MARGIN_LOOPS;
     const emergencyMarginLoops = IS_IOS
       ? IOS_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS
-      : MANIFOLD_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS;
-    const deferVelocity = IS_IOS ? IOS_LOOP_REBASE_DEFER_VELOCITY : MANIFOLD_LOOP_REBASE_DEFER_VELOCITY;
+      : IS_ANDROID
+        ? ANDROID_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS
+        : MANIFOLD_LOOP_REBASE_EMERGENCY_MARGIN_LOOPS;
+    const deferVelocity = IS_IOS
+      ? IOS_LOOP_REBASE_DEFER_VELOCITY
+      : IS_ANDROID
+        ? ANDROID_LOOP_REBASE_DEFER_VELOCITY
+        : MANIFOLD_LOOP_REBASE_DEFER_VELOCITY;
     const edgeMargin = Math.min(this.loopScrollLength * edgeMarginLoops, totalSpan * 0.4);
     const emergencyEdgeMargin = Math.min(
       this.loopScrollLength * emergencyMarginLoops,
@@ -563,7 +577,11 @@ export class ManifoldAppScroll {
   }
 
   private getLoopPhysicalSpan(): number {
-    const multiplier = IS_IOS ? IOS_NATIVE_LOOP_MULTIPLIER : MANIFOLD_LOOP_MULTIPLIER;
+    const multiplier = IS_IOS
+      ? IOS_NATIVE_LOOP_MULTIPLIER
+      : IS_ANDROID
+        ? ANDROID_NATIVE_LOOP_MULTIPLIER
+        : MANIFOLD_LOOP_MULTIPLIER;
     return this.loopScrollLength * multiplier;
   }
 

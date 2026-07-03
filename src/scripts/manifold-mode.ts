@@ -1734,17 +1734,20 @@ class ManifoldApp {
           scrollVelocity > 0.0035 ||
           time - this.lastInteractionBurstAt < 1400;
         const audioActive = this.audio.getAudioActiveState();
-        const iosInteractiveInterval = scrollVelocity > 0.02 ? 1000 / 20 : 1000 / 24;
-        const iosIdleInterval = 1000 / 8;
-        const effectiveFrameInterval = IS_IOS
+        const strictMobileRuntime = IS_IOS || IS_ANDROID;
+        const mobileInteractiveInterval = IS_IOS
+          ? (scrollVelocity > 0.02 ? 1000 / 20 : 1000 / 24)
+          : (scrollVelocity > 0.02 ? 1000 / 26 : 1000 / 30);
+        const mobileIdleInterval = IS_IOS ? 1000 / 8 : 1000 / 12;
+        const effectiveFrameInterval = strictMobileRuntime
           ? Math.max(
             perf.frameInterval || 0,
             forceResponsiveRate || perf.transitionActive || audioActive || this.cachedHasExpandedCard
-              ? iosInteractiveInterval
-              : iosIdleInterval
+              ? mobileInteractiveInterval
+              : mobileIdleInterval
           )
           : perf.frameInterval;
-        const shouldRunControllerPass = IS_IOS
+        const shouldRunControllerPass = strictMobileRuntime
           ? time - this.lastControllerRenderAt >= effectiveFrameInterval
           : (
             perf.frameInterval <= 0 ||
@@ -1785,21 +1788,23 @@ class ManifoldApp {
       const isInteracting = scrollVelocity > 0.0035 || time - this.lastInteractionBurstAt < 1400;
       const isMotionActive = perf.transitionActive || isInteracting;
       const audioActive = this.audio.getAudioActiveState();
-      const iosUiInterval = isMotionActive || audioActive ? 1000 / 16 : 1000 / 5;
-      const shouldRunIosUiPass = !IS_IOS || time - this.lastIosUiTickAt >= iosUiInterval;
+      const strictMobileRuntime = IS_IOS || IS_ANDROID;
+      const mobileUiInterval = isMotionActive || audioActive
+        ? (IS_IOS ? 1000 / 16 : 1000 / 20)
+        : (IS_IOS ? 1000 / 5 : 1000 / 8);
+      const shouldRunMobileUiPass = !strictMobileRuntime || time - this.lastIosUiTickAt >= mobileUiInterval;
 
-      // On iOS, skip HUD refresh when both controller pass AND UI pass were skipped
-      // to minimize main-thread work on idle frames.
-      const shouldRefreshHud = shouldRunIosUiPass
+      // On mobile, skip HUD refresh when the UI pass is skipped to reduce main-thread work.
+      const shouldRefreshHud = shouldRunMobileUiPass
         ? (isMotionActive ? (time - this.lastHudNavRenderAt > 120) : (time - this.lastHudNavRenderAt > 2400))
         : false;
 
       const uiStartedAt = performance.now();
-      if (shouldRunIosUiPass) {
+      if (shouldRunMobileUiPass) {
         this.lastIosUiTickAt = time;
       }
 
-      if (!IS_IOS || shouldRunIosUiPass) {
+      if (!strictMobileRuntime || shouldRunMobileUiPass) {
         this.syncHudNavigationMode();
 
         if (shouldRefreshHud) {
@@ -1861,6 +1866,10 @@ class ManifoldApp {
 
       if (velocity > 0.12) {
         stressMultiplier *= 0.82;
+      }
+
+      if (IS_ANDROID && velocity > 0.2) {
+        stressMultiplier *= IS_ANDROID_LOW_END ? 0.7 : 0.82;
       }
     }
 
