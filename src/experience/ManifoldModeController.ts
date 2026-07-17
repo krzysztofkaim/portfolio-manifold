@@ -150,6 +150,10 @@ export class ManifoldModeController {
   private currentAudioEnergy = 0;
   private readonly sectionAccentRgbCache = new Map<string, [number, number, number]>();
   private readonly resizeObserver: ResizeObserver;
+  private resizeSyncRaf = 0;
+  private cardChromeInitTimeout = 0;
+  private lastResizeViewportWidth = 0;
+  private lastResizeViewportHeight = 0;
   private readonly deviceMemory =
     'deviceMemory' in navigator
       ? ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8)
@@ -316,6 +320,8 @@ export class ManifoldModeController {
     this.loopSize = this.config.itemCount * this.config.zGap;
     this.viewportWidth = atlasState.viewportWidth;
     this.viewportHeight = atlasState.viewportHeight;
+    this.lastResizeViewportWidth = atlasState.viewportWidth;
+    this.lastResizeViewportHeight = atlasState.viewportHeight;
     this.lastActivityAt = atlasState.lastActivityAt;
     this.lastScrollActivityAt = atlasState.lastScrollActivityAt;
     this.adaptiveCooldownUntil = atlasState.adaptiveCooldownUntil;
@@ -661,14 +667,7 @@ export class ManifoldModeController {
       }
     });
 
-    this.resizeObserver = this.dom.createResizeObserver(() => {
-      pretextLayoutService.syncRootFontPx();
-      this.layoutItems();
-      this.refreshHintMeasurements();
-      this.particleField.resize(this.viewportWidth, this.viewportHeight, window.devicePixelRatio || 1);
-      this.particleField.layout(this.loopSize, this.viewportWidth, this.viewportHeight);
-      this.cardChromeRenderer?.resize(this.viewportWidth, this.viewportHeight);
-    });
+    this.resizeObserver = this.dom.createResizeObserver(() => this.scheduleLayoutSync());
 
     pretextLayoutService.syncRootFontPx();
     this.createItems();
@@ -677,10 +676,10 @@ export class ManifoldModeController {
     this.particleField.resize(this.viewportWidth, this.viewportHeight, window.devicePixelRatio || 1);
     this.particleField.layout(this.loopSize, this.viewportWidth, this.viewportHeight);
     const initCardChrome = () => {
-      if (IS_IOS || this.isAndroidLowEnd) {
+      if (IS_IOS || IS_ANDROID) {
         // iOS WebKit can occasionally composite this fullscreen WebGL layer as opaque black
-        // after the first interaction. Low-end Android benefits from the same fallback because
-        // the decorative fullscreen pass is disproportionately expensive there.
+        // after the first interaction. Android also benefits from avoiding a second fullscreen
+        // GPU context for a decorative pass while the DOM renderer remains fully functional.
         this.gpuCardChromeDisabled = true;
         elements.cardChromeLayer.style.display = 'none';
         this.dom.removeBodyClass('has-gpu-card-chrome', 'has-gpu-card-chrome-active');
@@ -695,8 +694,13 @@ export class ManifoldModeController {
       this.cardChromeRenderer.prewarm(this.viewportWidth, this.viewportHeight);
     };
 
-    if (this.initialViewMode === '2d') {
-      window.setTimeout(initCardChrome, 800);
+    if (IS_IOS || IS_ANDROID) {
+      initCardChrome();
+    } else if (this.initialViewMode === '2d') {
+      this.cardChromeInitTimeout = window.setTimeout(() => {
+        this.cardChromeInitTimeout = 0;
+        initCardChrome();
+      }, 800);
     } else {
       initCardChrome();
     }
@@ -765,6 +769,39 @@ export class ManifoldModeController {
       this.dom.addBodyClass('is-intro-active');
     }
     this.setupInteractiveButtonHooks();
+  }
+
+  private scheduleLayoutSync(): void {
+    const viewport = this.runtime.getViewportSize();
+    const widthChanged = viewport.width !== this.lastResizeViewportWidth;
+    const heightDelta = Math.abs(viewport.height - this.lastResizeViewportHeight);
+
+    this.lastResizeViewportWidth = viewport.width;
+    this.lastResizeViewportHeight = viewport.height;
+
+    if (!widthChanged && heightDelta === 0) {
+      return;
+    }
+
+    // Mobile address bars continuously resize the visual viewport while scrolling.
+    // Rebuilding every card for those height-only changes causes layout storms.
+    if ((IS_IOS || IS_ANDROID) && !widthChanged && heightDelta < 140) {
+      return;
+    }
+
+    if (this.resizeSyncRaf) {
+      return;
+    }
+
+    this.resizeSyncRaf = window.requestAnimationFrame(() => {
+      this.resizeSyncRaf = 0;
+      pretextLayoutService.syncRootFontPx();
+      this.layoutItems();
+      this.refreshHintMeasurements();
+      this.particleField.resize(this.viewportWidth, this.viewportHeight, window.devicePixelRatio || 1);
+      this.particleField.layout(this.loopSize, this.viewportWidth, this.viewportHeight);
+      this.cardChromeRenderer?.resize(this.viewportWidth, this.viewportHeight);
+    });
   }
 
   private setupInteractiveButtonHooks(): void {
@@ -1801,6 +1838,14 @@ export class ManifoldModeController {
       this.introAutoEnterTimeout = 0;
     }
     this.dom.disconnectResizeObserver(this.resizeObserver);
+    if (this.resizeSyncRaf) {
+      window.cancelAnimationFrame(this.resizeSyncRaf);
+      this.resizeSyncRaf = 0;
+    }
+    if (this.cardChromeInitTimeout) {
+      window.clearTimeout(this.cardChromeInitTimeout);
+      this.cardChromeInitTimeout = 0;
+    }
     this.inputController.detach();
     if (this.expandedRevealSchedulerRaf) {
       window.cancelAnimationFrame(this.expandedRevealSchedulerRaf);
@@ -1809,6 +1854,7 @@ export class ManifoldModeController {
     this.hudRenderer.destroy();
     this.physicsRuntime.destroy();
     this.cardChromeRenderer?.destroy();
+    this.twoDController.destroy();
 
     // Dispose of managed item effects and scheduled reveals before clearing items
     this.cardExpandController.destroy(this.items);
@@ -2067,12 +2113,14 @@ export class ManifoldModeController {
         <div class="card-body">
           <div class="card-preview-layer">
             <div class="card-core" aria-hidden="true">
-              <pixel-canvas
-                class="card-pixel-canvas"
-                data-gap="${pixelPreset.gap}"
-                data-speed="${pixelPreset.speed}"
-                data-colors="${pixelPreset.colors}"
-              ></pixel-canvas>
+              ${IS_IOS || IS_ANDROID
+                ? ''
+                : `<pixel-canvas
+                    class="card-pixel-canvas"
+                    data-gap="${pixelPreset.gap}"
+                    data-speed="${pixelPreset.speed}"
+                    data-colors="${pixelPreset.colors}"
+                  ></pixel-canvas>`}
               <div class="card-core-glow"></div>
               <div class="card-core-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
@@ -2080,11 +2128,13 @@ export class ManifoldModeController {
                 </svg>
               </div>
               <span class="card-core-chip">${cardData.chip}</span>
-              <div class="card-spectrum" aria-hidden="true">
-                ${Array.from({ length: 16 })
-          .map((_, i) => `<div class="card-spectrum-bar" data-index="${i}"></div>`)
-          .join('')}
-              </div>
+              ${IS_IOS || IS_ANDROID_LOW_END
+                ? ''
+                : `<div class="card-spectrum" aria-hidden="true">
+                    ${Array.from({ length: 16 })
+                      .map((_, i) => `<div class="card-spectrum-bar" data-index="${i}"></div>`)
+                      .join('')}
+                  </div>`}
             </div>
             <div class="card-id-row">
               <span class="card-id">${cardData.id}</span>

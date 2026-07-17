@@ -47,6 +47,10 @@
     if (isAndroidLowEnd) {
       root.classList.add('is-android-low-end');
     }
+
+    if (isIOS || isAndroid) {
+      root.classList.add('is-mobile-runtime');
+    }
   } catch {
     // Ignore UA parsing failures and keep the default styling path.
   }

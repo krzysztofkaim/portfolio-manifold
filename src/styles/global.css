@@ -621,6 +621,40 @@ html.is-safari body.has-custom-cursor * {
   cursor: auto !important;
 }
 
+/* Mobile browsers have tight compositor budgets. Keep only currently visible card
+   subtrees in layout and avoid promoting every card to a GPU-backed layer. */
+html.is-mobile-runtime .world,
+html.is-mobile-runtime .item,
+html.is-mobile-runtime .card,
+html.is-mobile-runtime .card-preview-layer,
+html.is-mobile-runtime .card-expanded-panel,
+html.is-mobile-runtime .card-transition-snapshot,
+html.is-mobile-runtime .two-d-section-frame {
+  will-change: auto !important;
+}
+
+html.is-mobile-runtime .card:not(.is-expanded) .card-expanded-panel,
+html.is-mobile-runtime .card:not(.is-transition-snapshot) .card-transition-snapshot {
+  display: none;
+}
+
+html.is-mobile-runtime .card.is-expanded .card-expanded-panel,
+html.is-mobile-runtime body.is-card-morphing .card .card-expanded-panel {
+  display: flex;
+}
+
+html.is-mobile-runtime body.is-transition-snapshots .card.is-transition-snapshot:not(.is-expanded) .card-transition-snapshot {
+  display: grid;
+}
+
+html.is-mobile-runtime body.is-2d-mode .card:not(.is-expanded) .card-body,
+html.is-mobile-runtime body.is-2d-mode .card:not(.is-expanded) .card-core,
+html.is-mobile-runtime body.is-2d-mode .card:not(.is-expanded) .card-core::before,
+html.is-mobile-runtime body.is-2d-mode .card:not(.is-expanded) .card-core::after,
+html.is-mobile-runtime body.is-2d-mode .card:not(.is-expanded) .card-core-icon {
+  transform: none !important;
+}
+
 html.is-android .bg-gradient-soft {
   opacity: 0.56;
 }

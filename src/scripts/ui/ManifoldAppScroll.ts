@@ -8,7 +8,7 @@ import {
 import { createLenisRebaseAdapter } from '../LenisRebaseAdapter';
 import type { LoopTelemetry } from './ManifoldAppDiagnostics';
 import { computeDampedLerp } from '../../experience/manifold/HyperMath';
-import { IS_ANDROID, IS_IOS, IS_SAFARI } from '../../utils/browserDetection';
+import { IS_ANDROID, IS_IOS } from '../../utils/browserDetection';
 
 const IOS_NATIVE_LOOP_MULTIPLIER = 14;
 const IOS_LOOP_REBASE_MARGIN_LOOPS = 2;
@@ -47,7 +47,7 @@ export class ManifoldAppScroll {
   private touchStartY = 0;
   private touchRefreshGuardArmed = false;
   private resizeSyncRaf = 0;
-  private readonly shouldBlockPullToRefresh = IS_IOS && IS_SAFARI;
+  private readonly shouldBlockPullToRefresh = IS_IOS;
   private readonly useDirectNativeScroll = IS_IOS || IS_ANDROID;
   private lastProxyHeightPx = -1;
 
@@ -335,13 +335,13 @@ export class ManifoldAppScroll {
     const deltaX = Math.abs(touch.clientX - this.touchStartX);
     const deltaY = touch.clientY - this.touchStartY;
 
-    if (deltaY < 14 || deltaY <= deltaX * 1.1) {
+    if (deltaY < 2 || deltaY <= deltaX * 1.1) {
       return;
     }
 
     if (this.isAtTopBoundary()) {
-      this.recoverFromNativeScrollEdge();
       event.preventDefault();
+      this.recoverFromNativeScrollEdge();
     }
   };
 
@@ -568,7 +568,10 @@ export class ManifoldAppScroll {
     const physicalScroll = this.getNativeScrollTop();
     const rebased = this.maybeRebasePhysicalScroll(physicalScroll, Number.POSITIVE_INFINITY);
     if (rebased.delta !== 0) {
-      if (this.useDirectNativeScroll && this.shouldDeferNativeRebase()) {
+      // At the actual native top edge, waiting for touchend gives WebKit enough time
+      // to claim the gesture as pull-to-refresh. Rebase immediately; logicalOffset
+      // keeps the rendered scene in exactly the same position.
+      if (this.useDirectNativeScroll && this.shouldDeferNativeRebase() && !this.isAtTopBoundary()) {
         this.pendingRebase = rebased;
         return;
       }

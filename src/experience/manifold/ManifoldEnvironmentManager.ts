@@ -1,5 +1,5 @@
 import { clamp, lerp } from '../../utils/math';
-import { IS_IOS } from '../../utils/browserDetection';
+import { IS_ANDROID, IS_IOS } from '../../utils/browserDetection';
 import {
   updateCanvasParticleActivity,
   type ManifoldCanvasParticleField
@@ -135,7 +135,7 @@ export class ManifoldEnvironmentManager {
 
   updateWorldEnvironment(input: Pick<ManifoldEnvironmentInput, 'activeViewModeProgress' | 'mouseX' | 'mouseY' | 'viewVelocity'>): void {
     const state = this.context.getState();
-    const flattenTwoDScene = IS_IOS && input.activeViewModeProgress > 0.9;
+    const flattenTwoDScene = (IS_IOS || IS_ANDROID) && input.activeViewModeProgress > 0.9;
     const tiltModeMix = flattenTwoDScene ? 0 : 1 - input.activeViewModeProgress;
     const tiltX = (input.mouseY * 5 - input.viewVelocity * 0.5) * tiltModeMix;
     const tiltY = input.mouseX * 5 * tiltModeMix;

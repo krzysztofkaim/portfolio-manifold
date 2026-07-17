@@ -133,11 +133,13 @@ interface BootElements extends LocaleElements {
   downloadCvLabel: HTMLElement;
 }
 
-class ManifoldApp {
+export class ManifoldApp {
   private lenis: Lenis | null = null;
   private controller: ManifoldModeController | null = null;
   private liquidGradient: LiquidGradientBackground | null = null;
   private running = false;
+  private animationFrameId = 0;
+  private pageLifecycleTeardown: (() => void) | null = null;
   private readonly prefersMobilePerformanceBudget =
     window.matchMedia('(pointer: coarse)').matches ||
     navigator.maxTouchPoints > 0 ||
@@ -218,6 +220,10 @@ class ManifoldApp {
     event.preventDefault();
     this.controller?.handleGpuContextLoss();
   };
+  private readonly handleRecordProfile = (event: Event) => {
+    const { durationMs } = (event as CustomEvent<RecordProfileDetail>).detail;
+    this.telemetry.track('profile_recording_started', { durationMs });
+  };
 
   constructor(private readonly elements: BootElements) {
     this.spectrumBars = elements.hudNav.spectrumBars;
@@ -263,12 +269,8 @@ class ManifoldApp {
     logManifoldConsoleBanner();
 
     // Setup global recording event listener (v2 Architecture)
-    window.addEventListener(EVENT_RECORD_PROFILE, (event: CustomEvent<RecordProfileDetail>) => {
-      const { durationMs } = event.detail;
-      this.telemetry.track('profile_recording_started', { durationMs });
-
-      // Future: integrate with real ProfilerController here
-    });
+    window.addEventListener(EVENT_RECORD_PROFILE, this.handleRecordProfile);
+    this.pageLifecycleTeardown = this.setupPageLifecycle();
 
     // Mobile/Safari Optimization: Start decorative layers with a safer quality budget.
     if (IS_SAFARI || this.prefersMobilePerformanceBudget) {
@@ -1714,9 +1716,43 @@ class ManifoldApp {
     this.hudSubviewPaginationForce = false;
   }
 
+  private setupPageLifecycle(): () => void {
+    const stop = () => this.stopLoop();
+    const resume = () => {
+      if (!document.hidden) {
+        this.startLoop();
+      }
+    };
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stop();
+      } else {
+        resume();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pagehide', stop);
+    window.addEventListener('pageshow', resume);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pagehide', stop);
+      window.removeEventListener('pageshow', resume);
+    };
+  }
+
   private startLoop(): void {
+    if (this.animationFrameId || document.hidden) {
+      return;
+    }
+
     this.running = true;
+    this.lastBackgroundRenderAt = 0;
+    this.lastControllerRenderAt = 0;
+    this.lastIosUiTickAt = 0;
     const frame = (time: number) => {
+      this.animationFrameId = 0;
       if (!this.running) return;
 
       const frameStartedAt = performance.now();
@@ -1839,9 +1875,17 @@ class ManifoldApp {
       }
 
       this.telemetryState.frameMs = performance.now() - frameStartedAt;
-      requestAnimationFrame(frame);
+      this.animationFrameId = window.requestAnimationFrame(frame);
     };
-    requestAnimationFrame(frame);
+    this.animationFrameId = window.requestAnimationFrame(frame);
+  }
+
+  private stopLoop(): void {
+    this.running = false;
+    if (this.animationFrameId) {
+      window.cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = 0;
+    }
   }
 
   private updateQualities(perf: { backgroundScale: number; pixelScale: number; transitionActive: boolean }, velocity = 0): void {
@@ -1903,7 +1947,10 @@ class ManifoldApp {
   }
 
   destroy(): void {
-    this.running = false;
+    this.stopLoop();
+    this.pageLifecycleTeardown?.();
+    this.pageLifecycleTeardown = null;
+    window.removeEventListener(EVENT_RECORD_PROFILE, this.handleRecordProfile);
     if (this.loopMetricsUpdateRaf) {
       window.cancelAnimationFrame(this.loopMetricsUpdateRaf);
       this.loopMetricsUpdateRaf = 0;

@@ -150,4 +150,29 @@ describe('ManifoldAppScroll iOS behavior', () => {
 
     expect(telemetry.rebaseCount).toBeGreaterThan(0);
   });
+
+  it('rebases immediately at the native top edge to prevent pull-to-refresh', () => {
+    const appScroll = new ManifoldAppScroll(
+      telemetry,
+      () => controller,
+      () => null
+    );
+
+    appScroll.setup();
+    appScroll.attachScrollProxy(scrollProxy);
+    appScroll.setLoopScrollLength(1000);
+    appScroll.initialize(7000);
+    const scrollingElement = document.scrollingElement ?? document.documentElement;
+    scrollingElement.scrollTop = 0;
+
+    (
+      appScroll as unknown as { handleTouchStart(event: TouchEvent): void }
+    ).handleTouchStart({
+      target: document.body,
+      touches: [{ clientX: 20, clientY: 20 }]
+    } as unknown as TouchEvent);
+
+    expect(scrollingElement.scrollTop).toBeGreaterThan(0);
+    expect(telemetry.rebaseCount).toBe(1);
+  });
 });

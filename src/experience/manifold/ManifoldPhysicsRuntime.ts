@@ -1,5 +1,5 @@
 import type { ItemState } from './ManifoldTypes';
-import { IS_IOS } from '../../utils/browserDetection';
+import { IS_ANDROID, IS_IOS } from '../../utils/browserDetection';
 import {
   ManifoldPhysicsOrchestrator,
   type ItemPhysicsResult,
@@ -82,7 +82,7 @@ export class ManifoldPhysicsRuntime {
   }
 
   private ensureWorker(): Worker | null {
-    if (IS_IOS) {
+    if (IS_IOS || IS_ANDROID) {
       return null;
     }
 

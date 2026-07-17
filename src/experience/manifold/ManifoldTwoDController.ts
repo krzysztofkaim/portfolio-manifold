@@ -72,6 +72,13 @@ export class ManifoldTwoDController {
 
   constructor(private readonly context: ManifoldTwoDControllerContext) { }
 
+  destroy(): void {
+    this.edgeCardCloneCache.clear();
+    this.edgeCardPool.length = 0;
+    this.edgeCardHost?.replaceChildren();
+    this.edgeCardHost = null;
+  }
+
   private get2DResponsiveScale(): number {
     const layoutState = this.context.getLayoutState();
 
