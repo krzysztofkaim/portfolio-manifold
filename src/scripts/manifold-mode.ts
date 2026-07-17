@@ -1777,13 +1777,15 @@ export class ManifoldApp {
         const mobileIdleInterval = IS_IOS ? 1000 / 8 : 1000 / 12;
         const effectiveFrameInterval = strictMobileRuntime
           ? Math.max(
-            perf.frameInterval || 0,
+            IS_IOS ? 0 : perf.frameInterval || 0,
             forceResponsiveRate || perf.transitionActive || audioActive || this.cachedHasExpandedCard
               ? mobileInteractiveInterval
               : mobileIdleInterval
           )
           : perf.frameInterval;
-        const shouldRunControllerPass = strictMobileRuntime
+        const shouldRunControllerPass = IS_IOS
+          ? true
+          : strictMobileRuntime
           ? time - this.lastControllerRenderAt >= effectiveFrameInterval
           : (
             perf.frameInterval <= 0 ||
@@ -1828,7 +1830,7 @@ export class ManifoldApp {
       const mobileUiInterval = isMotionActive || audioActive
         ? (IS_IOS ? 1000 / 16 : 1000 / 20)
         : (IS_IOS ? 1000 / 5 : 1000 / 8);
-      const shouldRunMobileUiPass = !strictMobileRuntime || time - this.lastIosUiTickAt >= mobileUiInterval;
+      const shouldRunMobileUiPass = IS_IOS || !strictMobileRuntime || time - this.lastIosUiTickAt >= mobileUiInterval;
 
       // On mobile, skip HUD refresh when the UI pass is skipped to reduce main-thread work.
       const shouldRefreshHud = shouldRunMobileUiPass

@@ -1,5 +1,6 @@
 import { ManifoldModeController } from '../../src/experience/ManifoldModeController';
 import type { ControllerElements } from '../../src/experience/manifold/ManifoldTypes';
+import type { ViewMode } from '../../src/experience/manifold/ManifoldTypes';
 import type { IDomAdapter, IRuntimeAdapter } from '../../src/ui/ports';
 
 export class MockDomAdapter implements IDomAdapter {
@@ -142,7 +143,7 @@ function createControllerElements(): ControllerElements {
   };
 }
 
-export function createController(): {
+export function createController(initialViewMode: ViewMode = '3d'): {
   controller: ManifoldModeController;
   dom: MockDomAdapter;
   elements: ControllerElements;
@@ -153,7 +154,7 @@ export function createController(): {
   const elements = createControllerElements();
   const dom = new MockDomAdapter();
   const runtime = new MockRuntimeAdapter();
-  const controller = new ManifoldModeController(elements, dom, runtime);
+  const controller = new ManifoldModeController(elements, dom, runtime, {}, initialViewMode);
 
   return { controller, dom, elements, runtime };
 }

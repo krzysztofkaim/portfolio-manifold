@@ -135,15 +135,15 @@ export class ManifoldEnvironmentManager {
 
   updateWorldEnvironment(input: Pick<ManifoldEnvironmentInput, 'activeViewModeProgress' | 'mouseX' | 'mouseY' | 'viewVelocity'>): void {
     const state = this.context.getState();
-    const flattenTwoDScene = (IS_IOS || IS_ANDROID) && input.activeViewModeProgress > 0.9;
-    const tiltModeMix = flattenTwoDScene ? 0 : 1 - input.activeViewModeProgress;
+    const flattenScene = IS_IOS || (IS_ANDROID && input.activeViewModeProgress > 0.9);
+    const tiltModeMix = flattenScene ? 0 : 1 - input.activeViewModeProgress;
     const tiltX = (input.mouseY * 5 - input.viewVelocity * 0.5) * tiltModeMix;
     const tiltY = input.mouseX * 5 * tiltModeMix;
-    const worldTransform = flattenTwoDScene ? 'flat' : `${tiltX.toFixed(2)}|${tiltY.toFixed(2)}`;
+    const worldTransform = flattenScene ? 'flat' : `${tiltX.toFixed(2)}|${tiltY.toFixed(2)}`;
 
     if (worldTransform !== state.lastWorldTransform) {
-      this.context.getWorldElement().style.transform = flattenTwoDScene
-        ? 'translateZ(0)'
+      this.context.getWorldElement().style.transform = flattenScene
+        ? 'none'
         : `rotateX(${tiltX.toFixed(3)}deg) rotateY(${tiltY.toFixed(3)}deg) translateZ(0)`;
     }
 
@@ -152,7 +152,7 @@ export class ManifoldEnvironmentManager {
       MANIFOLD_CONSTANTS.ANIMATION_DYNAMICS.perspectiveFar,
       input.activeViewModeProgress
     );
-    const perspective = flattenTwoDScene ? 'none' : `${perspectiveDepth.toFixed(0)}px`;
+    const perspective = flattenScene ? 'none' : `${perspectiveDepth.toFixed(0)}px`;
 
     if (perspective !== state.lastPerspective) {
       this.context.getViewportElement().style.perspective = perspective;

@@ -115,8 +115,17 @@ export class ManifoldInputService {
       return;
     }
 
-    const moved = Math.hypot(event.clientX - this.pointerDownX, event.clientY - this.pointerDownY);
+    const deltaX = event.clientX - this.pointerDownX;
+    const deltaY = event.clientY - this.pointerDownY;
+    const moved = Math.hypot(deltaX, deltaY);
     if (moved > 14) {
+      const expandedCard = this.context.getExpandedCard();
+      const mobileGesture = event.pointerType === 'touch' || this.context.getViewportSize().width <= 720;
+      const verticalSwipe = Math.abs(deltaY) > 28 && Math.abs(deltaY) > Math.abs(deltaX) * 1.15;
+      if (expandedCard && this.context.getExpandedTarget() > 0 && mobileGesture && verticalSwipe) {
+        this.consumeViewportClick = true;
+        this.context.closeExpandedCard();
+      }
       this.pressedCard = null;
       return;
     }

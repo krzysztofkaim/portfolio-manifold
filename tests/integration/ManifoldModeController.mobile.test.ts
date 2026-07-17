@@ -70,4 +70,27 @@ describe('ManifoldModeController mobile stability', () => {
     expect(requestFrame).not.toHaveBeenCalled();
     controller.destroy();
   });
+
+  it('keeps iOS transforms compositor-safe when switching to 3D and 4D', async () => {
+    vi.resetModules();
+    mockBrowser('ios');
+    const { createController } =
+      await import('../helpers/manifoldControllerTestUtils');
+    const { controller, elements, runtime } = createController('2d');
+
+    for (const mode of ['3d', '4d'] as const) {
+      controller.setViewMode(mode);
+      for (let frame = 0; frame < 8; frame += 1) {
+        runtime.advanceNow(16);
+        controller.render(runtime.now());
+      }
+
+      expect(elements.world.style.transform).not.toMatch(/rotate[XY]|translate3d/);
+      for (const item of elements.world.querySelectorAll<HTMLElement>('.item, .card')) {
+        expect(item.style.transform).not.toMatch(/rotate[XY]|translate3d/);
+      }
+    }
+
+    controller.destroy();
+  });
 });

@@ -1561,6 +1561,7 @@ export class ManifoldModeController {
           )
         ));
     const fastTwoDScrollSnapshotMode =
+      !IS_IOS &&
       this.is2DMode() &&
       !this.expandedCard &&
       activeViewModeProgress > 0.72 &&
@@ -1577,7 +1578,7 @@ export class ManifoldModeController {
             Math.abs(this.rawScrollVelocity) > 20
           )
       );
-    const transitionSnapshotsActive = this.transitionPerformanceMode || fastTwoDScrollSnapshotMode;
+    const transitionSnapshotsActive = !IS_IOS && (this.transitionPerformanceMode || fastTwoDScrollSnapshotMode);
     if (transitionSnapshotsActive !== this.lastTransitionSnapshotBodyState) {
       this.dom.toggleBodyClass('is-transition-snapshots', transitionSnapshotsActive);
       this.lastTransitionSnapshotBodyState = transitionSnapshotsActive;
